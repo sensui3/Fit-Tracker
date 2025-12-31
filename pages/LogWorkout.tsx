@@ -7,6 +7,13 @@ interface ExerciseData {
   image: string;
 }
 
+interface WorkoutSet {
+  id: number;
+  reps: number;
+  weight: number;
+  completed: boolean;
+}
+
 // Lista enriquecida de exercícios com imagens e grupos musculares
 const EXERCISE_DB: ExerciseData[] = [
   { name: "Supino Reto (Barra)", muscle: "Peitoral", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
@@ -38,6 +45,38 @@ const LogWorkout: React.FC = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Estado para as Séries (Workout Sets)
+  const [sets, setSets] = useState<WorkoutSet[]>([
+    { id: 1, weight: 20, reps: 12, completed: false },
+    { id: 2, weight: 20, reps: 12, completed: false },
+    { id: 3, weight: 20, reps: 12, completed: false },
+  ]);
+
+  // Adicionar nova série
+  const handleAddSet = () => {
+    const lastSet = sets[sets.length - 1];
+    const newId = sets.length > 0 ? sets[sets.length - 1].id + 1 : 1;
+    setSets([
+      ...sets,
+      {
+        id: newId,
+        weight: lastSet ? lastSet.weight : 0,
+        reps: lastSet ? lastSet.reps : 12,
+        completed: false
+      }
+    ]);
+  };
+
+  // Remover série
+  const handleRemoveSet = (id: number) => {
+    setSets(sets.filter(s => s.id !== id));
+  };
+
+  // Atualizar valores da série
+  const updateSet = (id: number, field: keyof WorkoutSet, value: number | boolean) => {
+    setSets(sets.map(s => s.id === id ? { ...s, [field]: value } : s));
+  };
 
   // Manipula a digitação no input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,47 +205,82 @@ const LogWorkout: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Sets Reps Weight */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Sets */}
-                    <div className="flex flex-col gap-2">
+                  {/* Sets List (Dynamic) */}
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
                         <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide">Séries</label>
-                        <div className="flex items-center h-14 bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl px-2">
-                        <button className="size-10 flex items-center justify-center text-slate-500 hover:text-[#16a34a] hover:bg-[#16a34a]/10 rounded-lg transition-colors">
-                        <span className="material-symbols-outlined">remove</span>
-                        </button>
-                        <input className="flex-1 w-full bg-transparent text-center border-none focus:ring-0 text-slate-900 dark:text-white font-bold text-xl p-0" type="number" defaultValue="4"/>
-                        <button className="size-10 flex items-center justify-center text-slate-500 hover:text-[#16a34a] hover:bg-[#16a34a]/10 rounded-lg transition-colors">
-                        <span className="material-symbols-outlined">add</span>
-                        </button>
-                        </div>
+                        <span className="text-xs font-bold text-slate-500 dark:text-text-secondary bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">
+                            Total: {sets.length}
+                        </span>
                     </div>
-                    {/* Reps */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide">Repetições</label>
-                        <div className="flex items-center h-14 bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl px-2">
-                        <button className="size-10 flex items-center justify-center text-slate-500 hover:text-[#16a34a] hover:bg-[#16a34a]/10 rounded-lg transition-colors">
-                        <span className="material-symbols-outlined">remove</span>
-                        </button>
-                        <input className="flex-1 w-full bg-transparent text-center border-none focus:ring-0 text-slate-900 dark:text-white font-bold text-xl p-0" type="number" defaultValue="12"/>
-                        <button className="size-10 flex items-center justify-center text-slate-500 hover:text-[#16a34a] hover:bg-[#16a34a]/10 rounded-lg transition-colors">
-                        <span className="material-symbols-outlined">add</span>
-                        </button>
-                        </div>
+
+                    {/* Header Row */}
+                    <div className="grid grid-cols-10 gap-2 px-2 text-xs font-bold text-slate-400 dark:text-text-secondary uppercase tracking-wider text-center mb-1">
+                        <div className="col-span-1">Set</div>
+                        <div className="col-span-3">Kg</div>
+                        <div className="col-span-3">Reps</div>
+                        <div className="col-span-3">Ações</div>
                     </div>
-                    {/* Weight */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide flex justify-between">
-                                                                    Carga
-                                                                    <span className="text-xs text-[#16a34a] bg-[#16a34a]/10 px-2 py-0.5 rounded uppercase">KG</span>
-                        </label>
-                        <div className="relative h-14">
-                        <input className="w-full h-full bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl px-4 text-slate-900 dark:text-white font-bold text-xl focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] transition-all" placeholder="0" type="number"/>
-                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                        <span className="material-symbols-outlined text-slate-400">weight</span>
-                        </div>
-                        </div>
+
+                    <div className="flex flex-col gap-3">
+                        {sets.map((set, index) => (
+                            <div key={set.id} className="grid grid-cols-10 gap-2 items-center animate-in fade-in slide-in-from-top-2 duration-300">
+                                {/* Set Number */}
+                                <div className="col-span-1 flex justify-center">
+                                    <div className="size-8 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 font-bold text-sm flex items-center justify-center">
+                                        {index + 1}
+                                    </div>
+                                </div>
+
+                                {/* Weight Input */}
+                                <div className="col-span-3">
+                                    <div className="relative">
+                                        <input 
+                                            type="number" 
+                                            value={set.weight}
+                                            onChange={(e) => updateSet(set.id, 'weight', parseFloat(e.target.value) || 0)}
+                                            className="w-full bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl px-2 py-2 text-center font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Reps Input */}
+                                <div className="col-span-3">
+                                    <input 
+                                        type="number" 
+                                        value={set.reps}
+                                        onChange={(e) => updateSet(set.id, 'reps', parseFloat(e.target.value) || 0)}
+                                        className="w-full bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl px-2 py-2 text-center font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none"
+                                    />
+                                </div>
+
+                                {/* Actions */}
+                                <div className="col-span-3 flex justify-center gap-2">
+                                    <button 
+                                        onClick={() => updateSet(set.id, 'completed', !set.completed)}
+                                        className={`size-10 rounded-xl flex items-center justify-center transition-all ${set.completed ? 'bg-[#16a34a] text-white shadow-lg shadow-green-600/20' : 'bg-slate-100 dark:bg-white/5 text-slate-300 dark:text-slate-600 hover:bg-slate-200 dark:hover:bg-white/10'}`}
+                                    >
+                                        <span className="material-symbols-outlined text-xl">check</span>
+                                    </button>
+                                    <button 
+                                        onClick={() => handleRemoveSet(set.id)}
+                                        className="size-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-xl">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
+
+                    {/* Add Set Button */}
+                    <button 
+                        onClick={handleAddSet}
+                        className="w-full mt-2 py-3 rounded-xl border-2 border-dashed border-slate-200 dark:border-border-dark text-slate-500 dark:text-text-secondary hover:text-[#16a34a] hover:border-[#16a34a] hover:bg-slate-50 dark:hover:bg-white/5 transition-all font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 group"
+                    >
+                        <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add</span>
+                        Adicionar Série
+                    </button>
                   </div>
 
                   <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-border-dark mt-2">

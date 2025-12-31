@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { Theme } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 const Settings: React.FC = () => {
+  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState('general');
 
@@ -253,14 +255,26 @@ const Settings: React.FC = () => {
                 </div>
             </section>
             
-            {/* Account Section Placeholder */}
+            {/* Account Section - Updated */}
              <section id="account" className="space-y-6 scroll-mt-32">
                 <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
                     <span className="material-symbols-outlined text-[#16a34a] text-2xl">person</span>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">Conta</h3>
                 </div>
                  <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl p-6 shadow-sm">
-                    <p className="text-slate-500 dark:text-text-secondary">Gerencie os detalhes da sua assinatura e informações de login aqui.</p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h4 className="font-bold text-slate-900 dark:text-white text-lg">Plano Atual</h4>
+                            <p className="text-slate-500 dark:text-text-secondary">FitTrack Basic (Gratuito)</p>
+                        </div>
+                        <button 
+                            onClick={() => navigate('/subscription')}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-[#102210] font-bold rounded-lg transition-colors text-sm shadow-md"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">stars</span>
+                            Gerenciar Assinatura
+                        </button>
+                    </div>
                  </div>
             </section>
 

@@ -13,6 +13,7 @@ import Login from './pages/Login';
 import Timer from './pages/Timer';
 import Notifications from './pages/Notifications';
 import Goals from './pages/Goals';
+import Subscription from './pages/Subscription';
 import { ThemeProvider } from './context/ThemeContext';
 
 const App: React.FC = () => {
@@ -31,6 +32,7 @@ const App: React.FC = () => {
             <Route path="goals" element={<Goals />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="subscription" element={<Subscription />} />
             <Route path="timer" element={<Timer />} />
             <Route path="notifications" element={<Notifications />} />
           </Route>
