@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 
 const ExerciseDetails: React.FC = () => {
   const navigate = useNavigate();
+  
+  // URL base da imagem
+  const exerciseImageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuCrTzRI2ONEYwjZ8K9_UoS0UNn3OGGHDSkTllT9zFTEXKmfripVEW8lsJkgWTmePAu_yOXemoH4RftsmtpdmCsUvOTk85Nj-J5SsT6HqplNmEZjxUZiutCTZUuUeycu0rW3gjlqck_723hZV7Tn3KjYmgiR1zTNaByM-oszdbLK6I3uxIv8X2bQgm_4N2auV_HP-nRxe-aXOuAgicUmmXKiNbBV-Pqj3Uskzx4-O1T2eNn-txJtHKQR3awj9qs2dduPCWeimHog6XQ";
 
   return (
     <div className="flex flex-col items-center px-4 py-6 md:px-10 lg:px-40">
@@ -30,9 +33,17 @@ const ExerciseDetails: React.FC = () => {
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gray-200 dark:bg-[#1c2e1c] group">
               <img 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrTzRI2ONEYwjZ8K9_UoS0UNn3OGGHDSkTllT9zFTEXKmfripVEW8lsJkgWTmePAu_yOXemoH4RftsmtpdmCsUvOTk85Nj-J5SsT6HqplNmEZjxUZiutCTZUuUeycu0rW3gjlqck_723hZV7Tn3KjYmgiR1zTNaByM-oszdbLK6I3uxIv8X2bQgm_4N2auV_HP-nRxe-aXOuAgicUmmXKiNbBV-Pqj3Uskzx4-O1T2eNn-txJtHKQR3awj9qs2dduPCWeimHog6XQ" 
+                src={`${exerciseImageUrl}=s1200`}
+                srcSet={`
+                  ${exerciseImageUrl}=s480 480w,
+                  ${exerciseImageUrl}=s768 768w,
+                  ${exerciseImageUrl}=s1200 1200w
+                `}
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 alt="Exercise Video Placeholder" 
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 flex items-center gap-2">
                 <span className="size-2 rounded-full bg-primary-DEFAULT animate-pulse"></span>

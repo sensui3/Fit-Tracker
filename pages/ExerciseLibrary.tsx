@@ -255,21 +255,19 @@ const ExerciseLibrary: React.FC = () => {
          </div>
       )}
 
-      {/* Simple Pagination Mock */}
+      {/* Simplified Pagination */}
       {filteredExercises.length > 0 && (
         <div className="mt-auto flex items-center justify-center border-t border-slate-200 dark:border-border-dark pt-8">
-            <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm">
-            <button className="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-300 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-surface-dark focus:z-20 focus:outline-offset-0">
-                <span className="sr-only">Previous</span>
-                <span className="material-symbols-outlined text-[20px]">chevron_left</span>
-            </button>
-            <button className="relative z-10 inline-flex items-center bg-[#16a34a] px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#16a34a]">1</button>
-            <button className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-surface-dark focus:z-20 focus:outline-offset-0">2</button>
-            <button className="relative inline-flex items-center rounded-r-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-300 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-surface-dark focus:z-20 focus:outline-offset-0">
-                <span className="sr-only">Next</span>
-                <span className="material-symbols-outlined text-[20px]">chevron_right</span>
-            </button>
-            </nav>
+            <div className="flex gap-3">
+                <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+                    <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                    Anterior
+                </button>
+                <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+                    Próximo
+                    <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                </button>
+            </div>
         </div>
       )}
     </div>

@@ -12,6 +12,8 @@ interface WorkoutSet {
   reps: number;
   weight: number;
   completed: boolean;
+  notes?: string;
+  showNotes?: boolean;
 }
 
 // Lista enriquecida de exercícios com imagens e grupos musculares
@@ -46,12 +48,41 @@ const LogWorkout: React.FC = () => {
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Estados para o Rest Timer
+  const [restTimer, setRestTimer] = useState(0);
+  const [isResting, setIsResting] = useState(false);
+
   // Estado para as Séries (Workout Sets)
   const [sets, setSets] = useState<WorkoutSet[]>([
-    { id: 1, weight: 20, reps: 12, completed: false },
-    { id: 2, weight: 20, reps: 12, completed: false },
-    { id: 3, weight: 20, reps: 12, completed: false },
+    { id: 1, weight: 20, reps: 12, completed: false, notes: "", showNotes: false },
+    { id: 2, weight: 20, reps: 12, completed: false, notes: "", showNotes: false },
+    { id: 3, weight: 20, reps: 12, completed: false, notes: "", showNotes: false },
   ]);
+
+  // Efeito do Cronômetro
+  useEffect(() => {
+    let interval: number;
+    if (isResting && restTimer > 0) {
+      interval = window.setInterval(() => {
+        setRestTimer((prev) => {
+          if (prev <= 1) {
+            setIsResting(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (restTimer === 0) {
+      setIsResting(false);
+    }
+    return () => clearInterval(interval);
+  }, [isResting, restTimer]);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
 
   // Adicionar nova série
   const handleAddSet = () => {
@@ -63,7 +94,9 @@ const LogWorkout: React.FC = () => {
         id: newId,
         weight: lastSet ? lastSet.weight : 0,
         reps: lastSet ? lastSet.reps : 12,
-        completed: false
+        completed: false,
+        notes: "",
+        showNotes: false
       }
     ]);
   };
@@ -74,8 +107,14 @@ const LogWorkout: React.FC = () => {
   };
 
   // Atualizar valores da série
-  const updateSet = (id: number, field: keyof WorkoutSet, value: number | boolean) => {
+  const updateSet = (id: number, field: keyof WorkoutSet, value: number | boolean | string) => {
     setSets(sets.map(s => s.id === id ? { ...s, [field]: value } : s));
+
+    // Iniciar descanso automaticamente ao concluir a série
+    if (field === 'completed' && value === true) {
+      setRestTimer(60); // 60 segundos padrão
+      setIsResting(true);
+    }
   };
 
   // Manipula a digitação no input
@@ -224,10 +263,11 @@ const LogWorkout: React.FC = () => {
 
                     <div className="flex flex-col gap-3">
                         {sets.map((set, index) => (
-                            <div key={set.id} className="grid grid-cols-10 gap-2 items-center animate-in fade-in slide-in-from-top-2 duration-300">
+                            <React.Fragment key={set.id}>
+                            <div className={`grid grid-cols-10 gap-2 items-center animate-in fade-in slide-in-from-top-2 duration-300 p-2 rounded-xl border transition-all ${set.completed ? 'bg-green-50/50 dark:bg-green-900/10 border-[#16a34a]/30' : 'border-transparent'}`}>
                                 {/* Set Number */}
                                 <div className="col-span-1 flex justify-center">
-                                    <div className="size-8 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 font-bold text-sm flex items-center justify-center">
+                                    <div className={`size-8 rounded-full font-bold text-sm flex items-center justify-center transition-colors ${set.completed ? 'bg-[#16a34a] text-white' : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400'}`}>
                                         {index + 1}
                                     </div>
                                 </div>
@@ -238,8 +278,9 @@ const LogWorkout: React.FC = () => {
                                         <input 
                                             type="number" 
                                             value={set.weight}
+                                            disabled={set.completed}
                                             onChange={(e) => updateSet(set.id, 'weight', parseFloat(e.target.value) || 0)}
-                                            className="w-full bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl px-2 py-2 text-center font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none"
+                                            className={`w-full border border-slate-200 dark:border-border-dark rounded-xl px-2 py-2 text-center font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all ${set.completed ? 'bg-slate-100 dark:bg-white/5 opacity-70 cursor-not-allowed' : 'bg-slate-50 dark:bg-background-dark'}`}
                                         />
                                     </div>
                                 </div>
@@ -249,118 +290,40 @@ const LogWorkout: React.FC = () => {
                                     <input 
                                         type="number" 
                                         value={set.reps}
+                                        disabled={set.completed}
                                         onChange={(e) => updateSet(set.id, 'reps', parseFloat(e.target.value) || 0)}
-                                        className="w-full bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl px-2 py-2 text-center font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none"
+                                        className={`w-full border border-slate-200 dark:border-border-dark rounded-xl px-2 py-2 text-center font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all ${set.completed ? 'bg-slate-100 dark:bg-white/5 opacity-70 cursor-not-allowed' : 'bg-slate-50 dark:bg-background-dark'}`}
                                     />
                                 </div>
 
                                 {/* Actions */}
-                                <div className="col-span-3 flex justify-center gap-2">
+                                <div className="col-span-3 flex justify-center gap-1.5">
+                                    <button 
+                                        onClick={() => updateSet(set.id, 'showNotes', !set.showNotes)}
+                                        title={set.notes ? "Editar Nota" : "Adicionar Nota"}
+                                        className={`size-10 rounded-xl flex items-center justify-center transition-all ${
+                                            set.showNotes || set.notes
+                                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500' 
+                                            : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <span className={`material-symbols-outlined text-xl ${set.notes ? 'filled' : ''}`}>
+                                            {set.notes ? 'description' : 'edit_note'}
+                                        </span>
+                                    </button>
                                     <button 
                                         onClick={() => updateSet(set.id, 'completed', !set.completed)}
-                                        className={`size-10 rounded-xl flex items-center justify-center transition-all ${set.completed ? 'bg-[#16a34a] text-white shadow-lg shadow-green-600/20' : 'bg-slate-100 dark:bg-white/5 text-slate-300 dark:text-slate-600 hover:bg-slate-200 dark:hover:bg-white/10'}`}
+                                        title={set.completed ? "Editar (Desmarcar)" : "Concluir Série"}
+                                        className={`size-10 rounded-xl flex items-center justify-center transition-all ${
+                                            set.completed 
+                                            ? 'bg-[#16a34a] text-white shadow-lg shadow-green-600/20 hover:bg-[#15803d]' 
+                                            : 'bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-slate-500 hover:bg-slate-300 dark:hover:bg-white/20'
+                                        }`}
                                     >
-                                        <span className="material-symbols-outlined text-xl">check</span>
+                                        <span className="material-symbols-outlined text-xl">
+                                            {set.completed ? 'edit' : 'check'}
+                                        </span>
                                     </button>
                                     <button 
                                         onClick={() => handleRemoveSet(set.id)}
-                                        className="size-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                                    >
-                                        <span className="material-symbols-outlined text-xl">delete</span>
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Add Set Button */}
-                    <button 
-                        onClick={handleAddSet}
-                        className="w-full mt-2 py-3 rounded-xl border-2 border-dashed border-slate-200 dark:border-border-dark text-slate-500 dark:text-text-secondary hover:text-[#16a34a] hover:border-[#16a34a] hover:bg-slate-50 dark:hover:bg-white/5 transition-all font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 group"
-                    >
-                        <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add</span>
-                        Adicionar Série
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-border-dark mt-2">
-                    <button onClick={() => navigate('/workouts')} className="bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-black font-bold h-12 px-8 rounded-lg transition-colors flex items-center gap-2 shadow-lg shadow-green-600/25 dark:shadow-green-500/25">
-                      <span className="material-symbols-outlined">check</span>
-                      Salvar Registro
-                    </button>
-                    <button 
-                      onClick={() => setShowDeleteModal(true)}
-                      className="text-slate-500 dark:text-text-secondary hover:text-red-600 dark:hover:text-red-400 font-medium h-12 px-6 rounded-lg transition-colors ml-auto"
-                    >
-                      Excluir
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-            
-            {/* Sidebar */}
-            <div className="lg:col-span-4 flex flex-col gap-6">
-                <div className="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-border-dark shadow-sm overflow-hidden">
-                    <div className="p-4 border-b border-slate-100 dark:border-border-dark flex justify-between items-center">
-                    <h3 className="text-slate-900 dark:text-white font-bold text-lg">Últimos Registros</h3>
-                    <button onClick={() => navigate('/workouts')} className="text-[#16a34a] text-sm font-medium hover:underline">Ver tudo</button>
-                    </div>
-                    <div className="flex flex-col">
-                        <div className="flex gap-4 p-4 border-b border-slate-100 dark:border-border-dark/50 hover:bg-slate-50 dark:hover:bg-background-dark/50 transition-colors cursor-pointer">
-                            <img 
-                              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw"
-                              alt="Supino Reto" 
-                              className="size-14 rounded-lg object-cover shrink-0"
-                            />
-                            <div className="flex flex-col justify-center flex-1">
-                            <h4 className="text-slate-900 dark:text-white font-semibold leading-tight">Supino Reto</h4>
-                            <p className="text-slate-500 dark:text-text-secondary text-sm">4 séries • 80kg</p>
-                            </div>
-                            <div className="text-xs font-medium text-slate-400 dark:text-text-secondary pt-1">
-                                                                    10:42
-                                                                </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Delete Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setShowDeleteModal(false)}></div>
-          <div className="relative w-full max-w-sm bg-white dark:bg-surface-dark rounded-3xl shadow-2xl p-8 flex flex-col gap-6 items-center text-center ring-1 ring-white/10 overflow-hidden transform transition-all scale-100 opacity-100">
-            <div className="size-20 rounded-2xl bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-4xl">delete</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Excluir Registro?</h3>
-              <p className="text-slate-500 dark:text-text-secondary leading-relaxed">
-                Você está prestes a remover o exercício <span className="font-bold text-slate-900 dark:text-white">{exerciseInput || "Selecionado"}</span>. Esta ação não pode ser desfeita.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 w-full pt-2">
-              <button 
-                onClick={() => setShowDeleteModal(false)}
-                className="h-12 rounded-xl font-bold text-slate-500 dark:text-text-secondary hover:bg-slate-50 dark:hover:bg-background-dark hover:text-slate-900 dark:hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-border-dark"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={() => { setShowDeleteModal(false); navigate('/dashboard'); }}
-                className="h-12 rounded-xl font-bold bg-red-600 text-white shadow-lg shadow-red-600/30 hover:bg-red-700 transition-all transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-export default LogWorkout;
+                                        title
