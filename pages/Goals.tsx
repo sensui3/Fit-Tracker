@@ -1,8 +1,95 @@
 import React, { useState } from 'react';
+import { useGoalFilters, Goal, GoalTab, ViewMode } from '../hooks/useGoalFilters';
+
+const INITIAL_GOALS: Goal[] = [
+  {
+    id: 1,
+    title: 'Supino Reto',
+    category: 'Força • Curto Prazo',
+    icon: 'fitness_center',
+    current: 92,
+    target: 100,
+    unit: 'kg',
+    progress: 92,
+    statusIcon: 'schedule',
+    statusText: 'Restam 14 dias',
+    trend: '+2kg esta semana',
+    trendColor: 'text-green-600 dark:text-green-400',
+    shimmer: true
+  },
+  {
+    id: 2,
+    title: 'VO2 Max',
+    category: 'Cardio • Longo Prazo',
+    icon: 'monitor_heart',
+    current: 48,
+    target: 55,
+    unit: 'ml/kg',
+    progress: 65,
+    statusIcon: 'schedule',
+    statusText: '3 meses',
+    trend: 'Estagnado',
+    trendColor: 'text-orange-500',
+    shimmer: false
+  },
+  {
+    id: 3,
+    title: 'Peso Corporal',
+    category: 'Estética • Curto Prazo',
+    icon: 'accessibility_new',
+    current: 78.5,
+    target: 75,
+    unit: 'kg',
+    progress: 40,
+    statusIcon: 'trending_down',
+    statusText: 'Baixando',
+    trend: '-0.5kg esta semana',
+    trendColor: 'text-green-600 dark:text-green-400',
+    shimmer: false,
+    reverse: true
+  },
+  {
+    id: 4,
+    title: 'Barra Fixa',
+    category: 'Habilidade • Longo Prazo',
+    icon: 'sports_gymnastics',
+    current: 12,
+    target: 20,
+    unit: 'reps',
+    progress: 60,
+    statusIcon: 'schedule',
+    statusText: 'Indefinido',
+    trend: 'Semana passada: 11',
+    trendColor: 'text-slate-500',
+    shimmer: false
+  },
+  {
+    id: 5,
+    title: 'Corrida 5km',
+    category: 'Cardio • Curto Prazo',
+    icon: 'directions_run',
+    current: 20,
+    target: 20,
+    unit: 'min',
+    progress: 100,
+    statusIcon: 'check_circle',
+    statusText: 'Concluído em 12/12',
+    trend: 'Meta Atingida!',
+    trendColor: 'text-[#16a34a]',
+    completed: true,
+    shimmer: false
+  }
+];
 
 const Goals: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('Todas as Metas');
   const [showAddGoalModal, setShowAddGoalModal] = useState(false);
+  const {
+    activeTab,
+    viewMode,
+    filteredGoals,
+    handleTabChange,
+    handleViewModeChange
+  } = useGoalFilters(INITIAL_GOALS);
 
   const stats = [
     { label: 'Metas Ativas', value: '8', badge: 'Active', badgeColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: 'flag' },
@@ -14,80 +101,15 @@ const Goals: React.FC = () => {
   const weeklyConsistency = [
     { day: 'Seg', val: 60, target: 100 },
     { day: 'Ter', val: 85, target: 100 },
-    { day: 'Qua', val: 0, target: 100 }, // Rest
+    { day: 'Qua', val: 0, target: 100 },
     { day: 'Qui', val: 70, target: 100 },
     { day: 'Sex', val: 90, target: 100, active: true },
     { day: 'Sab', val: 40, target: 100, future: true },
     { day: 'Dom', val: 0, target: 100, future: true },
   ];
 
-  const goals = [
-    {
-      id: 1,
-      title: 'Supino Reto',
-      category: 'Força • Curto Prazo',
-      icon: 'fitness_center',
-      current: 92,
-      target: 100,
-      unit: 'kg',
-      progress: 92,
-      statusIcon: 'schedule',
-      statusText: 'Restam 14 dias',
-      trend: '+2kg esta semana',
-      trendColor: 'text-green-600 dark:text-green-400',
-      shimmer: true
-    },
-    {
-      id: 2,
-      title: 'VO2 Max',
-      category: 'Cardio • Longo Prazo',
-      icon: 'monitor_heart',
-      current: 48,
-      target: 55,
-      unit: 'ml/kg',
-      progress: 65,
-      statusIcon: 'schedule',
-      statusText: '3 meses',
-      trend: 'Estagnado',
-      trendColor: 'text-orange-500',
-      shimmer: false
-    },
-    {
-      id: 3,
-      title: 'Peso Corporal',
-      category: 'Estética • Curto Prazo',
-      icon: 'accessibility_new',
-      current: 78.5,
-      target: 75,
-      unit: 'kg',
-      progress: 40, // Visual representation logic might differ for weight loss
-      statusIcon: 'trending_down',
-      statusText: 'Baixando',
-      trend: '-0.5kg esta semana',
-      trendColor: 'text-green-600 dark:text-green-400',
-      shimmer: false,
-      reverse: true
-    },
-    {
-      id: 4,
-      title: 'Barra Fixa',
-      category: 'Habilidade • Longo Prazo',
-      icon: 'sports_gymnastics',
-      current: 12,
-      target: 20,
-      unit: 'reps',
-      progress: 60,
-      statusIcon: 'schedule',
-      statusText: 'Indefinido',
-      trend: 'Semana passada: 11',
-      trendColor: 'text-slate-500',
-      shimmer: false
-    }
-  ];
-
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8 pb-20">
-      {/* Header */}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-2">
@@ -147,16 +169,10 @@ const Goals: React.FC = () => {
             {weeklyConsistency.map((day, idx) => (
               <div key={idx} className="flex flex-col items-center flex-1 gap-2 group cursor-pointer h-full justify-end">
                 <div className="relative w-full max-w-[40px] h-full rounded-t-sm bg-slate-100 dark:bg-white/5 overflow-hidden">
-                  {/* Background Fill (Goal) - Usually implied as full height or specific target line, 
-                      here we use opacity to show 'potential' vs 'realized' */}
-
-                  {/* Realized Fill */}
                   <div
                     className={`absolute bottom-0 w-full rounded-t-sm transition-all duration-500 ${day.future ? 'bg-[#16a34a]/30' : 'bg-[#16a34a]'}`}
                     style={{ height: `${day.val}%` }}
                   ></div>
-
-                  {/* Hover Effect */}
                   <div className="absolute inset-0 bg-[#16a34a]/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
                 <span className={`text-xs font-medium ${day.active ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-400'}`}>
@@ -169,7 +185,6 @@ const Goals: React.FC = () => {
 
         {/* Featured Goal Card (Marathon) */}
         <div className="lg:col-span-1 relative overflow-hidden rounded-xl bg-[#102210] p-6 shadow-lg flex flex-col group">
-          {/* Background Blur Effect */}
           <div className="absolute -top-10 -right-10 size-64 bg-[#16a34a]/20 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="relative z-10 flex justify-between items-start mb-6">
@@ -209,13 +224,13 @@ const Goals: React.FC = () => {
       {/* Filter Tabs */}
       <div className="border-b border-slate-200 dark:border-border-dark">
         <div className="flex gap-8 overflow-x-auto no-scrollbar">
-          {['Todas as Metas', 'Curto Prazo', 'Longo Prazo', 'Concluídas'].map((tab) => (
+          {(['Todas as Metas', 'Curto Prazo', 'Longo Prazo', 'Concluídas'] as GoalTab[]).map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabChange(tab)}
               className={`relative pb-4 text-sm font-bold transition-colors whitespace-nowrap ${activeTab === tab
-                  ? 'text-slate-900 dark:text-white'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'text-slate-900 dark:text-white'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
             >
               {tab}
@@ -231,47 +246,73 @@ const Goals: React.FC = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Minhas Metas</h2>
         <div className="flex gap-2">
-          <button className="size-8 flex items-center justify-center rounded bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white">
-            <span className="material-symbols-outlined text-lg">grid_view</span>
+          <button
+            onClick={() => handleViewModeChange('grid')}
+            className={`size-10 flex items-center justify-center rounded-xl transition-all ${viewMode === 'grid'
+              ? 'bg-[#16a34a] text-white shadow-lg shadow-green-600/20'
+              : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+          >
+            <span className="material-symbols-outlined text-xl">grid_view</span>
           </button>
-          <button className="size-8 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
-            <span className="material-symbols-outlined text-lg">list</span>
+          <button
+            onClick={() => handleViewModeChange('list')}
+            className={`size-10 flex items-center justify-center rounded-xl transition-all ${viewMode === 'list'
+              ? 'bg-[#16a34a] text-white shadow-lg shadow-green-600/20'
+              : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+          >
+            <span className="material-symbols-outlined text-xl">list</span>
           </button>
         </div>
       </div>
 
-      {/* Goals Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {goals.map((goal) => (
-          <div key={goal.id} className="group flex flex-col bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-border-dark p-5 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className="size-10 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-300">
-                  <span className="material-symbols-outlined">{goal.icon}</span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-900 dark:text-white line-clamp-1">{goal.title}</h4>
-                  <p className="text-xs text-slate-500 dark:text-text-secondary">{goal.category}</p>
-                </div>
+      {/* Goals Content */}
+      <div className={`
+        ${viewMode === 'grid'
+          ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+          : 'flex flex-col gap-4'
+        }
+      `}>
+        {filteredGoals.map((goal) => (
+          <div
+            key={goal.id}
+            className={`
+              group bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm hover:shadow-md transition-all
+              ${viewMode === 'grid'
+                ? 'flex flex-col rounded-xl p-5'
+                : 'flex flex-col md:flex-row items-center gap-6 p-4 rounded-2xl relative overflow-hidden'
+              }
+            `}
+          >
+            {/* Action Bar for List View (Background indicator) */}
+            {viewMode === 'list' && (
+              <div className="absolute left-0 top-0 w-1.5 h-full bg-[#16a34a]"></div>
+            )}
+
+            <div className={`flex items-center gap-4 ${viewMode === 'list' ? 'flex-1 md:min-w-[200px]' : 'mb-4'}`}>
+              <div className="size-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-300 shrink-0">
+                <span className="material-symbols-outlined text-2xl">{goal.icon}</span>
               </div>
-              <button className="text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                <span className="material-symbols-outlined">more_vert</span>
-              </button>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-slate-900 dark:text-white text-lg truncate">{goal.title}</h4>
+                <p className="text-xs text-slate-500 dark:text-text-secondary font-medium tracking-wide uppercase">{goal.category}</p>
+              </div>
             </div>
 
-            <div className="mt-auto mb-3">
-              <div className="flex items-end justify-between mb-1">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                  {goal.current}
-                  <span className="text-sm font-normal text-slate-500 ml-1">{goal.unit}</span>
-                </span>
-                <span className="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">
+            <div className={`flex flex-col gap-2 ${viewMode === 'list' ? 'flex-[2]' : 'mb-3'}`}>
+              <div className="flex items-end justify-between text-sm mb-1">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-black text-slate-900 dark:text-white">{goal.current}</span>
+                  <span className="text-slate-500 font-bold">{goal.unit}</span>
+                </div>
+                <div className="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
                   Meta: {goal.target}{goal.unit}
-                </span>
+                </div>
               </div>
-              <div className={`h-2 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden ${goal.reverse ? 'flex justify-end' : ''}`}>
+              <div className={`h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden ${goal.reverse ? 'flex justify-end' : ''}`}>
                 <div
-                  className="h-full bg-[#16a34a] rounded-full relative overflow-hidden"
+                  className="h-full bg-[#16a34a] rounded-full relative overflow-hidden transition-all duration-1000"
                   style={{ width: `${goal.progress}%` }}
                 >
                   {goal.shimmer && (
@@ -281,25 +322,51 @@ const Goals: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-border-dark flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                <span className="material-symbols-outlined text-sm">{goal.statusIcon}</span>
+            <div className={`
+              ${viewMode === 'grid'
+                ? 'pt-4 border-t border-slate-100 dark:border-border-dark flex items-center justify-between'
+                : 'flex flex-row md:flex-col lg:flex-row items-center gap-4 md:items-end lg:items-center justify-between'
+              }
+            `}>
+              <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium text-xs">
+                <span className="material-symbols-outlined text-base text-[#16a34a]">{goal.statusIcon}</span>
                 <span>{goal.statusText}</span>
               </div>
-              <span className={`font-medium ${goal.trendColor}`}>{goal.trend}</span>
+              <div className="flex items-center gap-3">
+                <span className={`text-xs font-bold px-2 py-1 rounded-lg bg-opacity-10 ${goal.trendColor} ${goal.trendColor.replace('text-', 'bg-')}`}>
+                  {goal.trend}
+                </span>
+                {viewMode === 'list' && (
+                  <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                    <span className="material-symbols-outlined">more_vert</span>
+                  </button>
+                )}
+              </div>
             </div>
+
+            {viewMode === 'grid' && (
+              <button className="absolute top-4 right-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="material-symbols-outlined">more_vert</span>
+              </button>
+            )}
           </div>
         ))}
 
         {/* Add New Goal Card */}
         <button
           onClick={() => setShowAddGoalModal(true)}
-          className="group flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-border-dark p-5 min-h-[180px] hover:bg-slate-50 dark:hover:bg-white/5 hover:border-[#16a34a] transition-all cursor-pointer"
+          className={`
+            group flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-border-dark transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:border-[#16a34a]
+            ${viewMode === 'grid'
+              ? 'flex-col gap-4 rounded-2xl min-h-[220px]'
+              : 'flex-row gap-6 p-6 rounded-2xl min-h-[80px]'
+            }
+          `}
         >
-          <div className="size-12 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-[#16a34a] group-hover:text-white transition-colors">
+          <div className="size-12 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-[#16a34a] group-hover:text-white transition-all transform group-hover:scale-110">
             <span className="material-symbols-outlined text-2xl">add</span>
           </div>
-          <p className="font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">Adicionar Nova Meta</p>
+          <p className="font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-lg">Adicionar Nova Meta</p>
         </button>
       </div>
 

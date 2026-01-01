@@ -6,37 +6,20 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { OptimizedImage } from '../components/ui/OptimizedImage';
 
+import { useExerciseFilters } from '../hooks/useExerciseFilters';
+
 const ExerciseLibrary: React.FC = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const {
+    searchTerm,
+    setSearchTerm,
+    activeFilters,
+    setActiveFilters,
+    toggleFilter,
+    filteredExercises,
+    clearFilters
+  } = useExerciseFilters();
 
-  // Toggle filter
-  const toggleFilter = (filter: string) => {
-    setActiveFilters(prev =>
-      prev.includes(filter)
-        ? prev.filter(f => f !== filter)
-        : [...prev, filter]
-    );
-  };
-
-  const filteredExercises = EXERCISES.filter(exercise => {
-    const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // Group filters by category
-    const activeMuscleFilters = activeFilters.filter(f => MUSCLE_FILTERS.includes(f));
-    const activeDifficultyFilters = activeFilters.filter(f => DIFFICULTY_FILTERS.includes(f));
-    const activeEquipmentFilters = activeFilters.filter(f => EQUIPMENT_FILTERS.includes(f));
-
-    // Logic: (Match ANY active muscle OR true if no muscle filters) 
-    // AND (Match ANY active difficulty OR true if no difficulty filters)
-    // AND (Match ANY active equipment OR true if no equipment filters)
-    const matchesMuscle = activeMuscleFilters.length === 0 || activeMuscleFilters.includes(exercise.muscle);
-    const matchesDifficulty = activeDifficultyFilters.length === 0 || activeDifficultyFilters.includes(exercise.difficulty);
-    const matchesEquipment = activeEquipmentFilters.length === 0 || activeEquipmentFilters.includes(exercise.equipment);
-
-    return matchesSearch && matchesMuscle && matchesDifficulty && matchesEquipment;
-  });
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col h-full">
@@ -153,7 +136,7 @@ const ExerciseLibrary: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setActiveFilters([])}
+              onClick={clearFilters}
               className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
             >
               Limpar tudo
@@ -224,7 +207,7 @@ const ExerciseLibrary: React.FC = () => {
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">Nenhum exercício encontrado</h3>
           <p className="text-slate-500 dark:text-text-secondary mt-2">Tente buscar por outro termo ou limpe os filtros.</p>
           <button
-            onClick={() => { setSearchTerm(""); setActiveFilters([]); }}
+            onClick={clearFilters}
             className="mt-6 text-[#16a34a] font-bold hover:underline"
           >
             Limpar busca

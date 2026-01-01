@@ -19,7 +19,7 @@ const Sidebar: React.FC = () => {
     { icon: 'flag', label: 'Metas', path: '/goals' },
     { icon: 'assignment', label: 'Planos', path: '/create-plan' },
     { icon: 'bar_chart', label: 'Relatórios', path: '/reports' },
-    { icon: 'menu_book', label: 'Exercícios', path: '/exercise/1' },
+    { icon: 'menu_book', label: 'Exercícios', path: '/exercises' },
   ];
 
   const systemItems = [
@@ -29,11 +29,15 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 h-screen bg-surface-light dark:bg-surface-darker border-r border-border-light dark:border-border-dark shrink-0 transition-colors duration-200 z-20">
+    <aside
+      role="navigation"
+      aria-label="Menu Principal"
+      className="hidden md:flex flex-col w-64 h-screen bg-surface-light dark:bg-surface-darker border-r border-border-light dark:border-border-dark shrink-0 transition-colors duration-200 z-20"
+    >
       {/* Logo */}
       <div className="h-20 flex items-center px-6 gap-3 shrink-0">
         <div className="size-10 rounded-xl bg-gradient-to-br from-primary-DEFAULT to-green-600 dark:from-primary-neon dark:to-green-600 flex items-center justify-center shadow-lg shadow-primary-DEFAULT/20 text-white dark:text-black">
-          <span className="material-symbols-outlined font-bold text-2xl">fitness_center</span>
+          <span className="material-symbols-outlined font-bold text-2xl" aria-hidden="true">fitness_center</span>
         </div>
         <div className="flex flex-col">
           <h1 className="text-xl font-bold tracking-tight leading-none text-slate-900 dark:text-white">FitTrack</h1>
@@ -46,8 +50,9 @@ const Sidebar: React.FC = () => {
         <Button
           onClick={() => navigate('/log-workout')}
           fullWidth
+          aria-label="Registrar novo treino"
           className="group shadow-md transform hover:-translate-y-0.5"
-          leftIcon={<span className="material-symbols-outlined font-semibold">add_circle</span>}
+          leftIcon={<span className="material-symbols-outlined font-semibold" aria-hidden="true">add_circle</span>}
         >
           <span className="font-bold text-sm tracking-wide">NOVO TREINO</span>
         </Button>
@@ -56,13 +61,14 @@ const Sidebar: React.FC = () => {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-2 flex flex-col gap-1 overflow-y-auto">
         <div className="px-3 mb-2 mt-2">
-          <span className="text-[11px] uppercase tracking-widest font-bold text-slate-400 dark:text-slate-500">Principal</span>
+          <span className="text-[11px] uppercase tracking-widest font-bold text-slate-400 dark:text-slate-500" aria-hidden="true">Principal</span>
         </div>
 
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
+            aria-label={item.label}
             className={({ isActive }) => `
               flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all duration-200
               ${isActive
@@ -70,21 +76,22 @@ const Sidebar: React.FC = () => {
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'}
             `}
           >
-            <span className={`material-symbols-outlined ${item.icon === 'dashboard' ? 'fill-1' : ''}`}>{item.icon}</span>
+            <span className={`material-symbols-outlined ${item.icon === 'dashboard' ? 'fill-1' : ''}`} aria-hidden="true">{item.icon}</span>
             <span>{item.label}</span>
           </NavLink>
         ))}
 
-        <div className="my-4 h-px bg-slate-200 dark:bg-border-dark mx-3"></div>
+        <div className="my-4 h-px bg-slate-200 dark:bg-border-dark mx-3" role="separator"></div>
 
         <div className="px-3 mb-2">
-          <span className="text-[11px] uppercase tracking-widest font-bold text-slate-400 dark:text-slate-500">Sistema</span>
+          <span className="text-[11px] uppercase tracking-widest font-bold text-slate-400 dark:text-slate-500" aria-hidden="true">Sistema</span>
         </div>
 
         {systemItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
+            aria-label={item.label}
             className={({ isActive }) => `
               flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all duration-200 relative
               ${isActive
@@ -92,10 +99,10 @@ const Sidebar: React.FC = () => {
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'}
             `}
           >
-            <span className="material-symbols-outlined">{item.icon}</span>
+            <span className="material-symbols-outlined" aria-hidden="true">{item.icon}</span>
             <span className="flex-1">{item.label}</span>
             {item.count && (
-              <span className="bg-[#16a34a] text-[#102210] text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto">
+              <span className="bg-[#16a34a] text-[#102210] text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto" aria-label={`${item.count} notificações não lidas`}>
                 {item.count}
               </span>
             )}
@@ -108,7 +115,7 @@ const Sidebar: React.FC = () => {
         <div className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group overflow-hidden">
           <OptimizedImage
             src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=120&h=120"
-            alt="User Avatar"
+            alt="Foto de perfil do usuário"
             className="size-10 rounded-full shrink-0 ring-2 ring-white dark:ring-white/10"
           />
           <div className="flex flex-col flex-1 min-w-0 pr-1">
@@ -117,10 +124,11 @@ const Sidebar: React.FC = () => {
           </div>
           <button
             onClick={handleLogout}
+            aria-label="Encerrar sessão"
             className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"
             title="Sair"
           >
-            <span className="material-symbols-outlined text-lg">logout</span>
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">logout</span>
           </button>
         </div>
       </div>

@@ -13,6 +13,7 @@ const CreatePlan = lazy(() => import('./pages/CreatePlan'));
 const LogWorkout = lazy(() => import('./pages/LogWorkout'));
 const ExerciseDetails = lazy(() => import('./pages/ExerciseDetails'));
 const ExerciseLibrary = lazy(() => import('./pages/ExerciseLibrary'));
+const WorkoutHistory = lazy(() => import('./pages/WorkoutHistory'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Login = lazy(() => import('./pages/Login'));
@@ -52,7 +53,8 @@ const App: React.FC = () => {
                   <Route path="create-plan" element={<CreatePlan />} />
                   <Route path="log-workout" element={<LogWorkout />} />
                   <Route path="exercise/:id" element={<ExerciseDetails />} />
-                  <Route path="workouts" element={<ExerciseLibrary />} />
+                  <Route path="workouts" element={<WorkoutHistory />} />
+                  <Route path="exercises" element={<ExerciseLibrary />} />
                   <Route path="goals" element={<Goals />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="settings" element={<Settings />} />

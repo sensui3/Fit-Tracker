@@ -18,129 +18,32 @@ interface WorkoutSet {
 
 const DEFAULT_REST_TIME = 60; // seconds
 
+import { useWorkoutLogger } from '../hooks/useWorkoutLogger';
+import { RestTimer } from '../components/workout/RestTimer';
+
 const LogWorkout: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  // Estados para o Autocomplete
-  const [exerciseInput, setExerciseInput] = useState('');
-  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Estados para o Rest Timer
-  const [restTimer, setRestTimer] = useState(0);
-  const [isResting, setIsResting] = useState(false);
-
-  // Estado para as Séries (Workout Sets)
-  const [sets, setSets] = useState<WorkoutSet[]>([
-    { id: 1, weight: 20, reps: 12, completed: false, notes: "", showNotes: false },
-    { id: 2, weight: 20, reps: 12, completed: false, notes: "", showNotes: false },
-    { id: 3, weight: 20, reps: 12, completed: false, notes: "", showNotes: false },
-  ]);
-
-  // Efeito do Cronômetro OTIMIZADO
-  useEffect(() => {
-    let interval: number;
-    if (isResting) {
-      interval = window.setInterval(() => {
-        setRestTimer((prev) => {
-          if (prev <= 1) {
-            setIsResting(false);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isResting]);
-
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
-
-  // Adicionar nova série
-  const handleAddSet = () => {
-    const lastSet = sets[sets.length - 1];
-    const newId = sets.length > 0 ? sets[sets.length - 1].id + 1 : 1;
-    setSets([
-      ...sets,
-      {
-        id: newId,
-        weight: lastSet ? lastSet.weight : 0,
-        reps: lastSet ? lastSet.reps : 12,
-        completed: false,
-        notes: "",
-        showNotes: false
-      }
-    ]);
-  };
-
-  // Remover série
-  const handleRemoveSet = (id: number) => {
-    setSets(sets.filter(s => s.id !== id));
-  };
-
-  // Atualizar valores da série
-  const updateSet = (id: number, field: keyof WorkoutSet, value: number | boolean | string) => {
-    setSets(sets.map(s => s.id === id ? { ...s, [field]: value } : s));
-
-    // Iniciar descanso automaticamente ao concluir a série
-    if (field === 'completed' && value === true) {
-      setRestTimer(DEFAULT_REST_TIME); // Inicia com o valor padrão (60s)
-      setIsResting(true);
-    }
-  };
-
-  // Manipula a digitação no input
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const userInput = e.target.value;
-    setExerciseInput(userInput);
-
-    // Filtra a lista
-    if (userInput.length > 0) {
-      const filtered = EXERCISES.filter(
-        (exercise) => exercise.name.toLowerCase().includes(userInput.toLowerCase())
-      );
-      setFilteredExercises(filtered);
-      setShowSuggestions(true);
-      setHighlightedIndex(-1);
-    } else {
-      setShowSuggestions(false);
-    }
-  };
-
-  // Manipula navegação por teclado
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showSuggestions || filteredExercises.length === 0) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setHighlightedIndex(prev => (prev < filteredExercises.length - 1 ? prev + 1 : 0));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredExercises.length - 1));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (highlightedIndex >= 0) {
-        handleSelectExercise(filteredExercises[highlightedIndex]);
-      }
-    } else if (e.key === 'Escape') {
-      setShowSuggestions(false);
-    }
-  };
-
-  // Seleciona um item da lista
-  const handleSelectExercise = (exercise: Exercise) => {
-    setExerciseInput(exercise.name);
-    setShowSuggestions(false);
-    setHighlightedIndex(-1);
-  };
+  const {
+    exerciseInput,
+    filteredExercises,
+    showSuggestions,
+    setShowSuggestions,
+    highlightedIndex,
+    setHighlightedIndex,
+    isResting,
+    setIsResting,
+    sets,
+    handleAddSet,
+    handleRemoveSet,
+    updateSet,
+    handleInputChange,
+    handleSelectExercise,
+    DEFAULT_REST_TIME
+  } = useWorkoutLogger();
 
   // Fecha o dropdown se clicar fora
   useEffect(() => {
@@ -154,7 +57,7 @@ const LogWorkout: React.FC = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [setShowSuggestions]);
 
   return (
     <>
@@ -185,8 +88,24 @@ const LogWorkout: React.FC = () => {
                       label="Exercício"
                       placeholder="Ex: Supino Reto, Agachamento..."
                       value={exerciseInput}
-                      onChange={handleInputChange}
-                      onKeyDown={handleKeyDown}
+                      onChange={(e) => handleInputChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (!showSuggestions || filteredExercises.length === 0) return;
+                        if (e.key === 'ArrowDown') {
+                          e.preventDefault();
+                          setHighlightedIndex(prev => (prev < filteredExercises.length - 1 ? prev + 1 : 0));
+                        } else if (e.key === 'ArrowUp') {
+                          e.preventDefault();
+                          setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredExercises.length - 1));
+                        } else if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (highlightedIndex >= 0) {
+                            handleSelectExercise(filteredExercises[highlightedIndex]);
+                          }
+                        } else if (e.key === 'Escape') {
+                          setShowSuggestions(false);
+                        }
+                      }}
                       onFocus={() => {
                         if (exerciseInput) setShowSuggestions(true);
                       }}
@@ -228,7 +147,6 @@ const LogWorkout: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* Header Row */}
                     <div className="grid grid-cols-10 gap-2 px-2 text-xs font-bold text-slate-400 dark:text-text-secondary uppercase tracking-wider text-center mb-1">
                       <div className="col-span-1">Set</div>
                       <div className="col-span-3">Kg</div>
@@ -240,14 +158,12 @@ const LogWorkout: React.FC = () => {
                       {sets.map((set, index) => (
                         <React.Fragment key={set.id}>
                           <div className={`grid grid-cols-10 gap-2 items-center animate-in fade-in slide-in-from-top-2 duration-300 p-2 rounded-xl border transition-all ${set.completed ? 'bg-green-50/50 dark:bg-green-900/10 border-[#16a34a]/30' : 'border-transparent'}`}>
-                            {/* Set Number */}
                             <div className="col-span-1 flex justify-center">
                               <div className={`size-8 rounded-full font-bold text-sm flex items-center justify-center transition-colors ${set.completed ? 'bg-[#16a34a] text-white' : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400'}`}>
                                 {index + 1}
                               </div>
                             </div>
 
-                            {/* Weight Input */}
                             <div className="col-span-3">
                               <input
                                 type="number"
@@ -258,7 +174,6 @@ const LogWorkout: React.FC = () => {
                               />
                             </div>
 
-                            {/* Reps Input */}
                             <div className="col-span-3">
                               <input
                                 type="number"
@@ -269,7 +184,6 @@ const LogWorkout: React.FC = () => {
                               />
                             </div>
 
-                            {/* Actions */}
                             <div className="col-span-3 flex justify-center gap-1.5">
                               <button
                                 onClick={() => updateSet(set.id, 'showNotes', !set.showNotes)}
@@ -305,13 +219,12 @@ const LogWorkout: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Notes Field (Collapsible) */}
                           {set.showNotes && (
                             <div className="col-span-12 -mt-2 animate-in fade-in slide-in-from-top-1">
                               <textarea
                                 value={set.notes || ''}
                                 onChange={(e) => updateSet(set.id, 'notes', e.target.value)}
-                                placeholder="Adicione observações sobre a execução (ex: falha na última rep, dor no ombro...)"
+                                placeholder="Adicione observações sobre a execução..."
                                 className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-border-dark rounded-xl p-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-y min-h-[60px]"
                               />
                             </div>
@@ -320,7 +233,6 @@ const LogWorkout: React.FC = () => {
                       ))}
                     </div>
 
-                    {/* Add Set Button */}
                     <button
                       onClick={handleAddSet}
                       className="w-full mt-2 py-3 rounded-xl border-2 border-dashed border-slate-200 dark:border-border-dark text-slate-500 dark:text-text-secondary hover:text-[#16a34a] hover:border-[#16a34a] hover:bg-slate-50 dark:hover:bg-white/5 transition-all font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 group"
@@ -357,7 +269,6 @@ const LogWorkout: React.FC = () => {
               </Card>
             </div>
 
-            {/* Sidebar */}
             <div className="lg:col-span-4 flex flex-col gap-6">
               <Card noPadding>
                 <div className="p-4 border-b border-slate-100 dark:border-border-dark flex justify-between items-center">
@@ -365,7 +276,6 @@ const LogWorkout: React.FC = () => {
                   <button onClick={() => navigate('/workouts')} className="text-[#16a34a] text-sm font-medium hover:underline">Ver tudo</button>
                 </div>
                 <div className="flex flex-col">
-                  {/* Sample data replaced here with logic or keeping it static for now as per original */}
                   <div className="flex gap-4 p-4 border-b border-slate-100 dark:border-border-dark/50 hover:bg-slate-50 dark:hover:bg-background-dark/50 transition-colors cursor-pointer">
                     <OptimizedImage
                       src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw"
@@ -388,60 +298,13 @@ const LogWorkout: React.FC = () => {
         </div>
       </div>
 
-      {/* Rest Timer Overlay */}
       {isResting && (
-        <div className="fixed bottom-6 left-0 w-full flex justify-center z-40 pointer-events-none px-4">
-          <div className="pointer-events-auto bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-4 rounded-2xl shadow-2xl flex items-center gap-5 animate-in slide-in-from-bottom-4 duration-300 ring-1 ring-white/10 dark:ring-black/10">
-            {/* Timer Display */}
-            <div className="flex items-center gap-3 pr-5 border-r border-white/10 dark:border-black/10">
-              <div className="size-10 rounded-full bg-[#16a34a] flex items-center justify-center animate-pulse">
-                <span className="material-symbols-outlined text-white">timer</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold uppercase tracking-wider opacity-60 leading-none">Descanso</span>
-                <span className="text-2xl font-black tabular-nums leading-tight w-[64px]">
-                  {formatTime(restTimer)}
-                </span>
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setRestTimer(prev => Math.max(0, prev - 10))}
-                className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
-                title="-10s"
-              >
-                <span className="text-xs font-bold">-10</span>
-              </button>
-              <button
-                onClick={() => setRestTimer(prev => prev + 10)}
-                className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
-                title="+10s"
-              >
-                <span className="text-xs font-bold">+10</span>
-              </button>
-              <button
-                onClick={() => setRestTimer(DEFAULT_REST_TIME)}
-                className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
-                title={`Reiniciar (${DEFAULT_REST_TIME}s)`}
-              >
-                <span className="material-symbols-outlined text-xl">replay</span>
-              </button>
-              <Button
-                size="sm"
-                variant="danger"
-                onClick={() => setIsResting(false)}
-                className="ml-2"
-              >
-                Pular
-              </Button>
-            </div>
-          </div>
-        </div>
+        <RestTimer
+          initialTime={DEFAULT_REST_TIME}
+          onClose={() => setIsResting(false)}
+        />
       )}
 
-      {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setShowDeleteModal(false)}></div>
