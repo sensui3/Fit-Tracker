@@ -7,7 +7,11 @@ import { Theme } from '../types';
 const Layout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+
+  const handleToggleTheme = () => {
+    setTheme(theme === Theme.Dark ? Theme.Light : Theme.Dark);
+  };
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display selection:bg-primary-DEFAULT dark:selection:bg-primary-neon selection:text-white dark:selection:text-black">
@@ -39,7 +43,7 @@ const Layout: React.FC = () => {
 
           <div className="flex items-center gap-1">
             <button
-              onClick={toggleTheme}
+              onClick={handleToggleTheme}
               className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-primary-DEFAULT transition-colors rounded-xl"
               aria-label="Alternar tema"
             >
