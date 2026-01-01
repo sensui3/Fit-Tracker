@@ -88,6 +88,7 @@ const EXERCISES: Exercise[] = [
 
 const MUSCLE_FILTERS = ['Peitoral', 'Costas', 'Pernas', 'Bíceps', 'Ombros', 'Cardio'];
 const DIFFICULTY_FILTERS = ['Iniciante', 'Intermediário', 'Avançado'];
+const EQUIPMENT_FILTERS = ['Barra', 'Halteres', 'Máquina', 'Polia', 'Peso do Corpo'];
 
 const ExerciseLibrary: React.FC = () => {
   const navigate = useNavigate();
@@ -109,12 +110,16 @@ const ExerciseLibrary: React.FC = () => {
     // Group filters by category
     const activeMuscleFilters = activeFilters.filter(f => MUSCLE_FILTERS.includes(f));
     const activeDifficultyFilters = activeFilters.filter(f => DIFFICULTY_FILTERS.includes(f));
+    const activeEquipmentFilters = activeFilters.filter(f => EQUIPMENT_FILTERS.includes(f));
     
-    // Logic: (Match ANY active muscle OR true if no muscle filters) AND (Match ANY active difficulty OR true if no difficulty filters)
+    // Logic: (Match ANY active muscle OR true if no muscle filters) 
+    // AND (Match ANY active difficulty OR true if no difficulty filters)
+    // AND (Match ANY active equipment OR true if no equipment filters)
     const matchesMuscle = activeMuscleFilters.length === 0 || activeMuscleFilters.includes(exercise.muscle);
     const matchesDifficulty = activeDifficultyFilters.length === 0 || activeDifficultyFilters.includes(exercise.difficulty);
+    const matchesEquipment = activeEquipmentFilters.length === 0 || activeEquipmentFilters.includes(exercise.equipment);
     
-    return matchesSearch && matchesMuscle && matchesDifficulty;
+    return matchesSearch && matchesMuscle && matchesDifficulty && matchesEquipment;
   });
 
   return (
@@ -126,7 +131,7 @@ const ExerciseLibrary: React.FC = () => {
             Biblioteca de Exercícios
           </h1>
           <p className="mt-2 text-slate-500 dark:text-text-secondary text-lg max-w-2xl">
-            Explore nosso catálogo completo. Filtre por grupo muscular ou nível de dificuldade para encontrar o exercício perfeito para seu treino.
+            Explore nosso catálogo completo. Filtre por grupo muscular, equipamento ou nível de dificuldade para encontrar o exercício perfeito para seu treino.
           </p>
         </div>
         <button className="hidden md:flex items-center gap-2 rounded-xl bg-slate-900 dark:bg-white px-5 py-3 text-sm font-bold text-white dark:text-slate-900 hover:opacity-90 transition-opacity shadow-lg">
@@ -186,6 +191,24 @@ const ExerciseLibrary: React.FC = () => {
                  {level}
                </button>
              ))}
+
+             {/* Divider */}
+             <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-2 shrink-0"></div>
+
+             {/* Equipment Filters */}
+             {EQUIPMENT_FILTERS.map(equip => (
+               <button
+                  key={equip}
+                  onClick={() => toggleFilter(equip)}
+                  className={`shrink-0 inline-flex items-center gap-x-2 rounded-lg px-4 py-2 text-sm font-medium shadow-sm ring-1 ring-inset transition-all
+                    ${activeFilters.includes(equip) 
+                      ? 'bg-purple-600 text-white ring-purple-600' 
+                      : 'bg-white dark:bg-surface-dark text-slate-700 dark:text-white ring-slate-200 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-white/5'
+                    }`}
+               >
+                 {equip}
+               </button>
+             ))}
           </div>
         </div>
 
@@ -195,12 +218,23 @@ const ExerciseLibrary: React.FC = () => {
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mr-2">Filtros:</span>
             {activeFilters.map(filter => {
                 const isDifficulty = DIFFICULTY_FILTERS.includes(filter);
+                const isEquipment = EQUIPMENT_FILTERS.includes(filter);
+                
+                let badgeClass = 'bg-[#16a34a]/10 text-[#16a34a] dark:text-[#13ec13] ring-[#16a34a]/20'; // Default Muscle
+                if (isDifficulty) {
+                    badgeClass = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 ring-blue-700/20';
+                } else if (isEquipment) {
+                    badgeClass = 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 ring-purple-700/20';
+                }
+
+                const hoverClass = isDifficulty ? 'hover:bg-blue-600/20' : isEquipment ? 'hover:bg-purple-600/20' : 'hover:bg-[#16a34a]/20';
+
                 return (
-                  <span key={filter} className={`inline-flex items-center gap-x-1.5 rounded-full px-3 py-1 text-xs font-bold ring-1 ring-inset ${isDifficulty ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 ring-blue-700/20' : 'bg-[#16a34a]/10 text-[#16a34a] dark:text-[#13ec13] ring-[#16a34a]/20'}`}>
+                  <span key={filter} className={`inline-flex items-center gap-x-1.5 rounded-full px-3 py-1 text-xs font-bold ring-1 ring-inset ${badgeClass}`}>
                     {filter}
                     <button 
                       onClick={() => toggleFilter(filter)}
-                      className={`group relative -mr-1 h-3.5 w-3.5 rounded-sm ${isDifficulty ? 'hover:bg-blue-600/20' : 'hover:bg-[#16a34a]/20'}`}
+                      className={`group relative -mr-1 h-3.5 w-3.5 rounded-sm ${hoverClass}`}
                     >
                       <span className="material-symbols-outlined text-[14px]">close</span>
                     </button>

@@ -16,6 +16,8 @@ interface WorkoutSet {
   showNotes?: boolean;
 }
 
+const DEFAULT_REST_TIME = 60; // seconds
+
 // Lista enriquecida de exercícios com imagens e grupos musculares
 const EXERCISE_DB: ExerciseData[] = [
   { name: "Supino Reto (Barra)", muscle: "Peitoral", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
@@ -37,7 +39,7 @@ const EXERCISE_DB: ExerciseData[] = [
   { name: "Prancha Isométrica", muscle: "Core", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
 ];
 
-export default function LogWorkout() {
+const LogWorkout: React.FC = () => {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
@@ -59,10 +61,10 @@ export default function LogWorkout() {
     { id: 3, weight: 20, reps: 12, completed: false, notes: "", showNotes: false },
   ]);
 
-  // Efeito do Cronômetro
+  // Efeito do Cronômetro OTIMIZADO
   useEffect(() => {
     let interval: number;
-    if (isResting && restTimer > 0) {
+    if (isResting) {
       interval = window.setInterval(() => {
         setRestTimer((prev) => {
           if (prev <= 1) {
@@ -72,11 +74,9 @@ export default function LogWorkout() {
           return prev - 1;
         });
       }, 1000);
-    } else if (restTimer === 0) {
-      setIsResting(false);
     }
     return () => clearInterval(interval);
-  }, [isResting, restTimer]);
+  }, [isResting]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -112,7 +112,7 @@ export default function LogWorkout() {
 
     // Iniciar descanso automaticamente ao concluir a série
     if (field === 'completed' && value === true) {
-      setRestTimer(60); // 60 segundos padrão
+      setRestTimer(DEFAULT_REST_TIME); // Inicia com o valor padrão (60s)
       setIsResting(true);
     }
   };
@@ -408,27 +408,27 @@ export default function LogWorkout() {
       {isResting && (
         <div className="fixed bottom-6 left-0 w-full flex justify-center z-40 pointer-events-none px-4">
             <div className="pointer-events-auto bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-4 rounded-2xl shadow-2xl flex items-center gap-5 animate-in slide-in-from-bottom-4 duration-300 ring-1 ring-white/10 dark:ring-black/10">
-            <div className="flex items-center gap-3">
+            {/* Timer Display */}
+            <div className="flex items-center gap-3 pr-5 border-r border-white/10 dark:border-black/10">
                 <div className="size-10 rounded-full bg-[#16a34a] flex items-center justify-center animate-pulse">
                 <span className="material-symbols-outlined text-white">timer</span>
                 </div>
                 <div className="flex flex-col">
                 <span className="text-[10px] font-bold uppercase tracking-wider opacity-60 leading-none">Descanso</span>
-                <span className="text-2xl font-black tabular-nums leading-tight">
+                <span className="text-2xl font-black tabular-nums leading-tight w-[64px]">
                     {formatTime(restTimer)}
                 </span>
                 </div>
             </div>
             
-            <div className="h-8 w-px bg-white/10 dark:bg-black/10"></div>
-            
+            {/* Controls */}
             <div className="flex items-center gap-2">
                 <button 
-                onClick={() => setRestTimer(60)}
+                onClick={() => setRestTimer(prev => Math.max(0, prev - 10))}
                 className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
-                title="Reiniciar (60s)"
+                title="-10s"
                 >
-                <span className="material-symbols-outlined text-xl">replay</span>
+                <span className="text-xs font-bold">-10</span>
                 </button>
                 <button 
                 onClick={() => setRestTimer(prev => prev + 10)}
@@ -436,6 +436,13 @@ export default function LogWorkout() {
                 title="+10s"
                 >
                 <span className="text-xs font-bold">+10</span>
+                </button>
+                <button 
+                onClick={() => setRestTimer(DEFAULT_REST_TIME)}
+                className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
+                title={`Reiniciar (${DEFAULT_REST_TIME}s)`}
+                >
+                <span className="material-symbols-outlined text-xl">replay</span>
                 </button>
                 <button 
                 onClick={() => setIsResting(false)}
@@ -452,33 +459,4 @@ export default function LogWorkout() {
       {showDeleteModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setShowDeleteModal(false)}></div>
-          <div className="relative w-full max-w-sm bg-white dark:bg-surface-dark rounded-3xl shadow-2xl p-8 flex flex-col gap-6 items-center text-center ring-1 ring-white/10 overflow-hidden transform transition-all scale-100 opacity-100">
-            <div className="size-20 rounded-2xl bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-4xl">delete</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Excluir Registro?</h3>
-              <p className="text-slate-500 dark:text-text-secondary leading-relaxed">
-                Você está prestes a remover o exercício <span className="font-bold text-slate-900 dark:text-white">{exerciseInput || "Selecionado"}</span>. Esta ação não pode ser desfeita.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 w-full pt-2">
-              <button 
-                onClick={() => setShowDeleteModal(false)}
-                className="h-12 rounded-xl font-bold text-slate-500 dark:text-text-secondary hover:bg-slate-50 dark:hover:bg-background-dark hover:text-slate-900 dark:hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-border-dark"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={() => { setShowDeleteModal(false); navigate('/dashboard'); }}
-                className="h-12 rounded-xl font-bold bg-red-600 text-white shadow-lg shadow-red-600/30 hover:bg-red-700 transition-all transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
+          <div className="relative w-full max-
