@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
+import { OptimizedImage } from './ui/OptimizedImage';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -103,19 +104,23 @@ const Sidebar: React.FC = () => {
       </nav>
 
       {/* User Footer */}
-      <div className="p-4 border-t border-border-light dark:border-border-dark bg-slate-50 dark:bg-black/20">
-        <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5 cursor-pointer transition-colors group">
-          <img
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzah6RHgTQs1E5A-ZbDUGXw5szSloOWeof78uX7bOMTCDcMX3ouYvjDr8iK5NZePv2VXkX3ePZ9-CrG5xjSMwfCfiR2VeqkZh2OGoIgR1E0j1GRT8klfwV42hlnHPibND0arPqA53BPA_x1IHE9H7fbCQ8m9VpaGWLupYxtDcohh6sSYWKvLvt1Oc2J-JkGLpn4xw54fql6O0mx8YiDV2hjQl6zXa0INlNzCyF4UyGL3sAveZv1tWmGPdDW80b9noy9cZEAhhgBa4"
+      <div className="mt-auto p-4 border-t border-border-light dark:border-border-dark">
+        <div className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group overflow-hidden">
+          <OptimizedImage
+            src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=120&h=120"
             alt="User Avatar"
-            className="size-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-primary-DEFAULT/50 dark:group-hover:ring-primary-neon/50 transition-all"
+            className="size-10 rounded-full shrink-0 ring-2 ring-white dark:ring-white/10"
           />
-          <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex flex-col flex-1 min-w-0 pr-1">
             <span className="text-sm font-bold text-slate-900 dark:text-white truncate">João Silva</span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 truncate">Plano Pro • Ativo</span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold tracking-tight">PLANO PRO</span>
           </div>
-          <button onClick={handleLogout} className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors" title="Sair">
-            <span className="material-symbols-outlined text-xl">logout</span>
+          <button
+            onClick={handleLogout}
+            className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors shrink-0"
+            title="Sair"
+          >
+            <span className="material-symbols-outlined text-lg">logout</span>
           </button>
         </div>
       </div>
