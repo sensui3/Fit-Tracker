@@ -40,137 +40,137 @@ const ExerciseLibrary: React.FC = () => {
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col h-full">
-      {/* Page Heading & Intro */}
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
+      {/* Page Heading & Search */}
+      <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white md:text-4xl">
             Biblioteca de Exercícios
           </h1>
-          <p className="mt-2 text-slate-500 dark:text-text-secondary text-lg max-w-2xl">
-            Explore nosso catálogo completo. Filtre por grupo muscular, equipamento ou nível de dificuldade para encontrar o exercício perfeito para seu treino.
+          <p className="mt-2 text-slate-500 dark:text-slate-400 text-base max-w-xl truncate">
+            Explore {EXERCISES.length} exercícios em nosso catálogo completo.
           </p>
         </div>
-        <Button className="hidden md:flex" icon="add">
-          Sugerir Novo
-        </Button>
+
+        <div className="flex flex-col sm:flex-row gap-3 items-center w-full lg:w-auto overflow-hidden">
+          <div className="relative w-full sm:w-64 md:w-80 group">
+            <Input
+              placeholder="Buscar exercício..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              leftIcon={<span className="material-symbols-outlined">search</span>}
+              className="h-11 shadow-sm border-slate-200 dark:border-white/10"
+            />
+          </div>
+          <Button icon="add" className="w-full sm:w-auto shrink-0 shadow-lg">
+            Sugerir Novo
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="sticky top-0 z-10 -mx-4 mb-6 bg-background-light/95 dark:bg-background-dark/95 px-4 py-4 backdrop-blur-sm md:mx-0 md:rounded-xl md:px-0 md:bg-transparent md:backdrop-blur-none">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-          {/* Search */}
-          <div className="flex-1">
-            <Input
-              placeholder="Buscar exercício por nome..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              icon="search"
-            />
-          </div>
-
-          {/* Quick Filters */}
+      <div className="sticky top-0 z-10 -mx-4 mb-6 bg-background-light/95 dark:bg-background-dark/95 px-4 py-4 backdrop-blur-sm md:mx-0 md:rounded-xl md:px-0 md:bg-transparent md:backdrop-blur-none space-y-4">
+        {/* Filters Row */}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center justify-between">
           <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar items-center">
             {/* Muscle Filters */}
-            {MUSCLE_FILTERS.map(muscle => (
-              <button
-                key={muscle}
-                onClick={() => toggleFilter(muscle)}
-                className={`shrink-0 inline-flex items-center gap-x-2 rounded-lg px-4 py-2 text-sm font-medium shadow-sm ring-1 ring-inset transition-all
-                    ${activeFilters.includes(muscle)
-                    ? 'bg-[#16a34a] text-white ring-[#16a34a]'
-                    : 'bg-white dark:bg-surface-dark text-slate-700 dark:text-white ring-slate-200 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-white/5'
-                  }`}
-              >
-                {muscle}
-              </button>
-            ))}
+            <div className="flex gap-2 shrink-0">
+              {MUSCLE_FILTERS.map(muscle => (
+                <button
+                  key={muscle}
+                  onClick={() => toggleFilter(muscle)}
+                  className={`shrink-0 inline-flex items-center gap-x-2 rounded-lg px-4 py-2 text-sm font-bold shadow-sm ring-1 ring-inset transition-all
+                      ${activeFilters.includes(muscle)
+                      ? 'bg-[#16a34a] text-white ring-[#16a34a]'
+                      : 'bg-white dark:bg-surface-dark text-slate-700 dark:text-white ring-slate-200 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-white/5'
+                    }`}
+                >
+                  {muscle}
+                </button>
+              ))}
+            </div>
 
-            {/* Divider */}
-            <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-2 shrink-0"></div>
+            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0"></div>
 
             {/* Difficulty Filters */}
-            {DIFFICULTY_FILTERS.map(level => (
-              <button
-                key={level}
-                onClick={() => toggleFilter(level)}
-                className={`shrink-0 inline-flex items-center gap-x-2 rounded-lg px-4 py-2 text-sm font-medium shadow-sm ring-1 ring-inset transition-all
-                    ${activeFilters.includes(level)
-                    ? 'bg-blue-600 text-white ring-blue-600'
-                    : 'bg-white dark:bg-surface-dark text-slate-700 dark:text-white ring-slate-200 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-white/5'
-                  }`}
-              >
-                {level}
-              </button>
-            ))}
+            <div className="flex gap-2 shrink-0">
+              {DIFFICULTY_FILTERS.map(level => (
+                <button
+                  key={level}
+                  onClick={() => toggleFilter(level)}
+                  className={`shrink-0 inline-flex items-center gap-x-2 rounded-lg px-4 py-2 text-sm font-bold shadow-sm ring-1 ring-inset transition-all
+                      ${activeFilters.includes(level)
+                      ? 'bg-blue-600 text-white ring-blue-600'
+                      : 'bg-white dark:bg-surface-dark text-slate-700 dark:text-white ring-slate-200 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-white/5'
+                    }`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
 
-            {/* Divider */}
-            <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-2 shrink-0"></div>
+            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0"></div>
 
             {/* Equipment Filters */}
-            {EQUIPMENT_FILTERS.map(equip => (
-              <button
-                key={equip}
-                onClick={() => toggleFilter(equip)}
-                className={`shrink-0 inline-flex items-center gap-x-2 rounded-lg px-4 py-2 text-sm font-medium shadow-sm ring-1 ring-inset transition-all
-                    ${activeFilters.includes(equip)
-                    ? 'bg-purple-600 text-white ring-purple-600'
-                    : 'bg-white dark:bg-surface-dark text-slate-700 dark:text-white ring-slate-200 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-white/5'
-                  }`}
-              >
-                {equip}
-              </button>
-            ))}
+            <div className="flex gap-2 shrink-0">
+              {EQUIPMENT_FILTERS.map(equip => (
+                <button
+                  key={equip}
+                  onClick={() => toggleFilter(equip)}
+                  className={`shrink-0 inline-flex items-center gap-x-2 rounded-lg px-4 py-2 text-sm font-bold shadow-sm ring-1 ring-inset transition-all
+                      ${activeFilters.includes(equip)
+                      ? 'bg-purple-600 text-white ring-purple-600'
+                      : 'bg-white dark:bg-surface-dark text-slate-700 dark:text-white ring-slate-200 dark:ring-border-dark hover:bg-slate-50 dark:hover:bg-white/5'
+                    }`}
+                >
+                  {equip}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Active Filters (Tags) */}
         {activeFilters.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2 items-center">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mr-2">Filtros:</span>
+          <div className="mt-2 flex flex-wrap gap-2 items-center">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mr-1">Ativos:</span>
             {activeFilters.map(filter => {
               const isDifficulty = DIFFICULTY_FILTERS.includes(filter);
               const isEquipment = EQUIPMENT_FILTERS.includes(filter);
 
-              let badgeClass = 'bg-[#16a34a]/10 text-[#16a34a] dark:text-[#13ec13] ring-[#16a34a]/20'; // Default Muscle
-              if (isDifficulty) {
-                badgeClass = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 ring-blue-700/20';
-              } else if (isEquipment) {
-                badgeClass = 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 ring-purple-700/20';
-              }
-
-              const hoverClass = isDifficulty ? 'hover:bg-blue-600/20' : isEquipment ? 'hover:bg-purple-600/20' : 'hover:bg-[#16a34a]/20';
+              let badgeClass = 'bg-[#16a34a]/10 text-[#16a34a] dark:text-[#13ec13] ring-[#16a34a]/20';
+              if (isDifficulty) badgeClass = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 ring-blue-700/20';
+              else if (isEquipment) badgeClass = 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 ring-purple-700/20';
 
               return (
-                <span key={filter} className={`inline-flex items-center gap-x-1.5 rounded-full px-3 py-1 text-xs font-bold ring-1 ring-inset ${badgeClass}`}>
+                <span key={filter} className={`inline-flex items-center gap-x-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase ring-1 ring-inset ${badgeClass}`}>
                   {filter}
-                  <button
-                    onClick={() => toggleFilter(filter)}
-                    className={`group relative -mr-1 h-3.5 w-3.5 rounded-sm ${hoverClass}`}
-                  >
+                  <button onClick={() => toggleFilter(filter)} className="p-0.5 hover:bg-black/5 rounded-full transition-colors">
                     <span className="material-symbols-outlined text-[14px]">close</span>
                   </button>
                 </span>
               );
             })}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setActiveFilters([])}
-              className="ml-2 text-xs font-medium text-slate-500 hover:text-[#16a34a] dark:text-slate-400 dark:hover:text-[#13ec13] underline decoration-dashed underline-offset-4"
+              className="text-xs text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
             >
-              Limpar todos
-            </button>
+              Limpar tudo
+            </Button>
           </div>
         )}
       </div>
 
       {/* Grid Layout */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-10">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-10">
         {filteredExercises.map((exercise) => (
           <Card
             key={exercise.id}
             onClick={() => navigate(`/exercise/${exercise.id}`)}
             className="group flex flex-col p-0 overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
           >
-            <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100 dark:bg-black/40 relative">
+            <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100 dark:bg-black/40 relative rounded-xl">
               <div className="absolute top-3 left-3 z-10 flex gap-2">
                 <span className="inline-flex items-center rounded-md bg-white/90 dark:bg-black/60 px-2 py-1 text-[10px] font-bold text-slate-900 dark:text-white shadow-sm backdrop-blur-md">
                   {exercise.muscle}
