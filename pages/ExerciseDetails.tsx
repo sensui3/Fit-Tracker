@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const ExerciseDetails: React.FC = () => {
   const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
-  
+
   // Estado para configuração do exercício
   const [workoutConfig, setWorkoutConfig] = useState({
     plan: 'Treino A - Superiores',
@@ -24,11 +24,11 @@ const ExerciseDetails: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center px-4 py-6 md:px-10 lg:px-40 relative">
-      
+
       {/* Modal de Configuração */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
             onClick={() => setShowAddModal(false)}
           ></div>
@@ -39,7 +39,7 @@ const ExerciseDetails: React.FC = () => {
                 <span className="material-symbols-outlined text-primary-DEFAULT">edit_calendar</span>
                 Configurar Exercício
               </h3>
-              <button 
+              <button
                 onClick={() => setShowAddModal(false)}
                 className="text-slate-400 hover:text-red-500 transition-colors"
               >
@@ -49,7 +49,7 @@ const ExerciseDetails: React.FC = () => {
 
             {/* Modal Body */}
             <div className="p-6 flex flex-col gap-5">
-              
+
               {/* Seleção de Plano */}
               <label className="flex flex-col gap-2">
                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Selecionar Plano</span>
@@ -57,9 +57,9 @@ const ExerciseDetails: React.FC = () => {
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <span className="material-symbols-outlined text-[20px]">assignment</span>
                   </span>
-                  <select 
+                  <select
                     value={workoutConfig.plan}
-                    onChange={(e) => setWorkoutConfig({...workoutConfig, plan: e.target.value})}
+                    onChange={(e) => setWorkoutConfig({ ...workoutConfig, plan: e.target.value })}
                     className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-DEFAULT outline-none appearance-none font-medium cursor-pointer"
                   >
                     <option>Treino A - Superiores</option>
@@ -76,28 +76,28 @@ const ExerciseDetails: React.FC = () => {
               <div className="grid grid-cols-3 gap-4">
                 <label className="flex flex-col gap-2">
                   <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Séries</span>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     value={workoutConfig.sets}
-                    onChange={(e) => setWorkoutConfig({...workoutConfig, sets: parseInt(e.target.value) || 0})}
+                    onChange={(e) => setWorkoutConfig({ ...workoutConfig, sets: parseInt(e.target.value) || 0 })}
                     className="w-full px-3 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-center text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-DEFAULT outline-none font-bold"
                   />
                 </label>
                 <label className="flex flex-col gap-2">
                   <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Reps</span>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={workoutConfig.reps}
-                    onChange={(e) => setWorkoutConfig({...workoutConfig, reps: e.target.value})}
+                    onChange={(e) => setWorkoutConfig({ ...workoutConfig, reps: e.target.value })}
                     className="w-full px-3 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-center text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-DEFAULT outline-none font-bold"
                   />
                 </label>
                 <label className="flex flex-col gap-2">
                   <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Carga (kg)</span>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     value={workoutConfig.weight}
-                    onChange={(e) => setWorkoutConfig({...workoutConfig, weight: parseInt(e.target.value) || 0})}
+                    onChange={(e) => setWorkoutConfig({ ...workoutConfig, weight: parseInt(e.target.value) || 0 })}
                     className="w-full px-3 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-center text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-DEFAULT outline-none font-bold"
                   />
                 </label>
@@ -105,29 +105,29 @@ const ExerciseDetails: React.FC = () => {
 
               {/* Preview */}
               <div className="bg-primary-DEFAULT/10 rounded-xl p-3 flex items-center gap-3">
-                 <div className="size-10 bg-primary-DEFAULT rounded-lg flex items-center justify-center text-white shrink-0">
-                    <span className="material-symbols-outlined">fitness_center</span>
-                 </div>
-                 <div className="flex flex-col">
-                    <span className="text-xs font-bold text-primary-DEFAULT uppercase tracking-wider">Resumo</span>
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                      Adicionar <strong>{workoutConfig.sets}x{workoutConfig.reps}</strong> ao {workoutConfig.plan.split('-')[0]}
-                    </span>
-                 </div>
+                <div className="size-10 bg-primary-DEFAULT rounded-lg flex items-center justify-center text-white shrink-0">
+                  <span className="material-symbols-outlined">fitness_center</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-primary-DEFAULT uppercase tracking-wider">Resumo</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                    Adicionar <strong>{workoutConfig.sets}x{workoutConfig.reps}</strong> ao {workoutConfig.plan.split('-')[0]}
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Modal Footer */}
             <div className="p-6 pt-2 flex gap-3">
-              <button 
+              <button
                 onClick={() => setShowAddModal(false)}
                 className="flex-1 py-3 px-4 bg-slate-100 dark:bg-[#0a160a] hover:bg-slate-200 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors"
               >
                 Cancelar
               </button>
-              <button 
+              <button
                 onClick={handleSave}
-                className="flex-1 py-3 px-4 bg-primary-DEFAULT hover:bg-primary-hover text-white dark:text-black font-bold rounded-xl shadow-lg shadow-green-600/20 transition-all transform active:scale-[0.98]"
+                className="flex-1 py-3 px-4 bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-black font-bold rounded-xl shadow-lg shadow-green-600/20 dark:shadow-green-500/20 transition-all transform active:scale-[0.98]"
               >
                 Salvar
               </button>
@@ -140,8 +140,8 @@ const ExerciseDetails: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-              <span 
-                onClick={() => navigate('/workouts')} 
+              <span
+                onClick={() => navigate('/workouts')}
                 className="hover:text-primary-DEFAULT transition-colors cursor-pointer"
               >
                 Biblioteca
@@ -159,7 +159,7 @@ const ExerciseDetails: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gray-200 dark:bg-[#1c2e1c] group">
-              <img 
+              <img
                 src={`${exerciseImageUrl}=s1200`}
                 srcSet={`
                   ${exerciseImageUrl}=s480 480w,
@@ -168,7 +168,7 @@ const ExerciseDetails: React.FC = () => {
                 `}
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                alt="Exercise Video Placeholder" 
+                alt="Exercise Video Placeholder"
                 loading="lazy"
                 decoding="async"
               />
@@ -199,19 +199,19 @@ const ExerciseDetails: React.FC = () => {
           </div>
 
           <div className="lg:col-span-5 flex flex-col gap-6">
-            
+
             {/* Botão de Adicionar ao Treino */}
             <div className="bg-white dark:bg-[#1c2e1c] p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                <button 
-                  onClick={() => setShowAddModal(true)}
-                  className="w-full flex items-center justify-center gap-3 bg-primary-DEFAULT hover:bg-primary-hover text-white dark:text-black py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 group transform hover:-translate-y-0.5"
-                >
-                  <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add_circle</span>
-                  Adicionar aos Meus Treinos
-                </button>
-                <p className="text-center text-xs text-slate-500 dark:text-gray-400 mt-3">
-                  Adicione este exercício a um plano existente para monitorar sua progressão.
-                </p>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="w-full flex items-center justify-center gap-3 bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-black py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 dark:shadow-green-500/20 group transform hover:-translate-y-0.5"
+              >
+                <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add_circle</span>
+                Adicionar Treino
+              </button>
+              <p className="text-center text-xs text-slate-500 dark:text-gray-400 mt-3">
+                Adicione este exercício a um plano existente para monitorar sua progressão.
+              </p>
             </div>
 
             <div className="bg-surface-light dark:bg-[#162616] p-6 rounded-2xl border-2 border-primary-DEFAULT/20 shadow-lg relative overflow-hidden">
@@ -223,7 +223,7 @@ const ExerciseDetails: React.FC = () => {
                 <div>
                   <p className="text-xs uppercase text-gray-500 font-bold mb-2 tracking-wider">Primário</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-DEFAULT text-white dark:text-black font-bold text-sm">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#16a34a] dark:bg-[#13ec13] text-white dark:text-black font-bold text-sm">
                       Peitoral Maior
                       <span className="material-symbols-outlined text-[18px]">check_circle</span>
                     </span>
