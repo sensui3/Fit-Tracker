@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { AreaChart, Area, LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 
-// Dados simulados para diferentes períodos
+// Dados simulados para diferentes períodos (Gráfico de Área)
 const MOCK_DATA = {
   week: [
     { name: 'Seg', val: 4500 },
@@ -20,6 +20,22 @@ const MOCK_DATA = {
     { name: 'Sem 4', val: 110000 },
     { name: 'Sem 5', val: 130000 },
   ],
+  quarter: [
+    { name: 'Sem 1', val: 32000 }, { name: 'Sem 2', val: 35000 },
+    { name: 'Sem 3', val: 28000 }, { name: 'Sem 4', val: 38000 },
+    { name: 'Sem 5', val: 42000 }, { name: 'Sem 6', val: 45000 },
+    { name: 'Sem 7', val: 41000 }, { name: 'Sem 8', val: 48000 },
+    { name: 'Sem 9', val: 52000 }, { name: 'Sem 10', val: 55000 },
+    { name: 'Sem 11', val: 51000 }, { name: 'Sem 12', val: 59000 },
+  ],
+  semester: [
+    { name: 'Mês 1', val: 140000 }, 
+    { name: 'Mês 2', val: 155000 },
+    { name: 'Mês 3', val: 138000 }, 
+    { name: 'Mês 4', val: 162000 },
+    { name: 'Mês 5', val: 175000 }, 
+    { name: 'Mês 6', val: 180000 },
+  ],
   year: [
     { name: 'Jan', val: 120000 },
     { name: 'Fev', val: 135000 },
@@ -36,35 +52,91 @@ const MOCK_DATA = {
   ]
 };
 
-const progressData = [
-  { week: 'Ponto 1', real: 65, meta: 70 },
-  { week: 'Ponto 2', real: 68, meta: 72 },
-  { week: 'Ponto 3', real: 75, meta: 74 },
-  { week: 'Ponto 4', real: 79, meta: 76 },
-  { week: 'Ponto 5', real: 85, meta: 80 },
-];
+// Dados simulados para o gráfico de progresso (Linha)
+const PROGRESS_MOCK_DATA = {
+  week: [
+    { name: 'Seg', real: 60, meta: 65 },
+    { name: 'Ter', real: 65, meta: 65 },
+    { name: 'Qua', real: 55, meta: 68 },
+    { name: 'Qui', real: 70, meta: 68 },
+    { name: 'Sex', real: 72, meta: 70 },
+    { name: 'Sab', real: 75, meta: 70 },
+    { name: 'Dom', real: 40, meta: 40 },
+  ],
+  month: [
+    { name: 'Sem 1', real: 65, meta: 70 },
+    { name: 'Sem 2', real: 68, meta: 72 },
+    { name: 'Sem 3', real: 75, meta: 74 },
+    { name: 'Sem 4', real: 79, meta: 76 },
+    { name: 'Sem 5', real: 85, meta: 80 },
+  ],
+  year: [
+    { name: 'Jan', real: 60, meta: 65 },
+    { name: 'Fev', real: 62, meta: 66 },
+    { name: 'Mar', real: 65, meta: 68 },
+    { name: 'Abr', real: 68, meta: 70 },
+    { name: 'Mai', real: 70, meta: 72 },
+    { name: 'Jun', real: 74, meta: 75 },
+    { name: 'Jul', real: 72, meta: 76 },
+    { name: 'Ago', real: 78, meta: 78 },
+    { name: 'Set', real: 80, meta: 80 },
+    { name: 'Out', real: 82, meta: 82 },
+    { name: 'Nov', real: 85, meta: 84 },
+    { name: 'Dez', real: 88, meta: 85 },
+  ]
+};
 
-type PeriodType = 'week' | 'month' | 'year';
+type PeriodType = 'week' | 'month' | 'quarter' | 'semester' | 'year';
+type ProgressPeriodType = 'week' | 'month' | 'year';
 type ExerciseType = 'all' | 'strength' | 'cardio' | 'flexibility';
 
-// Custom Tooltip Component para o gráfico de linha
+// Custom Tooltip Component para o gráfico de linha (Enhanced)
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
+    // Encontrar os valores específicos baseados na dataKey
+    const realEntry = payload.find((p: any) => p.dataKey === 'real');
+    const metaEntry = payload.find((p: any) => p.dataKey === 'meta');
+
+    const realVal = realEntry ? realEntry.value : 0;
+    const metaVal = metaEntry ? metaEntry.value : 0;
+    
+    const diff = realVal - metaVal;
+    const isPositive = diff >= 0;
+
     return (
-      <div className="bg-white dark:bg-[#1c271c] border border-slate-200 dark:border-[#283928] p-4 rounded-xl shadow-xl backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
-        <p className="text-slate-900 dark:text-white font-bold mb-3 text-sm border-b border-slate-100 dark:border-white/10 pb-2">{label}</p>
-        <div className="flex flex-col gap-2">
-          {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center justify-between gap-6 min-w-[140px]">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: entry.color }} />
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{entry.name}</span>
+      <div className="bg-white dark:bg-[#1c271c] border border-slate-200 dark:border-[#283928] p-4 rounded-xl shadow-xl backdrop-blur-md bg-opacity-95 dark:bg-opacity-95 min-w-[200px]">
+        <p className="text-slate-500 dark:text-slate-400 font-bold mb-4 text-xs uppercase tracking-wider border-b border-slate-100 dark:border-white/5 pb-2">{label}</p>
+        
+        <div className="flex flex-col gap-4">
+           {/* Comparação Visual */}
+           <div className="flex items-end justify-between gap-6">
+              <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-[#16a34a]"></div>
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400">Realizado</p>
+                </div>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-black text-slate-900 dark:text-white">{realVal}%</span>
+                </div>
               </div>
-              <span className="text-sm font-black text-slate-900 dark:text-white font-mono bg-slate-100 dark:bg-white/5 px-1.5 rounded">
-                {entry.value}%
+              <div className="text-right">
+                <div className="flex items-center justify-end gap-1.5 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-slate-400"></div>
+                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400">Meta</p>
+                </div>
+                <span className="text-xl font-bold text-slate-400 dark:text-slate-500">{metaVal}%</span>
+              </div>
+           </div>
+
+           {/* Badge de Delta */}
+           <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${isPositive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
+              <span className="material-symbols-outlined text-lg">
+                {isPositive ? 'trending_up' : 'trending_down'}
               </span>
-            </div>
-          ))}
+              <span className="text-xs font-bold leading-tight">
+                {Math.abs(diff)}% {isPositive ? 'acima' : 'abaixo'} do planejado
+              </span>
+           </div>
         </div>
       </div>
     );
@@ -74,32 +146,59 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const Reports: React.FC = () => {
   const navigate = useNavigate();
+  // Estado para o gráfico principal (Área)
   const [period, setPeriod] = useState<PeriodType>('month');
   const [exerciseType, setExerciseType] = useState<ExerciseType>('all');
+  
+  // Estado para o gráfico de progresso (Linha)
+  const [progressPeriod, setProgressPeriod] = useState<ProgressPeriodType>('month');
+  
+  const mainChartRef = useRef<HTMLDivElement>(null);
+  const progressChartRef = useRef<HTMLDivElement>(null);
 
-  // Lógica para filtrar/transformar os dados com base na seleção
+  // Lógica para filtrar/transformar os dados do gráfico de Área
   const chartData = useMemo(() => {
     let data = [...MOCK_DATA[period]];
 
-    // Simulação de alteração de valores baseada no tipo (apenas visual)
     if (exerciseType === 'cardio') {
-      data = data.map(d => ({ ...d, val: Math.round(d.val * 0.4) })); // Menor volume em cardio (ex: kcals/metros)
+      data = data.map(d => ({ ...d, val: Math.round(d.val * 0.4) }));
     } else if (exerciseType === 'strength') {
-      data = data.map(d => ({ ...d, val: Math.round(d.val * 0.9) })); // Maioria do volume
+      data = data.map(d => ({ ...d, val: Math.round(d.val * 0.9) }));
     } else if (exerciseType === 'flexibility') {
-        data = data.map(d => ({ ...d, val: Math.round(d.val * 0.1) })); // Baixo volume numérico
+        data = data.map(d => ({ ...d, val: Math.round(d.val * 0.1) }));
     }
 
     return data;
   }, [period, exerciseType]);
 
+  // Lógica para filtrar os dados do gráfico de Linha (Progresso)
+  const currentProgressData = useMemo(() => {
+    return PROGRESS_MOCK_DATA[progressPeriod];
+  }, [progressPeriod]);
+
   const getPeriodLabel = () => {
     switch(period) {
         case 'week': return 'Últimos 7 dias';
         case 'month': return 'Últimos 30 dias';
+        case 'quarter': return 'Últimos 3 meses';
+        case 'semester': return 'Últimos 6 meses';
         case 'year': return 'Este Ano';
         default: return '';
     }
+  };
+
+  const handlePeriodChange = (newPeriod: PeriodType) => {
+    setPeriod(newPeriod);
+    setTimeout(() => {
+        mainChartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+  };
+
+  const handleProgressPeriodChange = (newPeriod: ProgressPeriodType) => {
+    setProgressPeriod(newPeriod);
+    setTimeout(() => {
+        progressChartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
   };
 
   return (
@@ -130,22 +229,34 @@ const Reports: React.FC = () => {
           </div>
 
           {/* Time Period Filter */}
-          <div className="bg-slate-200 dark:bg-surface-dark p-1 rounded-lg flex items-center">
+          <div className="bg-slate-200 dark:bg-surface-dark p-1 rounded-lg flex items-center overflow-x-auto max-w-full">
             <button 
-                onClick={() => setPeriod('week')}
-                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${period === 'week' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
+                onClick={() => handlePeriodChange('week')}
+                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all whitespace-nowrap ${period === 'week' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
             >
                 Semana
             </button>
             <button 
-                onClick={() => setPeriod('month')}
-                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${period === 'month' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
+                onClick={() => handlePeriodChange('month')}
+                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all whitespace-nowrap ${period === 'month' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
             >
                 Mês
             </button>
             <button 
-                onClick={() => setPeriod('year')}
-                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${period === 'year' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
+                onClick={() => handlePeriodChange('quarter')}
+                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all whitespace-nowrap ${period === 'quarter' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
+            >
+                Trimestre
+            </button>
+            <button 
+                onClick={() => handlePeriodChange('semester')}
+                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all whitespace-nowrap ${period === 'semester' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
+            >
+                Semestre
+            </button>
+            <button 
+                onClick={() => handlePeriodChange('year')}
+                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all whitespace-nowrap ${period === 'year' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
             >
                 Ano
             </button>
@@ -165,7 +276,9 @@ const Reports: React.FC = () => {
             <span className="material-symbols-outlined text-primary-DEFAULT bg-primary-DEFAULT/10 p-1.5 rounded-md">fitness_center</span>
           </div>
           <div className="flex items-baseline gap-2 mt-1">
-            <p className="text-3xl font-bold text-slate-900 dark:text-white">{period === 'week' ? '4' : period === 'month' ? '18' : '142'}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-white">
+                {period === 'week' ? '4' : period === 'month' ? '18' : period === 'quarter' ? '48' : period === 'semester' ? '92' : '142'}
+            </p>
             <p className="text-primary-DEFAULT text-sm font-bold flex items-center">
               <span className="material-symbols-outlined text-[16px]">trending_up</span>
               +12%
@@ -181,7 +294,7 @@ const Reports: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-2 mt-1">
             <p className="text-3xl font-bold text-slate-900 dark:text-white">
-                {exerciseType === 'cardio' ? '2.4k' : (period === 'week' ? '12k' : period === 'month' ? '45k' : '520k')}
+                {exerciseType === 'cardio' ? '2.4k' : (period === 'week' ? '12k' : period === 'month' ? '45k' : period === 'quarter' ? '125k' : period === 'semester' ? '280k' : '520k')}
                 <span className="text-lg text-slate-500 ml-1">{exerciseType === 'cardio' ? 'kcal' : 'kg'}</span>
             </p>
             <p className="text-primary-DEFAULT text-sm font-bold flex items-center">
@@ -208,9 +321,9 @@ const Reports: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 scroll-mt-24">
         {/* Main Chart (Area) */}
-        <div className="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8">
+        <div ref={mainChartRef} className="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8 scroll-mt-32">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Volume de Treino</h3>
@@ -228,7 +341,7 @@ const Reports: React.FC = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#283928" />
-                <XAxis dataKey="name" tick={{fontSize: 12, fill: '#9ca3af'}} axisLine={false} tickLine={false} interval={period === 'year' ? 1 : 0} />
+                <XAxis dataKey="name" tick={{fontSize: 12, fill: '#9ca3af'}} axisLine={false} tickLine={false} interval={period === 'year' || period === 'quarter' ? 1 : 0} />
                 <YAxis tick={{fontSize: 12, fill: '#9ca3af'}} axisLine={false} tickLine={false} tickFormatter={(value) => `${value / 1000}k`} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1c271c', borderColor: '#283928', color: '#fff', borderRadius: '8px' }}
@@ -250,19 +363,41 @@ const Reports: React.FC = () => {
         </div>
 
         {/* Progress Trend Chart (Line) */}
-        <div className="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8">
+        <div ref={progressChartRef} className="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8 scroll-mt-32">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Tendência de Progresso</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400">Intensidade Real vs Meta</p>
             </div>
+            
+            {/* Filtros para o gráfico de progresso */}
+            <div className="bg-slate-100 dark:bg-black/20 p-1 rounded-lg flex items-center">
+              <button 
+                  onClick={() => handleProgressPeriodChange('week')}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${progressPeriod === 'week' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
+              >
+                  Sem
+              </button>
+              <button 
+                  onClick={() => handleProgressPeriodChange('month')}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${progressPeriod === 'month' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
+              >
+                  Mês
+              </button>
+              <button 
+                  onClick={() => handleProgressPeriodChange('year')}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${progressPeriod === 'year' ? 'bg-white dark:bg-[#16a34a] text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white'}`}
+              >
+                  Ano
+              </button>
+            </div>
           </div>
           
           <div className="w-full h-[300px] min-w-0">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={progressData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={currentProgressData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#283928" />
-                <XAxis dataKey="week" tick={{fontSize: 12, fill: '#9ca3af'}} axisLine={false} tickLine={false} />
+                <XAxis dataKey="name" tick={{fontSize: 12, fill: '#9ca3af'}} axisLine={false} tickLine={false} interval={progressPeriod === 'year' ? 1 : 0} />
                 <YAxis tick={{fontSize: 12, fill: '#9ca3af'}} axisLine={false} tickLine={false} />
                 <Tooltip 
                   content={<CustomTooltip />}

@@ -37,7 +37,7 @@ const EXERCISE_DB: ExerciseData[] = [
   { name: "Prancha Isométrica", muscle: "Core", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
 ];
 
-const LogWorkout: React.FC = () => {
+export default function LogWorkout() {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
@@ -326,4 +326,159 @@ const LogWorkout: React.FC = () => {
                                     </button>
                                     <button 
                                         onClick={() => handleRemoveSet(set.id)}
-                                        title
+                                        title="Remover Série"
+                                        className="size-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-xl">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {/* Notes Field (Collapsible) */}
+                            {set.showNotes && (
+                              <div className="col-span-12 -mt-2 animate-in fade-in slide-in-from-top-1">
+                                <textarea
+                                  value={set.notes || ''}
+                                  onChange={(e) => updateSet(set.id, 'notes', e.target.value)}
+                                  placeholder="Adicione observações sobre a execução (ex: falha na última rep, dor no ombro...)"
+                                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-border-dark rounded-xl p-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-y min-h-[60px]"
+                                />
+                              </div>
+                            )}
+                            </React.Fragment>
+                        ))}
+                    </div>
+
+                    {/* Add Set Button */}
+                    <button 
+                        onClick={handleAddSet}
+                        className="w-full mt-2 py-3 rounded-xl border-2 border-dashed border-slate-200 dark:border-border-dark text-slate-500 dark:text-text-secondary hover:text-[#16a34a] hover:border-[#16a34a] hover:bg-slate-50 dark:hover:bg-white/5 transition-all font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 group"
+                    >
+                        <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add</span>
+                        Adicionar Série
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-border-dark mt-2">
+                    <button onClick={() => navigate('/workouts')} className="bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-black font-bold h-12 px-8 rounded-lg transition-colors flex items-center gap-2 shadow-lg shadow-green-600/25 dark:shadow-green-500/25">
+                      <span className="material-symbols-outlined">check</span>
+                      Salvar Registro
+                    </button>
+                    <button 
+                      onClick={() => setShowDeleteModal(true)}
+                      className="text-slate-500 dark:text-text-secondary hover:text-red-600 dark:hover:text-red-400 font-medium h-12 px-6 rounded-lg transition-colors ml-auto"
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            
+            {/* Sidebar */}
+            <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-border-dark shadow-sm overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 dark:border-border-dark flex justify-between items-center">
+                    <h3 className="text-slate-900 dark:text-white font-bold text-lg">Últimos Registros</h3>
+                    <button onClick={() => navigate('/workouts')} className="text-[#16a34a] text-sm font-medium hover:underline">Ver tudo</button>
+                    </div>
+                    <div className="flex flex-col">
+                        <div className="flex gap-4 p-4 border-b border-slate-100 dark:border-border-dark/50 hover:bg-slate-50 dark:hover:bg-background-dark/50 transition-colors cursor-pointer">
+                            <img 
+                              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw"
+                              alt="Supino Reto" 
+                              className="size-14 rounded-lg object-cover shrink-0"
+                            />
+                            <div className="flex flex-col justify-center flex-1">
+                            <h4 className="text-slate-900 dark:text-white font-semibold leading-tight">Supino Reto</h4>
+                            <p className="text-slate-500 dark:text-text-secondary text-sm">4 séries • 80kg</p>
+                            </div>
+                            <div className="text-xs font-medium text-slate-400 dark:text-text-secondary pt-1">
+                                                                    10:42
+                                                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rest Timer Overlay */}
+      {isResting && (
+        <div className="fixed bottom-6 left-0 w-full flex justify-center z-40 pointer-events-none px-4">
+            <div className="pointer-events-auto bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-4 rounded-2xl shadow-2xl flex items-center gap-5 animate-in slide-in-from-bottom-4 duration-300 ring-1 ring-white/10 dark:ring-black/10">
+            <div className="flex items-center gap-3">
+                <div className="size-10 rounded-full bg-[#16a34a] flex items-center justify-center animate-pulse">
+                <span className="material-symbols-outlined text-white">timer</span>
+                </div>
+                <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase tracking-wider opacity-60 leading-none">Descanso</span>
+                <span className="text-2xl font-black tabular-nums leading-tight">
+                    {formatTime(restTimer)}
+                </span>
+                </div>
+            </div>
+            
+            <div className="h-8 w-px bg-white/10 dark:bg-black/10"></div>
+            
+            <div className="flex items-center gap-2">
+                <button 
+                onClick={() => setRestTimer(60)}
+                className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
+                title="Reiniciar (60s)"
+                >
+                <span className="material-symbols-outlined text-xl">replay</span>
+                </button>
+                <button 
+                onClick={() => setRestTimer(prev => prev + 10)}
+                className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
+                title="+10s"
+                >
+                <span className="text-xs font-bold">+10</span>
+                </button>
+                <button 
+                onClick={() => setIsResting(false)}
+                className="bg-white/10 dark:bg-black/5 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-bold transition-all ml-2"
+                >
+                Pular
+                </button>
+            </div>
+            </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setShowDeleteModal(false)}></div>
+          <div className="relative w-full max-w-sm bg-white dark:bg-surface-dark rounded-3xl shadow-2xl p-8 flex flex-col gap-6 items-center text-center ring-1 ring-white/10 overflow-hidden transform transition-all scale-100 opacity-100">
+            <div className="size-20 rounded-2xl bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-4xl">delete</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Excluir Registro?</h3>
+              <p className="text-slate-500 dark:text-text-secondary leading-relaxed">
+                Você está prestes a remover o exercício <span className="font-bold text-slate-900 dark:text-white">{exerciseInput || "Selecionado"}</span>. Esta ação não pode ser desfeita.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 w-full pt-2">
+              <button 
+                onClick={() => setShowDeleteModal(false)}
+                className="h-12 rounded-xl font-bold text-slate-500 dark:text-text-secondary hover:bg-slate-50 dark:hover:bg-background-dark hover:text-slate-900 dark:hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200 dark:focus:ring-border-dark"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={() => { setShowDeleteModal(false); navigate('/dashboard'); }}
+                className="h-12 rounded-xl font-bold bg-red-600 text-white shadow-lg shadow-red-600/30 hover:bg-red-700 transition-all transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
