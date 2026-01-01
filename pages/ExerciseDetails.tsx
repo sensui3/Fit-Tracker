@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { EXERCISES } from '../data/exercises';
 
 const ExerciseDetails: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const exercise = EXERCISES.find(ex => ex.id === id);
 
   // Estado para configuração do exercício
   const [workoutConfig, setWorkoutConfig] = useState({
@@ -13,12 +17,29 @@ const ExerciseDetails: React.FC = () => {
     weight: 20
   });
 
-  // URL base da imagem
-  const exerciseImageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuCrTzRI2ONEYwjZ8K9_UoS0UNn3OGGHDSkTllT9zFTEXKmfripVEW8lsJkgWTmePAu_yOXemoH4RftsmtpdmCsUvOTk85Nj-J5SsT6HqplNmEZjxUZiutCTZUuUeycu0rW3gjlqck_723hZV7Tn3KjYmgiR1zTNaByM-oszdbLK6I3uxIv8X2bQgm_4N2auV_HP-nRxe-aXOuAgicUmmXKiNbBV-Pqj3Uskzx4-O1T2eNn-txJtHKQR3awj9qs2dduPCWeimHog6XQ";
+  if (!exercise) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+        <div className="size-20 bg-slate-100 dark:bg-surface-dark rounded-full flex items-center justify-center mb-4">
+          <span className="material-symbols-outlined text-4xl text-slate-400">search_off</span>
+        </div>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Exercício não encontrado</h1>
+        <p className="text-slate-500 dark:text-text-secondary mb-6 text-center">
+          O exercício que você está procurando não existe ou foi removido.
+        </p>
+        <button
+          onClick={() => navigate('/workouts')}
+          className="px-6 py-3 bg-primary-DEFAULT hover:bg-primary-hover text-white dark:text-black font-bold rounded-xl transition-colors"
+        >
+          Voltar para Biblioteca
+        </button>
+      </div>
+    );
+  }
 
   const handleSave = () => {
     // Aqui iria a lógica real de salvar no backend/contexto
-    alert(`Exercício adicionado ao plano "${workoutConfig.plan}" com sucesso!\nConfiguração: ${workoutConfig.sets} séries de ${workoutConfig.reps} repetições.`);
+    alert(`Exercício "${exercise.name}" adicionado ao plano "${workoutConfig.plan}" com sucesso!\nConfiguração: ${workoutConfig.sets} séries de ${workoutConfig.reps} repetições.`);
     setShowAddModal(false);
   };
 
@@ -150,9 +171,9 @@ const ExerciseDetails: React.FC = () => {
               <span className="text-primary-DEFAULT font-medium">Detalhes</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-              Supino Reto
+              {exercise.name}
             </h1>
-            <p className="text-slate-500 dark:text-[#9db99d] text-lg">Barbell Bench Press</p>
+            <p className="text-slate-500 dark:text-[#9db99d] text-lg">{exercise.description}</p>
           </div>
         </div>
 
@@ -160,21 +181,21 @@ const ExerciseDetails: React.FC = () => {
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gray-200 dark:bg-[#1c2e1c] group">
               <img
-                src={`${exerciseImageUrl}=s1200`}
+                src={`${exercise.image}=s1200`}
                 srcSet={`
-                  ${exerciseImageUrl}=s480 480w,
-                  ${exerciseImageUrl}=s768 768w,
-                  ${exerciseImageUrl}=s1200 1200w
+                  ${exercise.image}=s480 480w,
+                  ${exercise.image}=s768 768w,
+                  ${exercise.image}=s1200 1200w
                 `}
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                alt="Exercise Video Placeholder"
+                alt={exercise.name}
                 loading="lazy"
                 decoding="async"
               />
               <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 flex items-center gap-2">
                 <span className="size-2 rounded-full bg-primary-DEFAULT animate-pulse"></span>
-                <span className="text-xs font-bold text-white uppercase tracking-wider">Composto</span>
+                <span className="text-xs font-bold text-white uppercase tracking-wider">{exercise.difficulty}</span>
               </div>
             </div>
 
@@ -183,18 +204,20 @@ const ExerciseDetails: React.FC = () => {
                 <span className="material-symbols-outlined text-primary-DEFAULT">menu_book</span>
                 Instruções de Execução
               </h3>
-              <ol className="relative border-l border-gray-200 dark:border-gray-700 ml-3 space-y-8">
-                <li className="mb-10 ml-6">
-                  <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-[#283928] rounded-full -left-4 ring-4 ring-white dark:ring-[#1c2e1c] text-primary-DEFAULT font-bold text-sm">1</span>
-                  <h4 className="font-semibold text-lg mb-1 text-slate-900 dark:text-white">Posicionamento</h4>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Deite-se no banco plano com os olhos diretamente abaixo da barra. Mantenha os pés firmes no chão e a coluna levemente arqueada.</p>
-                </li>
-                <li className="ml-6">
-                  <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-[#283928] rounded-full -left-4 ring-4 ring-white dark:ring-[#1c2e1c] text-primary-DEFAULT font-bold text-sm">2</span>
-                  <h4 className="font-semibold text-lg mb-1 text-slate-900 dark:text-white">Movimento</h4>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Desça a barra de forma controlada até tocar o meio do peito. Empurre a barra de volta à posição inicial.</p>
-                </li>
-              </ol>
+
+              {exercise.instructions && exercise.instructions.length > 0 ? (
+                <ol className="relative border-l border-gray-200 dark:border-gray-700 ml-3 space-y-8">
+                  {exercise.instructions.map((step, index) => (
+                    <li key={index} className={index === exercise.instructions!.length - 1 ? "ml-6" : "mb-10 ml-6"}>
+                      <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-[#283928] rounded-full -left-4 ring-4 ring-white dark:ring-[#1c2e1c] text-primary-DEFAULT font-bold text-sm">{index + 1}</span>
+                      <h4 className="font-semibold text-lg mb-1 text-slate-900 dark:text-white">{step.title}</h4>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{step.text}</p>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">Instruções detalhadas em breve.</p>
+              )}
             </div>
           </div>
 
@@ -224,10 +247,17 @@ const ExerciseDetails: React.FC = () => {
                   <p className="text-xs uppercase text-gray-500 font-bold mb-2 tracking-wider">Primário</p>
                   <div className="flex flex-wrap gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#16a34a] dark:bg-[#13ec13] text-white dark:text-black font-bold text-sm">
-                      Peitoral Maior
+                      {exercise.muscle}
                       <span className="material-symbols-outlined text-[18px]">check_circle</span>
                     </span>
                   </div>
+                </div>
+                <div>
+                  <p className="text-xs uppercase text-gray-500 font-bold mb-2 tracking-wider">Equipamento</p>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-light dark:bg-white/10 text-slate-700 dark:text-white font-medium text-sm">
+                    <span className="material-symbols-outlined text-[18px]">fitness_center</span>
+                    {exercise.equipment}
+                  </span>
                 </div>
               </div>
             </div>
