@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const Goals: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Todas as Metas');
+  const [showAddGoalModal, setShowAddGoalModal] = useState(false);
 
   const stats = [
     { label: 'Metas Ativas', value: '8', badge: 'Active', badgeColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: 'flag' },
@@ -87,9 +88,19 @@ const Goals: React.FC = () => {
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8 pb-20">
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Metas de Fitness</h1>
-        <p className="text-slate-500 dark:text-text-secondary text-lg">Defina limites e supere seus recordes pessoais.</p>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Metas de Fitness</h1>
+          <p className="text-slate-500 dark:text-text-secondary text-lg">Defina limites e supere seus recordes pessoais.</p>
+        </div>
+        <button
+          onClick={() => setShowAddGoalModal(true)}
+          className="flex items-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white px-5 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-green-600/20"
+        >
+          <span className="material-symbols-outlined">add_circle</span>
+          Nova Meta
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -121,30 +132,30 @@ const Goals: React.FC = () => {
               <p className="text-sm text-slate-500 dark:text-slate-400">Frequência de treinos vs Meta</p>
             </div>
             <div className="flex items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400">
-               <div className="flex items-center gap-1">
-                 <div className="size-2 rounded-full bg-[#16a34a]"></div>
-                 Realizado
-               </div>
-               <div className="flex items-center gap-1">
-                 <div className="size-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
-                 Meta
-               </div>
+              <div className="flex items-center gap-1">
+                <div className="size-2 rounded-full bg-[#16a34a]"></div>
+                Realizado
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="size-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                Meta
+              </div>
             </div>
           </div>
-          
+
           <div className="flex items-end justify-between h-48 gap-2 sm:gap-4">
             {weeklyConsistency.map((day, idx) => (
               <div key={idx} className="flex flex-col items-center flex-1 gap-2 group cursor-pointer h-full justify-end">
                 <div className="relative w-full max-w-[40px] h-full rounded-t-sm bg-slate-100 dark:bg-white/5 overflow-hidden">
                   {/* Background Fill (Goal) - Usually implied as full height or specific target line, 
                       here we use opacity to show 'potential' vs 'realized' */}
-                  
+
                   {/* Realized Fill */}
-                  <div 
+                  <div
                     className={`absolute bottom-0 w-full rounded-t-sm transition-all duration-500 ${day.future ? 'bg-[#16a34a]/30' : 'bg-[#16a34a]'}`}
                     style={{ height: `${day.val}%` }}
                   ></div>
-                  
+
                   {/* Hover Effect */}
                   <div className="absolute inset-0 bg-[#16a34a]/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
@@ -158,40 +169,40 @@ const Goals: React.FC = () => {
 
         {/* Featured Goal Card (Marathon) */}
         <div className="lg:col-span-1 relative overflow-hidden rounded-xl bg-[#102210] p-6 shadow-lg flex flex-col group">
-           {/* Background Blur Effect */}
-           <div className="absolute -top-10 -right-10 size-64 bg-[#16a34a]/20 rounded-full blur-3xl pointer-events-none"></div>
-           
-           <div className="relative z-10 flex justify-between items-start mb-6">
-             <div>
-               <span className="inline-block bg-[#16a34a] text-[#102210] text-xs font-bold px-2 py-1 rounded mb-2">Foco Principal</span>
-               <h3 className="text-white text-xl font-bold">Maratona 42k</h3>
-             </div>
-             <div className="bg-white/10 p-2 rounded-lg backdrop-blur-sm text-[#16a34a]">
-               <span className="material-symbols-outlined">directions_run</span>
-             </div>
-           </div>
+          {/* Background Blur Effect */}
+          <div className="absolute -top-10 -right-10 size-64 bg-[#16a34a]/20 rounded-full blur-3xl pointer-events-none"></div>
 
-           <div className="relative z-10 flex-1 flex flex-col justify-center mb-6">
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-4xl font-bold text-white">32.5</span>
-                <span className="text-slate-400 text-lg">/ 42 km</span>
-              </div>
-              <p className="text-slate-400 text-sm">Distância máxima alcançada</p>
-           </div>
+          <div className="relative z-10 flex justify-between items-start mb-6">
+            <div>
+              <span className="inline-block bg-[#16a34a] text-[#102210] text-xs font-bold px-2 py-1 rounded mb-2">Foco Principal</span>
+              <h3 className="text-white text-xl font-bold">Maratona 42k</h3>
+            </div>
+            <div className="bg-white/10 p-2 rounded-lg backdrop-blur-sm text-[#16a34a]">
+              <span className="material-symbols-outlined">directions_run</span>
+            </div>
+          </div>
 
-           <div className="relative z-10">
-              <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
-                <span>Progresso</span>
-                <span>77%</span>
-              </div>
-              <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-[#16a34a] w-[77%] rounded-full shadow-[0_0_10px_rgba(22,163,74,0.5)]"></div>
-              </div>
-              <div className="mt-4 flex items-center gap-2 text-sm text-slate-300">
-                <span className="material-symbols-outlined text-[#16a34a] text-base">event</span>
-                <span>Meta para 15 de Nov</span>
-              </div>
-           </div>
+          <div className="relative z-10 flex-1 flex flex-col justify-center mb-6">
+            <div className="flex items-baseline gap-1 mb-1">
+              <span className="text-4xl font-bold text-white">32.5</span>
+              <span className="text-slate-400 text-lg">/ 42 km</span>
+            </div>
+            <p className="text-slate-400 text-sm">Distância máxima alcançada</p>
+          </div>
+
+          <div className="relative z-10">
+            <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
+              <span>Progresso</span>
+              <span>77%</span>
+            </div>
+            <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-[#16a34a] w-[77%] rounded-full shadow-[0_0_10px_rgba(22,163,74,0.5)]"></div>
+            </div>
+            <div className="mt-4 flex items-center gap-2 text-sm text-slate-300">
+              <span className="material-symbols-outlined text-[#16a34a] text-base">event</span>
+              <span>Meta para 15 de Nov</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -202,11 +213,10 @@ const Goals: React.FC = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`relative pb-4 text-sm font-bold transition-colors whitespace-nowrap ${
-                activeTab === tab 
-                  ? 'text-slate-900 dark:text-white' 
+              className={`relative pb-4 text-sm font-bold transition-colors whitespace-nowrap ${activeTab === tab
+                  ? 'text-slate-900 dark:text-white'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
+                }`}
             >
               {tab}
               {activeTab === tab && (
@@ -221,12 +231,12 @@ const Goals: React.FC = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Minhas Metas</h2>
         <div className="flex gap-2">
-           <button className="size-8 flex items-center justify-center rounded bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white">
-             <span className="material-symbols-outlined text-lg">grid_view</span>
-           </button>
-           <button className="size-8 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
-             <span className="material-symbols-outlined text-lg">list</span>
-           </button>
+          <button className="size-8 flex items-center justify-center rounded bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white">
+            <span className="material-symbols-outlined text-lg">grid_view</span>
+          </button>
+          <button className="size-8 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+            <span className="material-symbols-outlined text-lg">list</span>
+          </button>
         </div>
       </div>
 
@@ -260,35 +270,129 @@ const Goals: React.FC = () => {
                 </span>
               </div>
               <div className={`h-2 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden ${goal.reverse ? 'flex justify-end' : ''}`}>
-                 <div 
-                   className="h-full bg-[#16a34a] rounded-full relative overflow-hidden"
-                   style={{ width: `${goal.progress}%` }}
-                 >
-                   {goal.shimmer && (
-                     <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
-                   )}
-                 </div>
+                <div
+                  className="h-full bg-[#16a34a] rounded-full relative overflow-hidden"
+                  style={{ width: `${goal.progress}%` }}
+                >
+                  {goal.shimmer && (
+                    <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
+                  )}
+                </div>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 dark:border-border-dark flex items-center justify-between text-xs">
-               <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                 <span className="material-symbols-outlined text-sm">{goal.statusIcon}</span>
-                 <span>{goal.statusText}</span>
-               </div>
-               <span className={`font-medium ${goal.trendColor}`}>{goal.trend}</span>
+              <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                <span className="material-symbols-outlined text-sm">{goal.statusIcon}</span>
+                <span>{goal.statusText}</span>
+              </div>
+              <span className={`font-medium ${goal.trendColor}`}>{goal.trend}</span>
             </div>
           </div>
         ))}
 
         {/* Add New Goal Card */}
-        <button className="group flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-border-dark p-5 min-h-[180px] hover:bg-slate-50 dark:hover:bg-white/5 hover:border-[#16a34a] transition-all cursor-pointer">
-           <div className="size-12 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-[#16a34a] group-hover:text-white transition-colors">
-             <span className="material-symbols-outlined text-2xl">add</span>
-           </div>
-           <p className="font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">Adicionar Nova Meta</p>
+        <button
+          onClick={() => setShowAddGoalModal(true)}
+          className="group flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-border-dark p-5 min-h-[180px] hover:bg-slate-50 dark:hover:bg-white/5 hover:border-[#16a34a] transition-all cursor-pointer"
+        >
+          <div className="size-12 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-[#16a34a] group-hover:text-white transition-colors">
+            <span className="material-symbols-outlined text-2xl">add</span>
+          </div>
+          <p className="font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">Adicionar Nova Meta</p>
         </button>
       </div>
+
+      {/* Add Goal Modal */}
+      {showAddGoalModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowAddGoalModal(false)}
+          ></div>
+          <div className="relative w-full max-w-md bg-white dark:bg-[#1c271c] rounded-2xl shadow-2xl ring-1 ring-white/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-slate-50 dark:bg-[#152015] px-6 py-4 border-b border-slate-200 dark:border-white/5 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#16a34a]">flag</span>
+                Nova Meta
+              </h3>
+              <button
+                onClick={() => setShowAddGoalModal(false)}
+                className="text-slate-400 hover:text-red-500 transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="p-6 flex flex-col gap-4">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Nome da Meta</span>
+                <input
+                  type="text"
+                  placeholder="Ex: Supino 100kg"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a] outline-none"
+                />
+              </label>
+
+              <div className="grid grid-cols-2 gap-4">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Categoria</span>
+                  <select className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a] outline-none appearance-none">
+                    <option>Força</option>
+                    <option>Cardio</option>
+                    <option>Estética</option>
+                    <option>Habilidade</option>
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Prazo</span>
+                  <select className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a] outline-none appearance-none">
+                    <option>Curto Prazo</option>
+                    <option>Longo Prazo</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Alvo</span>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a] outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Unidade</span>
+                  <input
+                    type="text"
+                    placeholder="kg, km..."
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0a160a] border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a] outline-none"
+                  />
+                </label>
+              </div>
+
+              <div className="flex gap-3 mt-2">
+                <button
+                  onClick={() => setShowAddGoalModal(false)}
+                  className="flex-1 py-3 px-4 bg-slate-100 dark:bg-[#0a160a] hover:bg-slate-200 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    alert('Meta criada com sucesso!');
+                    setShowAddGoalModal(false);
+                  }}
+                  className="flex-1 py-3 px-4 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold rounded-xl shadow-lg shadow-green-600/20 transition-all transform active:scale-[0.98]"
+                >
+                  Criar Meta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes shimmer {
