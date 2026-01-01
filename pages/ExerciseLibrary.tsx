@@ -41,7 +41,7 @@ const ExerciseLibrary: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               leftIcon={<span className="material-symbols-outlined">search</span>}
-              className="h-11 shadow-sm border-slate-200 dark:border-white/10"
+              className="h-12 shadow-sm border-slate-200 dark:border-white/10"
             />
           </div>
           <Button icon="add" className="w-full sm:w-auto shrink-0 shadow-lg">

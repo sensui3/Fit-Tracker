@@ -37,7 +37,8 @@ const WorkoutHistory: React.FC = () => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         leftIcon={<span className="material-symbols-outlined">search</span>}
-                        className="flex-1"
+                        className="h-12 shadow-sm"
+                        containerClassName="flex-1"
                     />
                 </div>
             </div>
@@ -53,8 +54,8 @@ const WorkoutHistory: React.FC = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 <div className={`size-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${workout.type === 'Cardio' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
-                                        workout.type === 'Musculação' ? 'bg-[#16a34a] text-white' :
-                                            'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
+                                    workout.type === 'Musculação' ? 'bg-[#16a34a] text-white' :
+                                        'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
                                     }`}>
                                     <span className="material-symbols-outlined text-2xl">
                                         {workout.type === 'Cardio' ? 'directions_run' :
@@ -87,8 +88,8 @@ const WorkoutHistory: React.FC = () => {
                                     <span className="text-xs font-bold text-slate-400">{workout.volume}</span>
                                 </div>
                                 <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${workout.status === 'Concluído'
-                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                        : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
                                     }`}>
                                     {workout.status}
                                 </span>

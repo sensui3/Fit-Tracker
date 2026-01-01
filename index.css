@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    @apply transition-colors duration-300 ease-in-out;
+  }
+
   body {
-    @apply font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200;
+    @apply font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white;
   }
 }
 

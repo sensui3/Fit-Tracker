@@ -2,12 +2,19 @@ import React, { Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { useTheme } from '../context/ThemeContext';
+import { Theme } from '../types';
 
 // Lazy load heavy chart component
 const WorkoutVolumeChart = lazy(() => import('../components/dashboard/WorkoutVolumeChart'));
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === Theme.Dark ? Theme.Light : Theme.Dark);
+  };
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
@@ -17,13 +24,22 @@ const Dashboard: React.FC = () => {
           <h1 className="text-2xl md:text-3xl font-bold dark:text-white">Bem-vindo de volta, João! 👋</h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">Você completou 80% do seu objetivo semanal. Mantenha o ritmo.</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-[#16a34a] dark:hover:text-[#13ec13] transition-all duration-300 border border-transparent hover:border-primary-DEFAULT/20"
+            title={theme === Theme.Dark ? 'Mudar para modo claro' : 'Mudar para modo escuro'}
+          >
+            <span className="material-symbols-outlined text-2xl">
+              {theme === Theme.Dark ? 'light_mode' : 'dark_mode'}
+            </span>
+          </button>
           <button
             onClick={() => navigate('/notifications')}
-            className="relative p-2 text-slate-500 hover:text-[#16a34a] dark:hover:text-[#13ec13] transition-colors"
+            className="relative p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-[#16a34a] dark:hover:text-[#13ec13] transition-all duration-300 border border-transparent hover:border-primary-DEFAULT/20"
           >
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-background-light dark:border-background-dark"></span>
+            <span className="material-symbols-outlined text-2xl">notifications</span>
+            <span className="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
           </button>
         </div>
       </div>
@@ -105,7 +121,11 @@ const Dashboard: React.FC = () => {
             </div>
             <h3 className="text-slate-900 dark:text-white text-lg font-bold z-10 relative">Iniciar Cronômetro</h3>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 mb-4 z-10 relative">Comece um treino livre agora mesmo.</p>
-            <Button variant="outline" size="sm" className="w-fit z-10">
+            <Button
+              variant="primary"
+              size="md"
+              className="w-fit z-10 !bg-[#16a34a] !text-white hover:!bg-[#15803d] shadow-xl shadow-green-600/30 px-10"
+            >
               Iniciar
             </Button>
           </Card>
@@ -155,8 +175,8 @@ const Dashboard: React.FC = () => {
             >
               <div className="flex items-center gap-4">
                 <div className={`size-10 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform ${item.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400' :
-                    item.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' :
-                      'bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400'
+                  item.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' :
+                    'bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400'
                   }`}>
                   <span className="material-symbols-outlined">{item.icon}</span>
                 </div>
