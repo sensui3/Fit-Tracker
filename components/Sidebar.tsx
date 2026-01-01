@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Button } from './ui/Button';
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Sidebar: React.FC = () => {
     { icon: 'flag', label: 'Metas', path: '/goals' },
     { icon: 'assignment', label: 'Planos', path: '/create-plan' },
     { icon: 'bar_chart', label: 'Relatórios', path: '/reports' },
-    { icon: 'menu_book', label: 'Exercícios', path: '/exercise/1' }, 
+    { icon: 'menu_book', label: 'Exercícios', path: '/exercise/1' },
   ];
 
   const systemItems = [
@@ -41,13 +42,14 @@ const Sidebar: React.FC = () => {
 
       {/* CTA */}
       <div className="px-5 py-4 shrink-0">
-        <button 
+        <Button
           onClick={() => navigate('/log-workout')}
-          className="group w-full flex items-center justify-center gap-3 bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-black h-12 rounded-xl transition-all duration-200 shadow-md transform hover:-translate-y-0.5"
+          fullWidth
+          className="group shadow-md transform hover:-translate-y-0.5"
+          leftIcon={<span className="material-symbols-outlined font-semibold">add_circle</span>}
         >
-          <span className="material-symbols-outlined font-semibold">add_circle</span>
           <span className="font-bold text-sm tracking-wide">NOVO TREINO</span>
-        </button>
+        </Button>
       </div>
 
       {/* Navigation */}
@@ -55,15 +57,15 @@ const Sidebar: React.FC = () => {
         <div className="px-3 mb-2 mt-2">
           <span className="text-[11px] uppercase tracking-widest font-bold text-slate-400 dark:text-slate-500">Principal</span>
         </div>
-        
+
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) => `
               flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all duration-200
-              ${isActive 
-                ? 'bg-primary-DEFAULT/10 dark:bg-primary-neon/10 text-primary-DEFAULT dark:text-primary-neon' 
+              ${isActive
+                ? 'bg-primary-DEFAULT/10 dark:bg-primary-neon/10 text-primary-DEFAULT dark:text-primary-neon'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'}
             `}
           >
@@ -84,17 +86,17 @@ const Sidebar: React.FC = () => {
             to={item.path}
             className={({ isActive }) => `
               flex items-center gap-3 px-3 py-3 rounded-lg font-medium transition-all duration-200 relative
-              ${isActive 
-                ? 'bg-primary-DEFAULT/10 dark:bg-primary-neon/10 text-primary-DEFAULT dark:text-primary-neon' 
+              ${isActive
+                ? 'bg-primary-DEFAULT/10 dark:bg-primary-neon/10 text-primary-DEFAULT dark:text-primary-neon'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'}
             `}
           >
             <span className="material-symbols-outlined">{item.icon}</span>
             <span className="flex-1">{item.label}</span>
             {item.count && (
-               <span className="bg-[#16a34a] text-[#102210] text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto">
-                 {item.count}
-               </span>
+              <span className="bg-[#16a34a] text-[#102210] text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto">
+                {item.count}
+              </span>
             )}
           </NavLink>
         ))}
@@ -103,8 +105,8 @@ const Sidebar: React.FC = () => {
       {/* User Footer */}
       <div className="p-4 border-t border-border-light dark:border-border-dark bg-slate-50 dark:bg-black/20">
         <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5 cursor-pointer transition-colors group">
-          <img 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzah6RHgTQs1E5A-ZbDUGXw5szSloOWeof78uX7bOMTCDcMX3ouYvjDr8iK5NZePv2VXkX3ePZ9-CrG5xjSMwfCfiR2VeqkZh2OGoIgR1E0j1GRT8klfwV42hlnHPibND0arPqA53BPA_x1IHE9H7fbCQ8m9VpaGWLupYxtDcohh6sSYWKvLvt1Oc2J-JkGLpn4xw54fql6O0mx8YiDV2hjQl6zXa0INlNzCyF4UyGL3sAveZv1tWmGPdDW80b9noy9cZEAhhgBa4" 
+          <img
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzah6RHgTQs1E5A-ZbDUGXw5szSloOWeof78uX7bOMTCDcMX3ouYvjDr8iK5NZePv2VXkX3ePZ9-CrG5xjSMwfCfiR2VeqkZh2OGoIgR1E0j1GRT8klfwV42hlnHPibND0arPqA53BPA_x1IHE9H7fbCQ8m9VpaGWLupYxtDcohh6sSYWKvLvt1Oc2J-JkGLpn4xw54fql6O0mx8YiDV2hjQl6zXa0INlNzCyF4UyGL3sAveZv1tWmGPdDW80b9noy9cZEAhhgBa4"
             alt="User Avatar"
             className="size-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-primary-DEFAULT/50 dark:group-hover:ring-primary-neon/50 transition-all"
           />

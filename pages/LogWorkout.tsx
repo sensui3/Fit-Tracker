@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface ExerciseData {
-  name: string;
-  muscle: string;
-  image: string;
-}
+import { EXERCISES, Exercise } from '../data/exercises';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Card } from '../components/ui/Card';
+import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { useToast } from '../components/ui/Toast';
 
 interface WorkoutSet {
   id: number;
@@ -18,34 +18,14 @@ interface WorkoutSet {
 
 const DEFAULT_REST_TIME = 60; // seconds
 
-// Lista enriquecida de exercícios com imagens e grupos musculares
-const EXERCISE_DB: ExerciseData[] = [
-  { name: "Supino Reto (Barra)", muscle: "Peitoral", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Supino Inclinado (Halteres)", muscle: "Peitoral Superior", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Crucifixo na Máquina", muscle: "Peitoral", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Agachamento Livre", muscle: "Pernas (Quadríceps)", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAYmC0rPib7YXizNo1HV2gleXNd_QBIIsW63ljv5wGV4DiJTsWtk0CKhIGL6qbylH6tPbCd_OGZcJH8O4KYzmF7fcIAOwFcRlsvgMgXyPG6K6fYQks-2GFXJ4Np0tTU77q7eKx9ie2fO7HO6x9f5gF7-8o6noeaG88dbPB5SJvmHxYicv-FDIWUNRD6FN1ayAn7MDm-iC2FQjM0Mfw40Ky9xpwPVZQep1PiBKHDDuyoEYf60N-kwoWGO9sREBUAqrtL4Jdj43K83Z0" },
-  { name: "Leg Press 45", muscle: "Pernas", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAYmC0rPib7YXizNo1HV2gleXNd_QBIIsW63ljv5wGV4DiJTsWtk0CKhIGL6qbylH6tPbCd_OGZcJH8O4KYzmF7fcIAOwFcRlsvgMgXyPG6K6fYQks-2GFXJ4Np0tTU77q7eKx9ie2fO7HO6x9f5gF7-8o6noeaG88dbPB5SJvmHxYicv-FDIWUNRD6FN1ayAn7MDm-iC2FQjM0Mfw40Ky9xpwPVZQep1PiBKHDDuyoEYf60N-kwoWGO9sREBUAqrtL4Jdj43K83Z0" },
-  { name: "Cadeira Extensora", muscle: "Quadríceps", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAYmC0rPib7YXizNo1HV2gleXNd_QBIIsW63ljv5wGV4DiJTsWtk0CKhIGL6qbylH6tPbCd_OGZcJH8O4KYzmF7fcIAOwFcRlsvgMgXyPG6K6fYQks-2GFXJ4Np0tTU77q7eKx9ie2fO7HO6x9f5gF7-8o6noeaG88dbPB5SJvmHxYicv-FDIWUNRD6FN1ayAn7MDm-iC2FQjM0Mfw40Ky9xpwPVZQep1PiBKHDDuyoEYf60N-kwoWGO9sREBUAqrtL4Jdj43K83Z0" },
-  { name: "Levantamento Terra", muscle: "Costas / Posterior", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAYmC0rPib7YXizNo1HV2gleXNd_QBIIsW63ljv5wGV4DiJTsWtk0CKhIGL6qbylH6tPbCd_OGZcJH8O4KYzmF7fcIAOwFcRlsvgMgXyPG6K6fYQks-2GFXJ4Np0tTU77q7eKx9ie2fO7HO6x9f5gF7-8o6noeaG88dbPB5SJvmHxYicv-FDIWUNRD6FN1ayAn7MDm-iC2FQjM0Mfw40Ky9xpwPVZQep1PiBKHDDuyoEYf60N-kwoWGO9sREBUAqrtL4Jdj43K83Z0" },
-  { name: "Puxada Alta", muscle: "Dorsais", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAYmC0rPib7YXizNo1HV2gleXNd_QBIIsW63ljv5wGV4DiJTsWtk0CKhIGL6qbylH6tPbCd_OGZcJH8O4KYzmF7fcIAOwFcRlsvgMgXyPG6K6fYQks-2GFXJ4Np0tTU77q7eKx9ie2fO7HO6x9f5gF7-8o6noeaG88dbPB5SJvmHxYicv-FDIWUNRD6FN1ayAn7MDm-iC2FQjM0Mfw40Ky9xpwPVZQep1PiBKHDDuyoEYf60N-kwoWGO9sREBUAqrtL4Jdj43K83Z0" },
-  { name: "Remada Curvada", muscle: "Costas", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAYmC0rPib7YXizNo1HV2gleXNd_QBIIsW63ljv5wGV4DiJTsWtk0CKhIGL6qbylH6tPbCd_OGZcJH8O4KYzmF7fcIAOwFcRlsvgMgXyPG6K6fYQks-2GFXJ4Np0tTU77q7eKx9ie2fO7HO6x9f5gF7-8o6noeaG88dbPB5SJvmHxYicv-FDIWUNRD6FN1ayAn7MDm-iC2FQjM0Mfw40Ky9xpwPVZQep1PiBKHDDuyoEYf60N-kwoWGO9sREBUAqrtL4Jdj43K83Z0" },
-  { name: "Rosca Direta", muscle: "Bíceps", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Rosca Martelo", muscle: "Bíceps / Antebraço", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Tríceps Corda", muscle: "Tríceps", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Tríceps Testa", muscle: "Tríceps", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Desenvolvimento Militar", muscle: "Ombros", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Elevação Lateral", muscle: "Ombros (Lateral)", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Abdominal Supra", muscle: "Abdômen", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-  { name: "Prancha Isométrica", muscle: "Core", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw" },
-];
-
 const LogWorkout: React.FC = () => {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Estados para o Autocomplete
   const [exerciseInput, setExerciseInput] = useState('');
-  const [filteredExercises, setFilteredExercises] = useState<ExerciseData[]>([]);
+  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -124,7 +104,7 @@ const LogWorkout: React.FC = () => {
 
     // Filtra a lista
     if (userInput.length > 0) {
-      const filtered = EXERCISE_DB.filter(
+      const filtered = EXERCISES.filter(
         (exercise) => exercise.name.toLowerCase().includes(userInput.toLowerCase())
       );
       setFilteredExercises(filtered);
@@ -156,7 +136,7 @@ const LogWorkout: React.FC = () => {
   };
 
   // Seleciona um item da lista
-  const handleSelectExercise = (exercise: ExerciseData) => {
+  const handleSelectExercise = (exercise: Exercise) => {
     setExerciseInput(exercise.name);
     setShowSuggestions(false);
     setHighlightedIndex(-1);
@@ -197,41 +177,36 @@ const LogWorkout: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 flex flex-col gap-6">
-              <div className="bg-white dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm p-6 md:p-8">
+              <Card>
                 <form className="flex flex-col gap-8" onSubmit={(e) => e.preventDefault()}>
                   {/* Exercise Input com Autocomplete */}
                   <div className="flex flex-col gap-2 relative" ref={dropdownRef}>
-                    <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide">Exercício</label>
-                    <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <span className="material-symbols-outlined text-slate-400 dark:text-text-secondary group-focus-within:text-[#16a34a] transition-colors">search</span>
-                      </div>
-                      <input
-                        className="w-full h-14 pl-12 pr-4 bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-text-secondary focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] transition-all text-lg font-medium"
-                        placeholder="Ex: Supino Reto, Agachamento..."
-                        type="text"
-                        value={exerciseInput}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyDown}
-                        onFocus={() => {
-                          if (exerciseInput) setShowSuggestions(true);
-                        }}
-                      />
-                    </div>
+                    <Input
+                      label="Exercício"
+                      placeholder="Ex: Supino Reto, Agachamento..."
+                      value={exerciseInput}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      onFocus={() => {
+                        if (exerciseInput) setShowSuggestions(true);
+                      }}
+                      leftIcon={<span className="material-symbols-outlined">search</span>}
+                    />
 
                     {/* Dropdown de Sugestões */}
                     {showSuggestions && filteredExercises.length > 0 && (
                       <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white dark:bg-surface-darker border border-slate-200 dark:border-border-dark rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto custom-scrollbar">
                         {filteredExercises.map((exercise, index) => (
                           <div
-                            key={index}
+                            key={exercise.id}
                             className={`px-4 py-3 cursor-pointer transition-colors flex items-center gap-4 group ${index === highlightedIndex ? 'bg-slate-100 dark:bg-white/10' : 'hover:bg-slate-50 dark:hover:bg-white/5'}`}
                             onClick={() => handleSelectExercise(exercise)}
                           >
-                            <img
+                            <OptimizedImage
                               src={exercise.image}
                               alt={exercise.name}
-                              className="size-10 rounded-md object-cover bg-slate-200 dark:bg-white/10 shrink-0"
+                              className="w-full h-full object-cover"
+                              containerClassName="size-10 rounded-md shrink-0 bg-slate-200 dark:bg-white/10"
                             />
                             <div className="flex flex-col flex-1 min-w-0">
                               <span className="text-slate-900 dark:text-white font-medium truncate group-hover:text-[#16a34a] transition-colors">{exercise.name}</span>
@@ -274,15 +249,13 @@ const LogWorkout: React.FC = () => {
 
                             {/* Weight Input */}
                             <div className="col-span-3">
-                              <div className="relative">
-                                <input
-                                  type="number"
-                                  value={set.weight}
-                                  disabled={set.completed}
-                                  onChange={(e) => updateSet(set.id, 'weight', parseFloat(e.target.value) || 0)}
-                                  className={`w-full border border-slate-200 dark:border-border-dark rounded-xl px-2 py-2 text-center font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all ${set.completed ? 'bg-slate-100 dark:bg-white/5 opacity-70 cursor-not-allowed' : 'bg-slate-50 dark:bg-background-dark'}`}
-                                />
-                              </div>
+                              <input
+                                type="number"
+                                value={set.weight}
+                                disabled={set.completed}
+                                onChange={(e) => updateSet(set.id, 'weight', parseFloat(e.target.value) || 0)}
+                                className={`w-full border border-slate-200 dark:border-border-dark rounded-xl px-2 py-2 text-center font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all ${set.completed ? 'bg-slate-100 dark:bg-white/5 opacity-70 cursor-not-allowed' : 'bg-slate-50 dark:bg-background-dark'}`}
+                              />
                             </div>
 
                             {/* Reps Input */}
@@ -302,8 +275,8 @@ const LogWorkout: React.FC = () => {
                                 onClick={() => updateSet(set.id, 'showNotes', !set.showNotes)}
                                 title={set.notes ? "Editar Nota" : "Adicionar Nota"}
                                 className={`size-10 rounded-xl flex items-center justify-center transition-all ${set.showNotes || set.notes
-                                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500'
-                                    : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10'
+                                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500'
+                                  : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10'
                                   }`}
                               >
                                 <span className={`material-symbols-outlined text-xl ${set.notes ? 'filled' : ''}`}>
@@ -314,8 +287,8 @@ const LogWorkout: React.FC = () => {
                                 onClick={() => updateSet(set.id, 'completed', !set.completed)}
                                 title={set.completed ? "Editar (Desmarcar)" : "Concluir Série"}
                                 className={`size-10 rounded-xl flex items-center justify-center transition-all ${set.completed
-                                    ? 'bg-[#16a34a] text-white shadow-lg shadow-green-600/20 hover:bg-[#15803d]'
-                                    : 'bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-slate-500 hover:bg-slate-300 dark:hover:bg-white/20'
+                                  ? 'bg-[#16a34a] text-white shadow-lg shadow-green-600/20 hover:bg-[#15803d]'
+                                  : 'bg-slate-200 dark:bg-white/10 text-slate-400 dark:text-slate-500 hover:bg-slate-300 dark:hover:bg-white/20'
                                   }`}
                               >
                                 <span className="material-symbols-outlined text-xl">
@@ -358,34 +331,47 @@ const LogWorkout: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-border-dark mt-2">
-                    <button onClick={() => navigate('/workouts')} className="bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-black font-bold h-12 px-8 rounded-lg transition-colors flex items-center gap-2 shadow-lg shadow-green-600/25 dark:shadow-green-500/25">
-                      <span className="material-symbols-outlined">check</span>
+                    <Button
+                      onClick={() => {
+                        addToast({
+                          type: 'success',
+                          title: 'Sucesso!',
+                          message: 'Treino salvo com sucesso.',
+                          duration: 4000
+                        });
+                        navigate('/workouts');
+                      }}
+                      leftIcon={<span className="material-symbols-outlined">check</span>}
+                    >
                       Salvar Registro
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="ghost"
                       onClick={() => setShowDeleteModal(true)}
-                      className="text-slate-500 dark:text-text-secondary hover:text-red-600 dark:hover:text-red-400 font-medium h-12 px-6 rounded-lg transition-colors ml-auto"
+                      className="ml-auto text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       Excluir
-                    </button>
+                    </Button>
                   </div>
                 </form>
-              </div>
+              </Card>
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-4 flex flex-col gap-6">
-              <div className="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-border-dark shadow-sm overflow-hidden">
+              <Card noPadding>
                 <div className="p-4 border-b border-slate-100 dark:border-border-dark flex justify-between items-center">
                   <h3 className="text-slate-900 dark:text-white font-bold text-lg">Últimos Registros</h3>
                   <button onClick={() => navigate('/workouts')} className="text-[#16a34a] text-sm font-medium hover:underline">Ver tudo</button>
                 </div>
                 <div className="flex flex-col">
+                  {/* Sample data replaced here with logic or keeping it static for now as per original */}
                   <div className="flex gap-4 p-4 border-b border-slate-100 dark:border-border-dark/50 hover:bg-slate-50 dark:hover:bg-background-dark/50 transition-colors cursor-pointer">
-                    <img
+                    <OptimizedImage
                       src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw"
                       alt="Supino Reto"
-                      className="size-14 rounded-lg object-cover shrink-0"
+                      className="w-full h-full object-cover"
+                      containerClassName="size-14 rounded-lg shrink-0"
                     />
                     <div className="flex flex-col justify-center flex-1">
                       <h4 className="text-slate-900 dark:text-white font-semibold leading-tight">Supino Reto</h4>
@@ -396,7 +382,7 @@ const LogWorkout: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             </div>
           </div>
         </div>
@@ -442,12 +428,14 @@ const LogWorkout: React.FC = () => {
               >
                 <span className="material-symbols-outlined text-xl">replay</span>
               </button>
-              <button
+              <Button
+                size="sm"
+                variant="danger"
                 onClick={() => setIsResting(false)}
-                className="bg-white/10 dark:bg-black/5 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white text-white dark:text-black px-4 py-2 rounded-lg text-sm font-bold transition-all ml-2"
+                className="ml-2"
               >
                 Pular
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -469,21 +457,23 @@ const LogWorkout: React.FC = () => {
                 </p>
               </div>
               <div className="flex gap-3 w-full mt-2">
-                <button
+                <Button
+                  variant="secondary"
+                  className="flex-1"
                   onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 px-4 py-2 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white font-bold hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
                 >
                   Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="danger"
+                  className="flex-1"
                   onClick={() => {
                     setShowDeleteModal(false);
                     navigate('/workouts');
                   }}
-                  className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition-colors shadow-lg shadow-red-600/20"
                 >
                   Excluir
-                </button>
+                </Button>
               </div>
             </div>
           </div>
