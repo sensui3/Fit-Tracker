@@ -6,9 +6,17 @@ export const useAuth = () => {
   const { user, isAuthenticated, isLoading, logout: storeLogout } = useAuthStore();
 
   const logout = async () => {
-    await signOut();
-    storeLogout();
-    window.location.href = '/login';
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Erro ao sair:', error);
+    } finally {
+      storeLogout();
+      // Com HashRouter, precisamos redirecionar para o hash correto
+      window.location.href = '/#/login';
+      // Recarrega para garantir limpeza total de estados residuais
+      window.location.reload();
+    }
   };
 
   return { user, isAuthenticated, isLoading, logout };
