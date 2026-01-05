@@ -3,6 +3,8 @@ import { Routes, Route, HashRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './components/ui/Toast';
+import { AppInitializer } from './components/AppInitializer';
+import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -31,43 +33,46 @@ const PageLoader = () => (
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <ToastProvider>
-          <HashRouter>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/login" element={<Login />} />
+    <GlobalErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <AppInitializer />
+            <HashRouter>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
 
-                {/* Rotas Protegidas */}
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <Layout />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<Dashboard />} />
-                  <Route path="reports" element={<Reports />} />
-                  <Route path="create-plan" element={<CreatePlan />} />
-                  <Route path="log-workout" element={<LogWorkout />} />
-                  <Route path="exercise/:id" element={<ExerciseDetails />} />
-                  <Route path="workouts" element={<WorkoutHistory />} />
-                  <Route path="exercises" element={<ExerciseLibrary />} />
-                  <Route path="goals" element={<Goals />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="settings" element={<Settings />} />
-                  <Route path="subscription" element={<Subscription />} />
-                  <Route path="timer" element={<Timer />} />
-                  <Route path="notifications" element={<Notifications />} />
-                </Route>
-              </Routes>
-            </Suspense>
-          </HashRouter>
-        </ToastProvider>
-      </AuthProvider>
-    </ThemeProvider>
+                  {/* Rotas Protegidas */}
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Layout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route index element={<Dashboard />} />
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="create-plan" element={<CreatePlan />} />
+                    <Route path="log-workout" element={<LogWorkout />} />
+                    <Route path="exercise/:id" element={<ExerciseDetails />} />
+                    <Route path="workouts" element={<WorkoutHistory />} />
+                    <Route path="exercises" element={<ExerciseLibrary />} />
+                    <Route path="goals" element={<Goals />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="subscription" element={<Subscription />} />
+                    <Route path="timer" element={<Timer />} />
+                    <Route path="notifications" element={<Notifications />} />
+                  </Route>
+                </Routes>
+              </Suspense>
+            </HashRouter>
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </GlobalErrorBoundary>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EXERCISES, Exercise } from '../data/exercises';
+import { EXERCISES } from '../data/exercises';
+import { Exercise } from '../types';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
@@ -297,13 +298,6 @@ const LogWorkout: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {isResting && (
-        <RestTimer
-          initialTime={DEFAULT_REST_TIME}
-          onClose={() => setIsResting(false)}
-        />
-      )}
 
       {showDeleteModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

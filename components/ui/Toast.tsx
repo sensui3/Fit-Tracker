@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useUIStore } from '../../stores/useUIStore';
 
-// Types
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 export interface ToastMessage {
@@ -11,21 +11,10 @@ export interface ToastMessage {
     duration?: number;
 }
 
-interface ToastContextType {
-    addToast: (toast: Omit<ToastMessage, 'id'>) => void;
-    removeToast: (id: string) => void;
-}
-
-// Context
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
-
-// Hook
+// Hook wrapper
 export const useToast = () => {
-    const context = useContext(ToastContext);
-    if (!context) {
-        throw new Error('useToast must be used within a ToastProvider');
-    }
-    return context;
+    const { addToast, removeToast } = useUIStore();
+    return { addToast, removeToast };
 };
 
 // UI Component for individual toast
@@ -44,7 +33,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
         setIsExiting(true);
         setTimeout(() => {
             onRemove(toast.id);
-        }, 300); // Match animation duration
+        }, 300); // Animation duration
     };
 
     const icons = {
@@ -90,29 +79,29 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
     );
 };
 
-// Provider
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [toasts, setToasts] = useState<ToastMessage[]>([]);
+// Global Toast Container
+export const GlobalToast: React.FC = () => {
+    const { toasts, removeToast } = useUIStore();
 
-    const addToast = useCallback(({ type, title, message, duration = 3000 }: Omit<ToastMessage, 'id'>) => {
-        const id = Math.random().toString(36).substring(2, 9);
-        setToasts((prev) => [...prev, { id, type, title, message, duration }]);
-    }, []);
-
-    const removeToast = useCallback((id: string) => {
-        setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, []);
+    if (toasts.length === 0) return null;
 
     return (
-        <ToastContext.Provider value={{ addToast, removeToast }}>
-            {children}
-            <div className="fixed top-4 right-4 z-[9999] flex flex-col items-end w-full max-w-sm pointer-events-none">
-                <div className="pointer-events-auto w-full">
-                    {toasts.map((toast) => (
-                        <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
-                    ))}
-                </div>
+        <div className="fixed top-4 right-4 z-[9999] flex flex-col items-end w-full max-w-sm pointer-events-none">
+            <div className="pointer-events-auto w-full">
+                {toasts.map((toast) => (
+                    <ToastItem key={toast.id} toast={toast as ToastMessage} onRemove={removeToast} />
+                ))}
             </div>
-        </ToastContext.Provider>
+        </div>
+    );
+};
+
+// Deprecated Provider for compatibility (optional)
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    return (
+        <>
+            {children}
+            <GlobalToast />
+        </>
     );
 };

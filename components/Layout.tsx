@@ -3,6 +3,9 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useTheme } from '../context/ThemeContext';
 import { Theme } from '../types';
+import { RestTimer } from './workout/RestTimer';
+import { useTimerStore } from '../stores/useTimerStore';
+import { useWorkoutStore } from '../stores/useWorkoutStore';
 
 const Layout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -73,6 +76,9 @@ const Layout: React.FC = () => {
           <Outlet />
         </div>
       </main>
+
+      {/* Global Rest Timer */}
+      <RestTimer onClose={() => useWorkoutStore.getState().setResting(false)} />
     </div>
   );
 };

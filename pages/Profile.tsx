@@ -5,6 +5,7 @@ import { Input } from '../components/ui/Input';
 import { OptimizedImage } from '../components/ui/OptimizedImage';
 import { useAuth } from '../context/AuthContext';
 import { dbService } from '../services/databaseService';
+import { sanitize, profileSchema } from '../lib/security';
 
 const Profile: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -133,14 +134,23 @@ const Profile: React.FC = () => {
     try {
       setSaving(true);
 
+      // Sanitização básica
+      const sanitizedName = sanitize(profileData.name);
+      const sanitizedLocation = sanitize(profileData.location);
+
+      // Validação simplificada com profileSchema
+      profileSchema.parse({
+        name: sanitizedName,
+      });
+
       // Salvar informações na tabela users
       await dbService.query`
         UPDATE users
         SET
-            name = ${profileData.name},
+            name = ${sanitizedName},
             birth_date = ${profileData.birthDate || null},
             gender = ${profileData.gender},
-            location = ${profileData.location},
+            location = ${sanitizedLocation},
             goal = ${profileData.goal},
             activity_level = ${profileData.activityLevel},
             updated_at = NOW()
@@ -158,9 +168,13 @@ const Profile: React.FC = () => {
       setIsEditing(false);
       console.log('Perfil salvo com sucesso!');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar perfil:', error);
-      alert('Erro ao salvar as informações.');
+      if (error.name === 'ZodError') {
+        alert(error.errors[0]?.message || 'Dados inválidos');
+      } else {
+        alert('Erro ao salvar as informações.');
+      }
     } finally {
       setSaving(false);
     }

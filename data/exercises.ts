@@ -1,16 +1,7 @@
 
-export interface Exercise {
-    id: string;
-    name: string;
-    muscle: string;
-    equipment: string;
-    difficulty: string;
-    image: string;
-    description: string;
-    instructions?: { title: string; text: string }[];
-}
+import { Exercise } from '../types';
 
-export const EXERCISES: Exercise[] = [
+const RAW_EXERCISES = [
     {
         id: "1",
         name: "Supino Reto (Barra)",
@@ -204,6 +195,13 @@ export const EXERCISES: Exercise[] = [
         ]
     }
 ];
+
+export const EXERCISES: Exercise[] = RAW_EXERCISES.map(e => ({
+    ...e,
+    muscle_group: e.muscle,
+    image_url: e.image,
+    is_custom: false
+} as unknown as Exercise));
 
 export const MUSCLE_FILTERS = ['Peitoral', 'Costas', 'Pernas', 'Bíceps', 'Ombros', 'Cardio', 'Tríceps', 'Core', 'Abdômen'];
 export const DIFFICULTY_FILTERS = ['Iniciante', 'Intermediário', 'Avançado'];

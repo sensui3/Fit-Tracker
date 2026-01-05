@@ -18,7 +18,7 @@ const data: ChartData[] = [
 
 const WorkoutVolumeChart: React.FC = () => {
     return (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
             <AreaChart data={data}>
                 <defs>
                     <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">

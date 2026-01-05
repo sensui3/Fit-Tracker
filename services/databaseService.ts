@@ -24,7 +24,7 @@ const getSql = () => {
         throw new Error('No database connection string provided');
     }
 
-    sqlInstance = neon(connectionString);
+    sqlInstance = neon(connectionString, { disableWarningInBrowsers: true });
     return sqlInstance;
 };
 

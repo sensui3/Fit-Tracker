@@ -53,11 +53,14 @@ export interface Exercise {
   id: string;
   name: string;
   muscle_group: MuscleGroup | string;
+  // UI Aliases
+  muscle?: string;
   equipment: string;
-  difficulty?: 'iniciante' | 'intermediario' | 'avancado';
+  difficulty?: 'iniciante' | 'intermediario' | 'avancado' | string;
   image_url?: string;
+  image?: string;
   description?: string;
-  instructions?: string[];
+  instructions?: string[] | { title: string; text: string }[];
   is_custom: boolean;
   user_id?: string;
   created_at?: string;

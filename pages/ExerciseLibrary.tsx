@@ -6,11 +6,13 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { OptimizedImage } from '../components/ui/OptimizedImage';
 import { dbService } from '../services/databaseService';
+import { useExerciseStore } from '../stores/useExerciseStore';
 
 import { useExerciseFilters } from '../hooks/useExerciseFilters';
 
 const ExerciseLibrary: React.FC = () => {
   const navigate = useNavigate();
+  const { toggleFavorite, isFavorite } = useExerciseStore();
   const [dbExercises, setDbExercises] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -259,8 +261,16 @@ const ExerciseLibrary: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <button className="text-slate-400 hover:text-[#16a34a] transition-colors" onClick={(e) => { e.stopPropagation(); /* bookmark logic */ }}>
-                  <span className="material-symbols-outlined text-xl">bookmark_border</span>
+                <button
+                  className={`transition-colors ${isFavorite(exercise.id) ? 'text-[#16a34a]' : 'text-slate-400 hover:text-[#16a34a]'}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(exercise.id);
+                  }}
+                >
+                  <span className={`material-symbols-outlined text-xl ${isFavorite(exercise.id) ? 'filled' : ''}`}>
+                    {isFavorite(exercise.id) ? 'bookmark' : 'bookmark_border'}
+                  </span>
                 </button>
               </div>
               <div className="mt-2 flex items-center gap-3 text-[10px] text-slate-500 dark:text-text-secondary">

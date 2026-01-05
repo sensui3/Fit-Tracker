@@ -1,32 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '../ui/Button';
+import { useTimerStore } from '../../stores/useTimerStore';
 
 interface RestTimerProps {
-    initialTime: number;
     onClose: () => void;
 }
 
-export const RestTimer: React.FC<RestTimerProps> = ({ initialTime, onClose }) => {
-    const [timeLeft, setTimeLeft] = useState(initialTime);
+export const RestTimer: React.FC<RestTimerProps> = ({ onClose }) => {
+    const {
+        timeLeft,
+        isActive,
+        tick,
+        stopTimer,
+        adjustTime,
+        initialTime,
+        setTimeLeft
+    } = useTimerStore();
 
     useEffect(() => {
-        if (timeLeft <= 0) {
+        if (!isActive) {
             onClose();
             return;
         }
 
         const interval = setInterval(() => {
-            setTimeLeft(prev => prev - 1);
+            tick();
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [timeLeft, onClose]);
+    }, [isActive, tick, onClose]);
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
         return `${m}:${s.toString().padStart(2, '0')}`;
     };
+
+    if (!isActive) return null;
 
     return (
         <div className="fixed bottom-6 left-0 w-full flex justify-center z-40 pointer-events-none px-4">
@@ -45,14 +55,14 @@ export const RestTimer: React.FC<RestTimerProps> = ({ initialTime, onClose }) =>
 
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => setTimeLeft(prev => Math.max(0, prev - 10))}
+                        onClick={() => adjustTime(-10)}
                         className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
                         title="-10s"
                     >
                         <span className="text-xs font-bold">-10</span>
                     </button>
                     <button
-                        onClick={() => setTimeLeft(prev => prev + 10)}
+                        onClick={() => adjustTime(10)}
                         className="size-9 flex items-center justify-center rounded-full bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 transition-colors text-slate-300 dark:text-slate-600 hover:text-white dark:hover:text-black"
                         title="+10s"
                     >
@@ -68,7 +78,7 @@ export const RestTimer: React.FC<RestTimerProps> = ({ initialTime, onClose }) =>
                     <Button
                         size="sm"
                         variant="danger"
-                        onClick={onClose}
+                        onClick={stopTimer}
                         className="ml-2"
                     >
                         Pular

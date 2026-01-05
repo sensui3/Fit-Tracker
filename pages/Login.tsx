@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signIn, signUp } from '../lib/auth-client';
+import { signInValidated, signUpValidated } from '../lib/auth-client';
+import { checkRateLimit } from '../lib/security';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -14,29 +15,34 @@ const Login: React.FC = () => {
 
   const handleAction = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Rate limit check
+    if (!checkRateLimit('auth-action', 3000)) {
+      setError('Muitas tentativas. Por favor, aguarde alguns segundos.');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
       if (isLogin) {
-        const { data, error } = await signIn.email({
-          email,
-          password,
-        });
-        if (error) throw error;
+        const { data, error: authError } = await signInValidated({ email, password });
+        if (authError) throw authError;
         navigate('/');
       } else {
-        const { data, error } = await signUp.email({
-          email,
-          password,
-          name,
-        });
-        if (error) throw error;
+        const { data, error: authError } = await signUpValidated({ email, password }, name);
+        if (authError) throw authError;
         setIsLogin(true); // Após cadastrar, muda para login
         alert('Conta criada com sucesso! Agora você pode entrar.');
       }
     } catch (err: any) {
-      setError(err.message || 'Ocorreu um erro ao processar sua solicitação.');
+      console.error('Auth error:', err);
+      if (err.name === 'ZodError') {
+        setError(err.errors[0]?.message || 'Dados inválidos');
+      } else {
+        setError(err.message || 'Ocorreu um erro ao processar sua solicitação.');
+      }
     } finally {
       setLoading(false);
     }

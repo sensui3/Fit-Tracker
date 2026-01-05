@@ -207,13 +207,17 @@ const ExerciseDetails: React.FC = () => {
 
               {exercise.instructions && exercise.instructions.length > 0 ? (
                 <ol className="relative border-l border-gray-200 dark:border-gray-700 ml-3 space-y-8">
-                  {exercise.instructions.map((step, index) => (
-                    <li key={index} className={index === exercise.instructions!.length - 1 ? "ml-6" : "mb-10 ml-6"}>
-                      <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-[#283928] rounded-full -left-4 ring-4 ring-white dark:ring-[#1c2e1c] text-primary-DEFAULT font-bold text-sm">{index + 1}</span>
-                      <h4 className="font-semibold text-lg mb-1 text-slate-900 dark:text-white">{step.title}</h4>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{step.text}</p>
-                    </li>
-                  ))}
+                  {exercise.instructions.map((step, index) => {
+                    const title = typeof step === 'string' ? `Passo ${index + 1}` : step.title;
+                    const text = typeof step === 'string' ? step : step.text;
+                    return (
+                      <li key={index} className={index === exercise.instructions!.length - 1 ? "ml-6" : "mb-10 ml-6"}>
+                        <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-[#283928] rounded-full -left-4 ring-4 ring-white dark:ring-[#1c2e1c] text-primary-DEFAULT font-bold text-sm">{index + 1}</span>
+                        <h4 className="font-semibold text-lg mb-1 text-slate-900 dark:text-white">{title}</h4>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{text}</p>
+                      </li>
+                    );
+                  })}
                 </ol>
               ) : (
                 <p className="text-gray-500 dark:text-gray-400">Instruções detalhadas em breve.</p>
