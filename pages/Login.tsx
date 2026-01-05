@@ -39,7 +39,8 @@ const Login: React.FC = () => {
     } catch (err: any) {
       console.error('Auth error:', err);
       if (err.name === 'ZodError') {
-        setError(err.errors[0]?.message || 'Dados inválidos');
+        const issues = err.issues || err.errors;
+        setError(issues?.[0]?.message || 'Dados inválidos');
       } else {
         setError(err.message || 'Ocorreu um erro ao processar sua solicitação.');
       }
