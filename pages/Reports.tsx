@@ -1,8 +1,10 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { AreaChart, Area, LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { dbService } from '../services/databaseService';
 
 // Dados simulados para diferentes períodos (Gráfico de Área)
 const MOCK_DATA = {
@@ -147,16 +149,22 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 // Dados simulados para a tabela de histórico
-const HISTORY_DATA = [
-  { id: 1, date: 'Hoje', time: '10:30 AM', exercise: 'Supino Reto', sets: 4, reps: '8-12', maxLoad: '80kg', status: 'Concluído' },
-  { id: 2, date: 'Ontem', time: '09:00 AM', exercise: 'Agachamento Livre', sets: 4, reps: '10-12', maxLoad: '120kg', status: 'Concluído' },
-  { id: 3, date: '30 Out', time: '18:15 PM', exercise: 'Puxada Frente', sets: 3, reps: '12-15', maxLoad: '65kg', status: 'Concluído' },
-  { id: 4, date: '28 Out', time: '16:00 PM', exercise: 'Desenvolvimento', sets: 4, reps: '8-10', maxLoad: '45kg', status: 'Incompleto' },
-  { id: 5, date: '25 Out', time: '07:30 AM', exercise: 'Leg Press 45', sets: 3, reps: '15-20', maxLoad: '240kg', status: 'Concluído' },
-];
+// Dados de exemplo para quando não houver histórico
+const EXAMPLE_HISTORY_ITEM = {
+  id: 'example-1',
+  date: 'Hoje',
+  time: '10:30 AM',
+  exercise: 'Supino Reto (Exemplo)',
+  sets: 4,
+  reps: '8-12',
+  maxLoad: '80kg',
+  status: 'Concluído',
+  isExample: true
+};
 
 const Reports: React.FC = () => {
 
+  const { user } = useAuth();
   const navigate = useNavigate();
   // Estado para o gráfico principal (Área)
   const [period, setPeriod] = useState<PeriodType>('month');
@@ -169,6 +177,59 @@ const Reports: React.FC = () => {
   const mainChartRef = useRef<HTMLDivElement>(null);
   const progressChartRef = useRef<HTMLDivElement>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
+
+  // Estado para dados do banco
+  const [dbWorkouts, setDbWorkouts] = useState<any[]>([]);
+  const [dbHistory, setDbHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load workout data from database
+  useEffect(() => {
+    const loadReportsData = async () => {
+      if (!user) return;
+      try {
+        // Load workout sessions for history table
+        const historyData = await dbService.query`
+          SELECT
+            ws.id,
+            ws.start_time,
+            ws.end_time,
+            ws.total_volume,
+            ws.notes,
+            tp.name as plan_name
+          FROM workout_sessions ws
+          LEFT JOIN training_plans tp ON tp.id = ws.plan_id
+          WHERE ws.user_id = ${user.id}
+          ORDER BY ws.start_time DESC
+          LIMIT 10
+        `;
+
+        const mappedHistory = historyData.map((item: any) => ({
+          id: item.id,
+          date: item.start_time ? new Date(item.start_time).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : 'Hoje',
+          time: item.start_time ? new Date(item.start_time).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '10:30 AM',
+          exercise: item.plan_name || 'Treino Personalizado',
+          sets: 4,
+          reps: '8-12',
+          maxLoad: `${item.total_volume}kg`,
+          status: item.end_time ? 'Concluído' : 'Incompleto',
+          isExample: false
+        }));
+
+        if (mappedHistory.length > 0) {
+          setDbHistory(mappedHistory);
+        } else {
+          setDbHistory([EXAMPLE_HISTORY_ITEM]);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados dos relatórios:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadReportsData();
+  }, [user]);
 
   // Fechar menu ao clicar fora
   React.useEffect(() => {
@@ -183,7 +244,7 @@ const Reports: React.FC = () => {
 
   const exportToCSV = () => {
     const headers = ['Data', 'Exercício', 'Séries', 'Repetições', 'Carga Máx', 'Status'];
-    const rows = HISTORY_DATA.map(item => [
+    const rows = dbHistory.map(item => [
       item.date,
       item.exercise,
       item.sets,
@@ -223,7 +284,7 @@ const Reports: React.FC = () => {
     autoTable(doc, {
       startY: 40,
       head: [['Data', 'Exercício', 'Séries', 'Reps', 'Carga', 'Status']],
-      body: HISTORY_DATA.map(item => [
+      body: dbHistory.map(item => [
         `${item.date} (${item.time})`,
         item.exercise,
         item.sets,
@@ -559,7 +620,7 @@ const Reports: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-border-dark">
-                {HISTORY_DATA.map((item) => (
+                {dbHistory.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col">
@@ -572,7 +633,14 @@ const Reports: React.FC = () => {
                         <div className="w-8 h-8 rounded-full bg-primary-DEFAULT/20 flex items-center justify-center text-primary-DEFAULT">
                           <span className="material-symbols-outlined text-[18px]">fitness_center</span>
                         </div>
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{item.exercise}</span>
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                          {item.exercise}
+                          {item.isExample && (
+                            <span className="ml-2 text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                              Exemplo
+                            </span>
+                          )}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center text-sm text-slate-600 dark:text-slate-300">{item.sets}</td>

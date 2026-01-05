@@ -1,15 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EXERCISES, MUSCLE_FILTERS, DIFFICULTY_FILTERS, EQUIPMENT_FILTERS } from '../data/exercises';
+import { MUSCLE_FILTERS, DIFFICULTY_FILTERS, EQUIPMENT_FILTERS } from '../data/exercises';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { dbService } from '../services/databaseService';
 
 import { useExerciseFilters } from '../hooks/useExerciseFilters';
 
 const ExerciseLibrary: React.FC = () => {
   const navigate = useNavigate();
+  const [dbExercises, setDbExercises] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const EXAMPLE_EXERCISE = {
+    id: 'example-1',
+    name: 'Supino Reto (Exemplo)',
+    muscle: 'Peito',
+    equipment: 'Barra',
+    difficulty: 'Intermediário',
+    image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80',
+    description: 'Exercício composto fundamental para desenvolvimento do peitoral, ombros e tríceps.',
+    instructions: ['Deite-se no banco', 'Segure a barra', 'Desça controlando', 'Empurre para cima'],
+    isExample: true
+  };
+
+  // Load exercises from database
+  useEffect(() => {
+    const loadExercises = async () => {
+      try {
+        const exercisesData = await dbService.query`
+          SELECT
+            id,
+            name,
+            muscle_group as muscle,
+            equipment,
+            difficulty,
+            image_url as image,
+            description,
+            instructions
+          FROM exercises
+          ORDER BY name
+        `;
+
+        const mappedExercises = exercisesData.map((exercise: any) => ({
+          id: exercise.id,
+          name: exercise.name,
+          muscle: exercise.muscle,
+          equipment: exercise.equipment,
+          difficulty: exercise.difficulty,
+          image: exercise.image,
+          description: exercise.description,
+          instructions: exercise.instructions || [],
+          isExample: false
+        }));
+
+        if (mappedExercises.length > 0) {
+          setDbExercises(mappedExercises);
+        } else {
+          setDbExercises([EXAMPLE_EXERCISE]);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar exercícios:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExercises();
+  }, []);
+
+  const allExercises = dbExercises;
+
   const {
     searchTerm,
     setSearchTerm,
@@ -20,6 +83,25 @@ const ExerciseLibrary: React.FC = () => {
     clearFilters
   } = useExerciseFilters();
 
+  // Apply filters manually since we're using database data
+  const manualFilteredExercises = allExercises.filter(exercise => {
+    if (searchTerm && !exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !exercise.muscle.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
+    }
+
+    if (activeFilters.length > 0) {
+      const matchesMuscle = activeFilters.some(filter => MUSCLE_FILTERS.includes(filter) && exercise.muscle === filter);
+      const matchesDifficulty = activeFilters.some(filter => DIFFICULTY_FILTERS.includes(filter) && exercise.difficulty === filter);
+      const matchesEquipment = activeFilters.some(filter => EQUIPMENT_FILTERS.includes(filter) && exercise.equipment === filter);
+
+      if (!matchesMuscle && !matchesDifficulty && !matchesEquipment) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col h-full">
@@ -30,7 +112,7 @@ const ExerciseLibrary: React.FC = () => {
             Biblioteca de Exercícios
           </h1>
           <p className="mt-2 text-slate-500 dark:text-slate-400 text-base max-w-xl truncate">
-            Explore {EXERCISES.length} exercícios em nosso catálogo completo.
+            Explore {allExercises.length} exercícios em nosso catálogo completo.
           </p>
         </div>
 
@@ -147,7 +229,7 @@ const ExerciseLibrary: React.FC = () => {
 
       {/* Grid Layout */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-10">
-        {filteredExercises.map((exercise) => (
+        {manualFilteredExercises.map((exercise) => (
           <Card
             key={exercise.id}
             onClick={() => navigate(`/exercise/${exercise.id}`)}
@@ -167,9 +249,16 @@ const ExerciseLibrary: React.FC = () => {
             </div>
             <div className="flex flex-1 flex-col p-5">
               <div className="flex items-start justify-between">
-                <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
-                  {exercise.name}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+                    {exercise.name}
+                  </h3>
+                  {exercise.isExample && (
+                    <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                      Exemplo
+                    </span>
+                  )}
+                </div>
                 <button className="text-slate-400 hover:text-[#16a34a] transition-colors" onClick={(e) => { e.stopPropagation(); /* bookmark logic */ }}>
                   <span className="material-symbols-outlined text-xl">bookmark_border</span>
                 </button>
@@ -199,7 +288,7 @@ const ExerciseLibrary: React.FC = () => {
       </div>
 
       {/* Empty State */}
-      {filteredExercises.length === 0 && (
+      {manualFilteredExercises.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="size-20 bg-slate-100 dark:bg-surface-dark rounded-full flex items-center justify-center mb-4">
             <span className="material-symbols-outlined text-4xl text-slate-400">search_off</span>
@@ -216,7 +305,7 @@ const ExerciseLibrary: React.FC = () => {
       )}
 
       {/* Simplified Pagination */}
-      {filteredExercises.length > 0 && (
+      {manualFilteredExercises.length > 0 && (
         <div className="mt-auto flex items-center justify-center border-t border-slate-200 dark:border-border-dark pt-8">
           <div className="flex gap-3">
             <Button variant="outline" size="sm" icon="chevron_left">

@@ -1,39 +1,28 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useSession, signOut } from '../lib/auth-client';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: () => void;
-  logout: () => void;
+  user: any;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session, isPending: isLoading } = useSession();
 
-  useEffect(() => {
-    // Verifica se já existe um login salvo ao carregar
-    const storedAuth = localStorage.getItem('fitTrack_isAuthenticated');
-    if (storedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, []);
-
-  const login = () => {
-    localStorage.setItem('fitTrack_isAuthenticated', 'true');
-    setIsAuthenticated(true);
+  const logout = async () => {
+    await signOut();
+    window.location.href = '/login';
   };
 
-  const logout = () => {
-    localStorage.removeItem('fitTrack_isAuthenticated');
-    setIsAuthenticated(false);
-  };
+  const isAuthenticated = !!session;
+  const user = session?.user;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, user, logout }}>
       {children}
     </AuthContext.Provider>
   );

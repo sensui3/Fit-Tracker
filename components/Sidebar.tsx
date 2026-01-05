@@ -11,11 +11,10 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    await logout();
     if (onItemClick) onItemClick();
   };
 
@@ -132,12 +131,14 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
             className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
           >
             <OptimizedImage
-              src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=120&h=120"
-              alt="Foto de perfil do usuário"
+              src={user?.image || "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=120&h=120"}
+              alt={`Foto de perfil de ${user?.name || 'usuário'}`}
               className="size-10 rounded-full shrink-0 ring-2 ring-white dark:ring-white/10 group-hover:ring-primary-DEFAULT transition-all"
             />
             <div className="flex flex-col flex-1 min-w-0 pr-1">
-              <span className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-primary-DEFAULT transition-colors">João Silva</span>
+              <span className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-primary-DEFAULT transition-colors">
+                {user?.name || 'Usuário'}
+              </span>
               <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold tracking-tight">PLANO PRO</span>
             </div>
           </div>

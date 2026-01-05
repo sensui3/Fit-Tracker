@@ -1,0 +1,11 @@
+{
+  "better-auth": {
+    "url": "https://mcp.chonkie.ai/better-auth/better-auth-builder/mcp"
+  },
+  "neon": {
+    "url": "https://mcp.chonkie.ai/neon/mcp-server-neon/mcp",
+    "env": {
+      "NEON_API_KEY": "napi_zdre0ig5h34vr7k08jhib7bl1mnsxn4dha659ryndhnq2gnlfq4m38l7ogd9u9gc"
+    }
+  }
+}

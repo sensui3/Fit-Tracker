@@ -14,6 +14,7 @@ export interface Goal {
     trend: string;
     trendColor: string;
     shimmer?: boolean;
+    isExample?: boolean;
     reverse?: boolean;
     completed?: boolean;
 }

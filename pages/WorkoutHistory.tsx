@@ -1,23 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { dbService } from '../services/databaseService';
 
-const MOCK_WORKOUTS = [
-    { id: 1, date: '2026-01-01', time: '10:30', title: 'Treino de Peito (Foco Força)', type: 'Musculação', duration: '1h 15m', volume: '8.400 kg', status: 'Concluído' },
-    { id: 2, date: '2025-12-31', time: '09:00', title: 'Cardio HIIT + Abdominais', type: 'Cardio', duration: '50m', volume: '420 kcal', status: 'Concluído' },
-    { id: 3, date: '2025-12-30', time: '18:15', title: 'Costas e Bíceps', type: 'Musculação', duration: '1h 20m', volume: '7.200 kg', status: 'Concluído' },
-    { id: 4, date: '2025-12-28', time: '16:00', title: 'Ombros e Trapézio', type: 'Musculação', duration: '1h 10m', volume: '5.100 kg', status: 'Incompleto' },
-    { id: 5, date: '2025-12-25', time: '07:30', title: 'Inferiores Completo', type: 'Musculação', duration: '1h 45m', volume: '15.600 kg', status: 'Concluído' },
-    { id: 6, date: '2025-12-23', time: '08:00', title: 'Mobilidade e Flexibilidade', type: 'Flexibilidade', duration: '30m', volume: '50 kcal', status: 'Concluído' },
+const MOCK_WORKOUT_EXAMPLE = [
+    {
+        id: 'example-1',
+        date: new Date().toISOString().split('T')[0],
+        time: '10:30',
+        title: 'Treino de Peito (Exemplo)',
+        type: 'Musculação',
+        duration: '1h 15m',
+        volume: '8.400 kg',
+        status: 'Concluído',
+        isExample: true
+    }
 ];
 
 const WorkoutHistory: React.FC = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
+    const { user } = useAuth();
+    const [dbWorkouts, setDbWorkouts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const filteredWorkouts = MOCK_WORKOUTS.filter(w =>
+    // Load workout sessions from database
+    useEffect(() => {
+        const loadWorkouts = async () => {
+            if (!user) return;
+            try {
+                const workoutsData = await dbService.query`
+                    SELECT
+                        ws.id,
+                        ws.start_time,
+                        ws.end_time,
+                        ws.total_volume,
+                        ws.notes,
+                        tp.name as plan_name,
+                        tp.description as plan_description
+                    FROM workout_sessions ws
+                    LEFT JOIN training_plans tp ON tp.id = ws.plan_id
+                    WHERE ws.user_id = ${user.id}
+                    ORDER BY ws.start_time DESC
+                `;
+
+                const mappedWorkouts = workoutsData.map((workout: any) => {
+                    const startTime = new Date(workout.start_time);
+                    const endTime = workout.end_time ? new Date(workout.end_time) : null;
+                    const duration = endTime ? Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60)) : 0;
+
+                    return {
+                        id: workout.id,
+                        date: startTime.toISOString().split('T')[0],
+                        time: startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        title: workout.plan_name || 'Treino Personalizado',
+                        type: 'Musculação',
+                        duration: duration > 0 ? `${Math.floor(duration / 60)}h ${duration % 60}m` : 'Em andamento',
+                        volume: `${workout.total_volume} kg`,
+                        status: endTime ? 'Concluído' : 'Incompleto',
+                        isExample: false
+                    };
+                });
+
+                setDbWorkouts(mappedWorkouts);
+            } catch (error) {
+                console.error('Erro ao carregar treinos:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadWorkouts();
+    }, [user]);
+
+    const allWorkouts = dbWorkouts.length > 0 ? dbWorkouts : MOCK_WORKOUT_EXAMPLE;
+
+    const filteredWorkouts = allWorkouts.filter(w =>
         w.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         w.type.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -63,9 +124,16 @@ const WorkoutHistory: React.FC = () => {
                                     </span>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#16a34a] transition-colors">
-                                        {workout.title}
-                                    </h3>
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#16a34a] transition-colors">
+                                            {workout.title}
+                                        </h3>
+                                        {workout.isExample && (
+                                            <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                                                Exemplo
+                                            </span>
+                                        )}
+                                    </div>
                                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
                                         <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
                                             <span className="material-symbols-outlined text-base">calendar_today</span>

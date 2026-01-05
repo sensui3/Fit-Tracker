@@ -1,112 +1,131 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useGoalFilters, Goal, GoalTab, ViewMode } from '../hooks/useGoalFilters';
+import { dbService } from '../services/databaseService';
 
-const INITIAL_GOALS: Goal[] = [
-  {
-    id: 1,
-    title: 'Supino Reto',
-    category: 'Força • Curto Prazo',
-    icon: 'fitness_center',
-    current: 92,
-    target: 100,
-    unit: 'kg',
-    progress: 92,
-    statusIcon: 'schedule',
-    statusText: 'Restam 14 dias',
-    trend: '+2kg esta semana',
-    trendColor: 'text-green-600 dark:text-green-400',
-    shimmer: true
-  },
-  {
-    id: 2,
-    title: 'VO2 Max',
-    category: 'Cardio • Longo Prazo',
-    icon: 'monitor_heart',
-    current: 48,
-    target: 55,
-    unit: 'ml/kg',
-    progress: 65,
-    statusIcon: 'schedule',
-    statusText: '3 meses',
-    trend: 'Estagnado',
-    trendColor: 'text-orange-500',
-    shimmer: false
-  },
-  {
-    id: 3,
-    title: 'Peso Corporal',
-    category: 'Estética • Curto Prazo',
-    icon: 'accessibility_new',
-    current: 78.5,
-    target: 75,
-    unit: 'kg',
-    progress: 40,
-    statusIcon: 'trending_down',
-    statusText: 'Baixando',
-    trend: '-0.5kg esta semana',
-    trendColor: 'text-green-600 dark:text-green-400',
-    shimmer: false,
-    reverse: true
-  },
-  {
-    id: 4,
-    title: 'Barra Fixa',
-    category: 'Habilidade • Longo Prazo',
-    icon: 'sports_gymnastics',
-    current: 12,
-    target: 20,
-    unit: 'reps',
-    progress: 60,
-    statusIcon: 'schedule',
-    statusText: 'Indefinido',
-    trend: 'Semana passada: 11',
-    trendColor: 'text-slate-500',
-    shimmer: false
-  },
-  {
-    id: 5,
-    title: 'Corrida 5km',
-    category: 'Cardio • Curto Prazo',
-    icon: 'directions_run',
-    current: 20,
-    target: 20,
-    unit: 'min',
-    progress: 100,
-    statusIcon: 'check_circle',
-    statusText: 'Concluído em 12/12',
-    trend: 'Meta Atingida!',
-    trendColor: 'text-[#16a34a]',
-    completed: true,
-    shimmer: false
-  }
-];
+const EXAMPLE_GOAL: Goal = {
+  id: 999,
+  title: 'Supino Reto (Exemplo)',
+  category: 'Força • Curto Prazo',
+  icon: 'fitness_center',
+  current: 92,
+  target: 100,
+  unit: 'kg',
+  progress: 92,
+  statusIcon: 'schedule',
+  statusText: 'Restam 14 dias',
+  trend: '+2kg esta semana',
+  trendColor: 'text-green-600 dark:text-green-400',
+  shimmer: true,
+  isExample: true
+};
 
 const Goals: React.FC = () => {
+  const { user } = useAuth();
   const [showAddGoalModal, setShowAddGoalModal] = useState(false);
+  const [dbGoals, setDbGoals] = useState<Goal[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load goals from database
+  useEffect(() => {
+    const loadGoals = async () => {
+      if (!user) return;
+      try {
+        const goalsData = await dbService.query`
+          SELECT
+            id,
+            type,
+            target_value,
+            current_value,
+            deadline,
+            is_completed,
+            created_at
+          FROM user_goals
+          WHERE user_id = ${user.id}
+          ORDER BY created_at DESC
+        `;
+
+        const mappedGoals: Goal[] = goalsData.map((goal: any, index: number) => {
+          const progress = goal.target_value > 0 ? (goal.current_value / goal.target_value) * 100 : 0;
+          const isWeightGoal = goal.type === 'weight';
+          const isCompleted = goal.is_completed || progress >= 100;
+
+          return {
+            id: goal.id,
+            title: goal.type === 'weight' ? 'Peso Corporal' :
+              goal.type === 'workout_frequency' ? 'Frequência de Treinos' :
+                goal.type === 'lift_max' ? 'Supino Reto' : goal.type,
+            category: `${goal.type === 'weight' ? 'Estética' :
+              goal.type === 'workout_frequency' ? 'Consistência' :
+                'Força'} • Curto Prazo`,
+            icon: goal.type === 'weight' ? 'accessibility_new' :
+              goal.type === 'workout_frequency' ? 'calendar_today' :
+                'fitness_center',
+            current: goal.current_value,
+            target: goal.target_value,
+            unit: goal.type === 'weight' ? 'kg' :
+              goal.type === 'workout_frequency' ? 'x/semana' :
+                'kg',
+            progress: Math.min(progress, 100),
+            statusIcon: isCompleted ? 'check_circle' : 'schedule',
+            statusText: isCompleted ? 'Concluída' :
+              goal.deadline ? `Até ${new Date(goal.deadline).toLocaleDateString('pt-BR')}` :
+                'Em andamento',
+            trend: isCompleted ? 'Meta Atingida!' : '+5% esta semana',
+            trendColor: isCompleted ? 'text-[#16a34a]' : 'text-green-600 dark:text-green-400',
+            completed: isCompleted,
+            shimmer: !isCompleted,
+            reverse: isWeightGoal, // For weight goals, lower is better
+            isExample: false
+          };
+        });
+
+        setDbGoals(mappedGoals);
+      } catch (error) {
+        console.error('Erro ao carregar metas:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadGoals();
+  }, [user]);
+
+  // Combine database goals with initial goals
+  // Use database goals or fallback to example
+  const allGoals = dbGoals.length > 0 ? dbGoals : [EXAMPLE_GOAL];
+
   const {
     activeTab,
     viewMode,
     filteredGoals,
     handleTabChange,
     handleViewModeChange
-  } = useGoalFilters(INITIAL_GOALS);
+  } = useGoalFilters(allGoals);
+
+  // Calculate stats based on current goals (DB or Example)
+  const activeCount = allGoals.filter(g => !g.completed).length;
+  const completedCount = allGoals.filter(g => g.completed).length;
+  const successRate = allGoals.length > 0 ? Math.round((completedCount / allGoals.length) * 100) : 0;
 
   const stats = [
-    { label: 'Metas Ativas', value: '8', badge: 'Active', badgeColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: 'flag' },
-    { label: 'Concluídas (2023)', value: '12', sub: '+3 este mês', subColor: 'text-[#16a34a]', icon: 'emoji_events' },
-    { label: 'Taxa de Sucesso', value: '87%', sub: '+2.4%', subColor: 'text-[#16a34a]', icon: 'trending_up' },
-    { label: 'Sequência Atual', value: '5 dias', sub: 'Recorde: 21 dias', subColor: 'text-slate-400', icon: 'local_fire_department' },
+    { label: 'Metas Ativas', value: activeCount.toString(), badge: 'Active', badgeColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: 'flag' },
+    { label: 'Concluídas', value: completedCount.toString(), sub: 'Total', subColor: 'text-[#16a34a]', icon: 'emoji_events' },
+    { label: 'Taxa de Sucesso', value: `${successRate}%`, sub: 'Geral', subColor: 'text-[#16a34a]', icon: 'trending_up' },
+    { label: 'Sequência Atual', value: '0 dias', sub: 'Recorde: 0 dias', subColor: 'text-slate-400', icon: 'local_fire_department' },
   ];
 
   const weeklyConsistency = [
-    { day: 'Seg', val: 60, target: 100 },
-    { day: 'Ter', val: 85, target: 100 },
+    { day: 'Seg', val: 0, target: 100 },
+    { day: 'Ter', val: 0, target: 100 },
     { day: 'Qua', val: 0, target: 100 },
-    { day: 'Qui', val: 70, target: 100 },
-    { day: 'Sex', val: 90, target: 100, active: true },
-    { day: 'Sab', val: 40, target: 100, future: true },
+    { day: 'Qui', val: 0, target: 100 },
+    { day: 'Sex', val: 0, target: 100, active: true },
+    { day: 'Sab', val: 0, target: 100, future: true },
     { day: 'Dom', val: 0, target: 100, future: true },
   ];
+
+  const featuredGoal = allGoals[0];
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8 pb-20">
@@ -183,39 +202,44 @@ const Goals: React.FC = () => {
           </div>
         </div>
 
-        {/* Featured Goal Card (Marathon) */}
+        {/* Featured Goal Card (Dynamic) */}
         <div className="lg:col-span-1 relative overflow-hidden rounded-xl bg-[#102210] p-6 shadow-lg flex flex-col group">
           <div className="absolute -top-10 -right-10 size-64 bg-[#16a34a]/20 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="relative z-10 flex justify-between items-start mb-6">
             <div>
-              <span className="inline-block bg-[#16a34a] text-[#102210] text-xs font-bold px-2 py-1 rounded mb-2">Foco Principal</span>
-              <h3 className="text-white text-xl font-bold">Maratona 42k</h3>
+              <span className="inline-block bg-[#16a34a] text-[#102210] text-xs font-bold px-2 py-1 rounded mb-2">
+                {featuredGoal?.isExample ? 'Exemplo' : 'Foco Principal'}
+              </span>
+              <h3 className="text-white text-xl font-bold truncate pr-2">{featuredGoal?.title || 'Sem Metas'}</h3>
             </div>
             <div className="bg-white/10 p-2 rounded-lg backdrop-blur-sm text-[#16a34a]">
-              <span className="material-symbols-outlined">directions_run</span>
+              <span className="material-symbols-outlined">{featuredGoal?.icon || 'flag'}</span>
             </div>
           </div>
 
           <div className="relative z-10 flex-1 flex flex-col justify-center mb-6">
             <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-4xl font-bold text-white">32.5</span>
-              <span className="text-slate-400 text-lg">/ 42 km</span>
+              <span className="text-4xl font-bold text-white">{featuredGoal?.current || 0}</span>
+              <span className="text-slate-400 text-lg">/ {featuredGoal?.target || 0} {featuredGoal?.unit}</span>
             </div>
-            <p className="text-slate-400 text-sm">Distância máxima alcançada</p>
+            <p className="text-slate-400 text-sm">Progresso atual</p>
           </div>
 
           <div className="relative z-10">
             <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
               <span>Progresso</span>
-              <span>77%</span>
+              <span>{featuredGoal?.progress ? Math.round(featuredGoal.progress) : 0}%</span>
             </div>
             <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
-              <div className="h-full bg-[#16a34a] w-[77%] rounded-full shadow-[0_0_10px_rgba(22,163,74,0.5)]"></div>
+              <div
+                className="h-full bg-[#16a34a] rounded-full shadow-[0_0_10px_rgba(22,163,74,0.5)] transition-all duration-1000"
+                style={{ width: `${featuredGoal?.progress || 0}%` }}
+              ></div>
             </div>
             <div className="mt-4 flex items-center gap-2 text-sm text-slate-300">
               <span className="material-symbols-outlined text-[#16a34a] text-base">event</span>
-              <span>Meta para 15 de Nov</span>
+              <span>{featuredGoal?.statusText || 'Defina sua meta'}</span>
             </div>
           </div>
         </div>
@@ -295,7 +319,14 @@ const Goals: React.FC = () => {
                 <span className="material-symbols-outlined text-2xl">{goal.icon}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-slate-900 dark:text-white text-lg truncate">{goal.title}</h4>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-bold text-slate-900 dark:text-white text-lg truncate">{goal.title}</h4>
+                  {goal.isExample && (
+                    <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                      Exemplo
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-slate-500 dark:text-text-secondary font-medium tracking-wide uppercase">{goal.category}</p>
               </div>
             </div>

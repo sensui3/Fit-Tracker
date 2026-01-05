@@ -1,9 +1,11 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import { Theme } from '../types';
+import { dbService } from '../services/databaseService';
 
 // Lazy load heavy chart component
 const WorkoutVolumeChart = lazy(() => import('../components/dashboard/WorkoutVolumeChart'));
@@ -11,6 +13,108 @@ const WorkoutVolumeChart = lazy(() => import('../components/dashboard/WorkoutVol
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const { user, isAuthenticated } = useAuth();
+  const [userStats, setUserStats] = useState({
+    totalWorkouts: 0,
+    totalVolume: 0,
+    avgSessionTime: 0,
+    currentStreak: 0
+  });
+  const [recentSessions, setRecentSessions] = useState<any[]>([]);
+  const [personalRecords, setPersonalRecords] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Carregar dados do usuário
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!user?.id) return;
+
+      try {
+        setLoading(true);
+
+        // Carregar estatísticas do usuário
+        const statsResult = await dbService.query`
+          SELECT
+            COUNT(DISTINCT ws.id) as total_workouts,
+            COALESCE(SUM(ws.total_volume), 0) as total_volume,
+            COALESCE(AVG(EXTRACT(EPOCH FROM (ws.end_time - ws.start_time))/60), 0) as avg_session_time
+          FROM workout_sessions ws
+          WHERE ws.user_id = ${user.id}
+        `;
+
+        if (statsResult[0]) {
+          setUserStats({
+            totalWorkouts: parseInt(statsResult[0].total_workouts) || 0,
+            totalVolume: parseFloat(statsResult[0].total_volume) || 0,
+            avgSessionTime: Math.round(parseFloat(statsResult[0].avg_session_time) || 0),
+            currentStreak: 0 // TODO: implementar cálculo de streak
+          });
+        }
+
+        // Carregar sessões recentes
+        const sessionsResult = await dbService.query`
+          SELECT
+            ws.id,
+            ws.start_time,
+            ws.end_time,
+            ws.total_volume,
+            tp.name as plan_name,
+            COUNT(wl.id) as exercises_count,
+            EXTRACT(EPOCH FROM (ws.end_time - ws.start_time))/60 as duration_minutes
+          FROM workout_sessions ws
+          LEFT JOIN training_plans tp ON ws.plan_id = tp.id
+          LEFT JOIN workout_logs wl ON wl.session_id = ws.id
+          WHERE ws.user_id = ${user.id}
+          GROUP BY ws.id, ws.start_time, ws.end_time, ws.total_volume, tp.name
+          ORDER BY ws.start_time DESC
+          LIMIT 3
+        `;
+
+        setRecentSessions(sessionsResult.map(session => ({
+          title: session.plan_name || 'Treino Livre',
+          time: new Date(session.start_time).toLocaleDateString('pt-BR', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short'
+          }),
+          tag: session.plan_name ? 'Planejado' : 'Livre',
+          duration: `${Math.round(session.duration_minutes)} min`,
+          value: `${session.total_volume} kg`,
+          icon: session.plan_name ? 'fitness_center' : 'directions_run',
+          color: session.plan_name ? 'orange' : 'blue'
+        })));
+
+        // Carregar recordes pessoais (exercícios com maior peso)
+        const recordsResult = await dbService.query`
+          SELECT
+            e.name,
+            MAX(s.weight) as max_weight
+          FROM sets s
+          JOIN workout_logs wl ON s.log_id = wl.id
+          JOIN exercises e ON wl.exercise_id = e.id
+          JOIN workout_sessions ws ON wl.session_id = ws.id
+          WHERE ws.user_id = ${user.id}
+          GROUP BY e.name
+          ORDER BY max_weight DESC
+          LIMIT 3
+        `;
+
+        setPersonalRecords(recordsResult.map(record => ({
+          label: record.name,
+          value: `${record.max_weight}kg`
+        })));
+
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      loadUserData();
+    }
+  }, [user?.id, isAuthenticated]);
 
   const toggleTheme = () => {
     setTheme(theme === Theme.Dark ? Theme.Light : Theme.Dark);
@@ -21,8 +125,15 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold dark:text-white">Bem-vindo de volta, João! 👋</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Você completou 80% do seu objetivo semanal. Mantenha o ritmo.</p>
+          <h1 className="text-2xl md:text-3xl font-bold dark:text-white">
+            Bem-vindo de volta, {user?.name?.split(' ')[0] || 'Usuário'}! 👋
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            {userStats.totalWorkouts > 0
+              ? `Você realizou ${userStats.totalWorkouts} treinos. Continue assim!`
+              : 'Comece seus treinos e veja suas estatísticas aqui.'
+            }
+          </p>
         </div>
         <div className="hidden md:flex items-center gap-4">
           <button
@@ -60,21 +171,32 @@ const Dashboard: React.FC = () => {
             <div className="p-3 rounded-lg bg-blue-500/10 text-blue-500">
               <span className="material-symbols-outlined">timer</span>
             </div>
-            <span className="text-xs font-medium px-2 py-1 rounded bg-green-500/20 text-green-500">+12%</span>
+            <span className="text-xs font-medium px-2 py-1 rounded bg-green-500/20 text-green-500">
+              {userStats.totalWorkouts > 0 ? '+12%' : 'Novo'}
+            </span>
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Tempo de Treino</p>
-          <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">4h 32m</h4>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Tempo Médio</p>
+          <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+            {userStats.avgSessionTime > 0
+              ? `${Math.floor(userStats.avgSessionTime / 60)}h ${userStats.avgSessionTime % 60}m`
+              : '--'
+            }
+          </h4>
         </Card>
 
         <Card className="flex flex-col">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 rounded-lg bg-orange-500/10 text-orange-500">
-              <span className="material-symbols-outlined">local_fire_department</span>
+              <span className="material-symbols-outlined">directions_run</span>
             </div>
-            <span className="text-xs font-medium px-2 py-1 rounded bg-green-500/20 text-green-500">+5%</span>
+            <span className="text-xs font-medium px-2 py-1 rounded bg-green-500/20 text-green-500">
+              {userStats.totalWorkouts > 0 ? '+5%' : 'Novo'}
+            </span>
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Calorias Queimadas</p>
-          <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">2,450 kcal</h4>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Total de Treinos</p>
+          <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+            {userStats.totalWorkouts}
+          </h4>
         </Card>
 
         <Card className="flex flex-col">
@@ -82,10 +204,14 @@ const Dashboard: React.FC = () => {
             <div className="p-3 rounded-lg bg-[#16a34a]/10 text-[#16a34a] dark:text-[#13ec13]">
               <span className="material-symbols-outlined">fitness_center</span>
             </div>
-            <span className="text-xs font-medium px-2 py-1 rounded bg-slate-500/20 text-slate-500">0%</span>
+            <span className="text-xs font-medium px-2 py-1 rounded bg-slate-500/20 text-slate-500">
+              {userStats.totalVolume > 0 ? '0%' : 'Novo'}
+            </span>
           </div>
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Volume Total</p>
-          <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">12,500 kg</h4>
+          <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+            {userStats.totalVolume > 0 ? `${userStats.totalVolume.toLocaleString()} kg` : '--'}
+          </h4>
         </Card>
       </div>
 
@@ -136,16 +262,17 @@ const Dashboard: React.FC = () => {
               Recordes Pessoais
             </h3>
             <div className="flex flex-col gap-3">
-              {[
-                { label: 'Supino Reto', value: '100kg' },
-                { label: 'Agachamento', value: '140kg' },
-                { label: 'Lev. Terra', value: '180kg' }
-              ].map((record, i, arr) => (
+              {personalRecords.length > 0 ? personalRecords.map((record, i, arr) => (
                 <div key={record.label} className={`flex items-center justify-between ${i !== arr.length - 1 ? 'border-b border-border-light dark:border-border-dark pb-2' : ''}`}>
                   <span className="text-slate-500 dark:text-slate-400 text-sm">{record.label}</span>
                   <span className="text-slate-900 dark:text-white font-bold text-sm">{record.value}</span>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                  <span className="material-symbols-outlined text-4xl mb-2 block">emoji_events</span>
+                  <p className="text-sm">Comece seus treinos para ver seus recordes aqui!</p>
+                </div>
+              )}
             </div>
           </Card>
         </div>
@@ -163,37 +290,39 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
         <div className="divide-y divide-border-light dark:divide-border-dark text-slate-900 dark:text-white">
-          {[
-            { title: 'Treino de Cardio', time: 'Hoje, 08:30', tag: 'HIIT', duration: '45 min', value: '350 kcal', icon: 'directions_run', color: 'blue' },
-            { title: 'Superiores (Peito e Tríceps)', time: 'Ontem, 18:00', tag: 'Força', duration: '1h 10m', value: '8.500 kg', icon: 'fitness_center', color: 'orange' },
-            { title: 'Inferiores (Agachamento Foco)', time: 'Seg, 19:30', tag: 'Hipertrofia', duration: '1h 30m', value: '12.200 kg', icon: 'accessibility_new', color: 'purple' }
-          ].map((item) => (
+          {recentSessions.length > 0 ? recentSessions.map((session) => (
             <div
-              key={item.title}
+              key={session.title + session.time}
               onClick={() => navigate('/log-workout')}
               className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
             >
               <div className="flex items-center gap-4">
-                <div className={`size-10 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform ${item.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400' :
-                  item.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' :
+                <div className={`size-10 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform ${session.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400' :
+                  session.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' :
                     'bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400'
                   }`}>
-                  <span className="material-symbols-outlined">{item.icon}</span>
+                  <span className="material-symbols-outlined">{session.icon}</span>
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900 dark:text-white">{item.title}</p>
+                  <p className="font-bold text-slate-900 dark:text-white">{session.title}</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{item.time}</p>
-                    <span className="text-[10px] bg-slate-100 dark:bg-white/10 px-1.5 rounded text-slate-500 dark:text-slate-400">{item.tag}</span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{session.time}</p>
+                    <span className="text-[10px] bg-slate-100 dark:bg-white/10 px-1.5 rounded text-slate-500 dark:text-slate-400">{session.tag}</span>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-sm font-bold text-slate-900 dark:text-white">{item.duration}</span>
-                <span className="text-xs text-slate-400">{item.value}</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">{session.duration}</span>
+                <span className="text-xs text-slate-400">{session.value}</span>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
+              <span className="material-symbols-outlined text-4xl mb-2 block">history</span>
+              <p className="text-sm">Nenhum treino registrado ainda.</p>
+              <p className="text-xs mt-1">Comece seu primeiro treino para ver o histórico aqui!</p>
+            </div>
+          )}
         </div>
       </Card>
     </div>

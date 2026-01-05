@@ -10,8 +10,8 @@ const Subscription: React.FC = () => {
       <div className="flex flex-col w-full max-w-5xl gap-8">
         {/* Breadcrumbs */}
         <div className="flex flex-wrap gap-2 text-sm">
-          <button 
-            onClick={() => navigate('/settings')} 
+          <button
+            onClick={() => navigate('/settings')}
             className="text-slate-500 dark:text-text-secondary hover:underline hover:text-primary-DEFAULT transition-colors"
           >
             Configurações
@@ -55,7 +55,7 @@ const Subscription: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Visual Card Representation */}
             <div className="relative w-full md:w-1/3 min-h-[200px] bg-[#16a34a]/10 dark:bg-[#16a34a]/5 flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-[#16a34a]/20 to-transparent"></div>
@@ -67,8 +67,8 @@ const Subscription: React.FC = () => {
                 <p className="font-black text-slate-900 dark:text-white text-lg">FitTrack Basic</p>
                 <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">Validado</p>
               </div>
-              <div 
-                className="absolute inset-0 bg-cover bg-center opacity-10 dark:opacity-5 mix-blend-overlay" 
+              <div
+                className="absolute inset-0 bg-cover bg-center opacity-10 dark:opacity-5 mix-blend-overlay"
                 style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBdmo_eM6lshNS-IXgCO0u1hrL1GOE28AvtcSbHDzYMxPaIBJVlx-Xvt1MPemt9MsqJ_zec6khIyaVhYzvs1LRXJ572bI4PtsOkwO0pu_-VFhhvAl9JcnZICOsfGO6hXXa8uFwFuQLq7GUl_oJVFFgoMkcxj_7kFr7DLiYXxaUmoyo-NTCZ6n_QqgQ26EKjUbUpdRSzqCmC5YQ21fpvnBSYMrwf1VAPMWBzJLWzDOVTTIDWHRMWQK7KCRc5ZVls21lvApwO6X3_UXo')" }}
               ></div>
             </div>
@@ -80,15 +80,15 @@ const Subscription: React.FC = () => {
           <div className="text-center max-w-2xl mx-auto mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3">Escolha o plano ideal para sua evolução</h2>
             <p className="text-slate-500 dark:text-text-secondary">Desbloqueie recursos exclusivos para acelerar seus resultados na academia.</p>
-            
+
             {/* Billing Toggle */}
             <div className="flex items-center justify-center gap-4 mt-8">
               <span className={`text-sm font-bold ${billingCycle === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-500'}`}>Mensal</span>
-              <button 
+              <button
                 onClick={() => setBillingCycle(prev => prev === 'monthly' ? 'annual' : 'monthly')}
                 className="relative w-14 h-8 bg-slate-900 dark:bg-white rounded-full p-1 transition-colors focus:outline-none"
               >
-                <div 
+                <div
                   className={`w-6 h-6 bg-[#16a34a] rounded-full shadow-md transition-transform duration-300 ${billingCycle === 'annual' ? 'translate-x-6' : 'translate-x-0'}`}
                 ></div>
               </button>
@@ -141,11 +141,11 @@ const Subscription: React.FC = () => {
               </div>
               <div className="flex items-baseline gap-1 mb-6">
                 <span className="text-4xl font-black text-slate-900 dark:text-white">
-                    {billingCycle === 'annual' ? 'R$ 19,90' : 'R$ 24,90'}
+                  {billingCycle === 'annual' ? 'R$ 19,90' : 'R$ 24,90'}
                 </span>
                 <span className="text-slate-500 dark:text-text-secondary">/mês</span>
                 {billingCycle === 'annual' && (
-                    <span className="ml-2 text-xs font-bold text-[#16a34a] bg-[#16a34a]/10 px-2 py-1 rounded">Cobrado anualmente</span>
+                  <span className="ml-2 text-xs font-bold text-[#16a34a] bg-[#16a34a]/10 px-2 py-1 rounded">Cobrado anualmente</span>
                 )}
               </div>
               <ul className="flex flex-col gap-4 mb-8 flex-1">
@@ -164,8 +164,11 @@ const Subscription: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <button className="w-full py-3 px-4 rounded-lg bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-[#102210] font-black text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02]">
-                Fazer Upgrade Agora
+              <button
+                className="w-full py-3 px-4 rounded-lg bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 font-bold text-sm cursor-not-allowed"
+                disabled
+              >
+                Em Breve
               </button>
               <p className="text-center text-xs text-slate-500 dark:text-text-secondary mt-3">Cancele a qualquer momento.</p>
             </div>
@@ -179,7 +182,11 @@ const Subscription: React.FC = () => {
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Método de Pagamento</h3>
               <p className="text-sm text-slate-500 dark:text-text-secondary">Gerencie como você paga sua assinatura.</p>
             </div>
-            <button className="text-sm font-bold text-[#16a34a] hover:text-[#15803d] dark:hover:text-[#13ec13] flex items-center gap-1 transition-colors">
+            <button
+              className="text-sm font-bold text-slate-400 dark:text-slate-600 flex items-center gap-1 transition-colors cursor-not-allowed"
+              disabled
+              title="Indisponível no momento"
+            >
               <span className="material-symbols-outlined text-[18px]">add</span>
               Adicionar Novo
             </button>
