@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { dbService } from '../services/databaseService';
+import { ExerciseSelectorModal } from '../components/exercise/ExerciseSelectorModal';
+import { Exercise } from '../types';
+import { useToast } from '../components/ui/Toast';
 
 const CreatePlan: React.FC = () => {
   const navigate = useNavigate();
@@ -10,6 +13,8 @@ const CreatePlan: React.FC = () => {
   const [dbExercises, setDbExercises] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isExampleMode, setIsExampleMode] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addToast } = useToast();
 
   const MOCK_PLAN = {
     id: 'example-plan',
@@ -84,6 +89,39 @@ const CreatePlan: React.FC = () => {
     loadPlanData();
   }, [user]);
 
+  const handleAddExercise = (exercise: Exercise) => {
+    const newExercise = {
+      exercise_id: exercise.id,
+      name: exercise.name,
+      muscle: exercise.muscle_group || (exercise as any).muscle,
+      equipment: exercise.equipment,
+      image: exercise.image_url || exercise.image,
+      target_sets: 3,
+      target_reps: '12',
+      target_weight: 0,
+      order: dbExercises.length + 1
+    };
+    setDbExercises([...dbExercises, newExercise]);
+    addToast({
+      type: 'success',
+      message: `${exercise.name} adicionado ao plano.`
+    });
+  };
+
+  const handleRemoveExercise = (exerciseId: string) => {
+    setDbExercises(prev => prev.filter(ex => ex.exercise_id !== exerciseId));
+  };
+
+  const handleUpdateExercise = (exerciseId: string, field: string, value: any) => {
+    setDbExercises(prev => prev.map(ex =>
+      ex.exercise_id === exerciseId ? { ...ex, [field]: value } : ex
+    ));
+  };
+
+  const totalVolume = useMemo(() => {
+    return dbExercises.reduce((acc, ex) => acc + (ex.target_sets * (Number(ex.target_weight) || 0) * 10), 0);
+  }, [dbExercises]);
+
   return (
     <div className="flex-1 w-full flex justify-center py-8 px-4 lg:px-8">
       <div className="flex flex-col w-full max-w-[1024px] gap-8">
@@ -141,8 +179,11 @@ const CreatePlan: React.FC = () => {
               {dbExercises.map((exercise, index) => (
                 <div key={exercise.exercise_id} className="group flex flex-col md:grid md:grid-cols-12 gap-4 p-4 md:px-6 md:py-4 items-center hover:bg-slate-50 dark:hover:bg-[#162016] transition-colors">
                   <div className="flex w-full md:hidden justify-between items-center mb-2">
-                    <span className="text-sm text-[#16a34a] font-bold">#{exercise.order}</span>
-                    <button className="text-red-500">
+                    <span className="text-sm text-[#16a34a] font-bold">#{index + 1}</span>
+                    <button
+                      onClick={() => handleRemoveExercise(exercise.exercise_id)}
+                      className="text-red-500 p-1"
+                    >
                       <span className="material-symbols-outlined">delete</span>
                     </button>
                   </div>
@@ -170,19 +211,37 @@ const CreatePlan: React.FC = () => {
                   <div className="col-span-6 md:col-span-6 w-full grid grid-cols-3 gap-4">
                     <div className="flex flex-col gap-1">
                       <label className="md:hidden text-xs text-slate-500 dark:text-text-secondaryDark">Séries</label>
-                      <input className="w-full bg-slate-50 dark:bg-[#1c271c] border border-slate-300 dark:border-[#3b543b] rounded p-2 text-center text-slate-900 dark:text-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none" type="number" defaultValue={exercise.target_sets} />
+                      <input
+                        className="w-full bg-slate-50 dark:bg-[#1c271c] border border-slate-300 dark:border-[#3b543b] rounded p-2 text-center text-slate-900 dark:text-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none"
+                        type="number"
+                        value={exercise.target_sets}
+                        onChange={(e) => handleUpdateExercise(exercise.exercise_id, 'target_sets', parseInt(e.target.value) || 0)}
+                      />
                     </div>
                     <div className="flex flex-col gap-1">
                       <label className="md:hidden text-xs text-slate-500 dark:text-text-secondaryDark">Reps</label>
-                      <input className="w-full bg-slate-50 dark:bg-[#1c271c] border border-slate-300 dark:border-[#3b543b] rounded p-2 text-center text-slate-900 dark:text-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none" type="text" defaultValue={exercise.target_reps} />
+                      <input
+                        className="w-full bg-slate-50 dark:bg-[#1c271c] border border-slate-300 dark:border-[#3b543b] rounded p-2 text-center text-slate-900 dark:text-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none"
+                        type="text"
+                        value={exercise.target_reps}
+                        onChange={(e) => handleUpdateExercise(exercise.exercise_id, 'target_reps', e.target.value)}
+                      />
                     </div>
                     <div className="flex flex-col gap-1">
                       <label className="md:hidden text-xs text-slate-500 dark:text-text-secondaryDark">Carga</label>
-                      <input className="w-full bg-slate-50 dark:bg-[#1c271c] border border-slate-300 dark:border-[#3b543b] rounded p-2 text-center text-slate-900 dark:text-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none" type="number" defaultValue={exercise.target_weight} />
+                      <input
+                        className="w-full bg-slate-50 dark:bg-[#1c271c] border border-slate-300 dark:border-[#3b543b] rounded p-2 text-center text-slate-900 dark:text-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none"
+                        type="number"
+                        value={exercise.target_weight}
+                        onChange={(e) => handleUpdateExercise(exercise.exercise_id, 'target_weight', parseFloat(e.target.value) || 0)}
+                      />
                     </div>
                   </div>
                   <div className="col-span-1 hidden md:flex justify-end">
-                    <button className="text-slate-400 dark:text-text-secondaryDark hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10">
+                    <button
+                      onClick={() => handleRemoveExercise(exercise.exercise_id)}
+                      className="text-slate-400 dark:text-text-secondaryDark hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10"
+                    >
                       <span className="material-symbols-outlined">delete</span>
                     </button>
                   </div>
@@ -191,7 +250,10 @@ const CreatePlan: React.FC = () => {
             </div>
           </div>
           {/* Add Button */}
-          <button className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-[#3b543b] text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white hover:border-[#16a34a] dark:hover:border-[#13ec13] hover:bg-slate-50 dark:hover:bg-[#1c271c] transition-all group">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-[#3b543b] text-slate-500 dark:text-text-secondaryDark hover:text-slate-900 dark:hover:text-white hover:border-[#16a34a] dark:hover:border-[#13ec13] hover:bg-slate-50 dark:hover:bg-[#1c271c] transition-all group"
+          >
             <span className="material-symbols-outlined group-hover:text-[#16a34a] transition-colors">add_circle</span>
             <span className="font-bold">Adicionar Exercício</span>
           </button>
@@ -200,8 +262,8 @@ const CreatePlan: React.FC = () => {
         {/* Footer Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
           <div className="bg-white dark:bg-[#1c271c] border border-border-light dark:border-transparent rounded-lg p-4 flex flex-col shadow-sm">
-            <span className="text-slate-500 dark:text-text-secondaryDark text-xs uppercase tracking-wider font-semibold">Volume Total</span>
-            <span className="text-slate-900 dark:text-white text-lg font-bold">2.450 kg</span>
+            <span className="text-slate-500 dark:text-text-secondaryDark text-xs uppercase tracking-wider font-semibold">Volume Estimado</span>
+            <span className="text-slate-900 dark:text-white text-lg font-bold">{totalVolume.toLocaleString()} kg</span>
           </div>
           {/* ... other stats */}
         </div>
@@ -211,6 +273,12 @@ const CreatePlan: React.FC = () => {
           <button onClick={() => navigate('/workouts')} className="px-6 py-3 rounded-lg text-white dark:text-black font-bold bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] shadow-lg shadow-green-600/20 dark:shadow-green-500/20 transition-all">Salvar Plano</button>
         </div>
       </div>
+
+      <ExerciseSelectorModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleAddExercise}
+      />
     </div>
   );
 };
