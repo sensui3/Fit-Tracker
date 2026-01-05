@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import * as Sentry from "@sentry/react";
 
 interface Props {
     children: ReactNode;
@@ -21,6 +22,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error('Uncaught error:', error, errorInfo);
+        Sentry.captureException(error, { extra: { ...errorInfo } });
     }
 
     public render() {
@@ -40,12 +42,20 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                                 {this.state.error?.message}
                             </code>
                         </div>
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="w-full py-3 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold rounded-xl transition-all shadow-lg shadow-green-600/20"
-                        >
-                            Recarregar Aplicação
-                        </button>
+                        <div className="grid grid-cols-1 gap-3">
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="w-full py-3 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold rounded-xl transition-all shadow-lg shadow-green-600/20"
+                            >
+                                Recarregar Aplicação
+                            </button>
+                            <button
+                                onClick={() => Sentry.showReportDialog({ eventId: Sentry.lastEventId() })}
+                                className="w-full py-3 bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white font-bold rounded-xl hover:bg-slate-300 dark:hover:bg-white/20 transition-all"
+                            >
+                                Enviar Relatório de Erro
+                            </button>
+                        </div>
                     </div>
                 </div>
             );

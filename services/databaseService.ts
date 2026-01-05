@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { logDomainError } from '../lib/sentry';
 
 /**
  * Serviço de conexão com o banco de dados Neon.
@@ -50,6 +51,10 @@ export const dbService = {
             return result as unknown as T[];
         } catch (error) {
             console.error('Database Query Error:', error);
+            logDomainError(error as Error, 'database_query', {
+                query: typeof strings === 'string' ? strings : strings.join('?'),
+                params
+            });
             throw error;
         }
     },

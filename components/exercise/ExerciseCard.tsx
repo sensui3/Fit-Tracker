@@ -13,6 +13,7 @@ export const ExerciseCard = memo(({ exercise, isFavorite, onToggleFavorite, onCl
     return (
         <Card
             onClick={onClick}
+            noPadding
             className="group flex flex-col p-0 overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full"
         >
             <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100 dark:bg-black/40 relative rounded-xl">
@@ -22,7 +23,7 @@ export const ExerciseCard = memo(({ exercise, isFavorite, onToggleFavorite, onCl
                     </span>
                 </div>
                 <OptimizedImage
-                    src={exercise.image}
+                    src={exercise.image_url || exercise.image}
                     alt={exercise.name}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />

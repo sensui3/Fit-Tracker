@@ -7,6 +7,10 @@ import { AppInitializer } from './components/AppInitializer';
 import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import { initSentry } from './lib/sentry';
+
+// Initialize Sentry
+initSentry();
 
 // Lazy loading pages for performance optimization
 const Dashboard = lazy(() => import('./pages/Dashboard'));

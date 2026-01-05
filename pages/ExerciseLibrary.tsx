@@ -6,36 +6,7 @@ import { Input } from '../components/ui/Input';
 import { useExerciseStore } from '../stores/useExerciseStore';
 import { useExerciseFilters } from '../hooks/useExerciseFilters';
 import { ExerciseCard } from '../components/exercise/ExerciseCard';
-// @ts-ignore
-import { FixedSizeList } from 'react-window';
-// @ts-ignore
-import { AutoSizer } from 'react-virtualized-auto-sizer';
-
-// Row renderer for virtualization moved outside to avoid recreation on each render
-const ExerciseRow = ({ index, style, data }: any) => {
-  const { items, columns, isFavorite, onToggleFavorite, onClick } = data;
-  const startIndex = index * columns;
-  const rowItems = items.slice(startIndex, startIndex + columns);
-
-  return (
-    <div style={style} className="flex gap-6 px-4 md:px-0">
-      {rowItems.map((exercise: any) => (
-        <div key={exercise.id} style={{ width: `${100 / columns}%` }} className="h-full">
-          <ExerciseCard
-            exercise={exercise}
-            isFavorite={isFavorite(exercise.id)}
-            onToggleFavorite={onToggleFavorite}
-            onClick={() => onClick(exercise.id)}
-          />
-        </div>
-      ))}
-      {/* Fill empty spaces in the last row to maintain grid alignment */}
-      {rowItems.length < columns && Array.from({ length: columns - rowItems.length }).map((_, i) => (
-        <div key={`empty-${i}`} style={{ width: `${100 / columns}%` }} />
-      ))}
-    </div>
-  );
-};
+import { SuggestExerciseModal } from '../components/exercise/SuggestExerciseModal';
 
 const ExerciseLibrary: React.FC = () => {
   const navigate = useNavigate();
@@ -48,8 +19,11 @@ const ExerciseLibrary: React.FC = () => {
     toggleFilter,
     filteredExercises,
     clearFilters,
-    loading
+    loading,
+    addCustomExercise
   } = useExerciseFilters();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleToggleFavorite = useCallback((id: string) => {
     toggleFavorite(id);
@@ -60,7 +34,7 @@ const ExerciseLibrary: React.FC = () => {
   }, [navigate]);
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col h-screen overflow-hidden">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col min-h-full">
       {/* Page Heading & Search */}
       <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between shrink-0">
         <div className="flex-1 min-w-0">
@@ -85,6 +59,7 @@ const ExerciseLibrary: React.FC = () => {
           <Button
             leftIcon={<span className="material-symbols-outlined">add</span>}
             className="w-full sm:w-auto shrink-0 shadow-lg"
+            onClick={() => setIsModalOpen(true)}
           >
             Sugerir Novo
           </Button>
@@ -94,10 +69,10 @@ const ExerciseLibrary: React.FC = () => {
       {/* Search and Filters Bar */}
       <div className="mb-6 space-y-4 shrink-0">
         {/* Filters Row */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center justify-between">
-          <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar items-center">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center justify-between -mx-4 md:mx-0">
+          <div className="flex gap-2 overflow-x-auto pb-4 lg:pb-0 no-scrollbar items-center px-4 md:px-0">
             {/* Muscle Filters */}
-            <div className="flex gap-2 shrink-0">
+            <div className="flex gap-2 shrink-0 pr-4 md:pr-0">
               {MUSCLE_FILTERS.map(muscle => (
                 <button
                   key={muscle}
@@ -193,36 +168,19 @@ const ExerciseLibrary: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#16a34a]"></div>
           </div>
         ) : filteredExercises.length > 0 ? (
-          /* @ts-ignore - types are broken for AutoSizer in some react versions */
-          <AutoSizer>
-            {({ height, width }: { height: number; width: number }) => {
-              let columns = 1;
-              if (width >= 1024) columns = 3;
-              else if (width >= 640) columns = 2;
-
-              const rowCount = Math.ceil(filteredExercises.length / columns);
-              const rowHeight = 460; // Approximate height of ExerciseCard + gap
-
-              return (
-                <FixedSizeList
-                  height={height}
-                  itemCount={rowCount}
-                  itemSize={rowHeight}
-                  width={width}
-                  itemData={{
-                    items: filteredExercises,
-                    columns,
-                    isFavorite,
-                    onToggleFavorite: handleToggleFavorite,
-                    onClick: handleNavigate
-                  }}
-                  className="pb-10 custom-scrollbar"
-                >
-                  {ExerciseRow}
-                </FixedSizeList>
-              );
-            }}
-          </AutoSizer>
+          <div className="mt-4 pb-20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredExercises.map(exercise => (
+                <ExerciseCard
+                  key={exercise.id}
+                  exercise={exercise}
+                  isFavorite={isFavorite(exercise.id)}
+                  onToggleFavorite={handleToggleFavorite}
+                  onClick={() => handleNavigate(exercise.id)}
+                />
+              ))}
+            </div>
+          </div>
         ) : (
           /* Empty State */
           <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -240,6 +198,12 @@ const ExerciseLibrary: React.FC = () => {
           </div>
         )}
       </div>
+
+      <SuggestExerciseModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuggest={addCustomExercise}
+      />
     </div>
   );
 };

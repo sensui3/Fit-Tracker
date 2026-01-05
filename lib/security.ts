@@ -56,3 +56,32 @@ export const checkRateLimit = (key: string, limitMs: number = 2000): boolean => 
     rateLimits.set(key, now);
     return true;
 };
+
+/**
+ * Limpeza de dados sensíveis para logs e monitoramento.
+ * Remove senhas, emails e chaves de API de objetos ou strings.
+ */
+export const scrubData = (data: any): any => {
+    if (typeof data === 'string') {
+        // Regex básica para emails e senhas em strings
+        return data
+            .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL_REDACTED]')
+            .replace(/(password|senha|token|key)=[^&\s]+/gi, '$1=[REDACTED]');
+    }
+
+    if (data && typeof data === 'object') {
+        const scrubbed = Array.isArray(data) ? [...data] : { ...data };
+        const sensitiveKeys = ['password', 'senha', 'token', 'key', 'secret', 'email', 'auth'];
+
+        for (const key in scrubbed) {
+            if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk))) {
+                scrubbed[key] = '[REDACTED]';
+            } else if (typeof scrubbed[key] === 'object') {
+                scrubbed[key] = scrubData(scrubbed[key]);
+            }
+        }
+        return scrubbed;
+    }
+
+    return data;
+};
