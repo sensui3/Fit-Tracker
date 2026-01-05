@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useWorkoutStore } from '../stores/useWorkoutStore';
-import { EXERCISES, Exercise } from '../data/exercises';
+import { EXERCISES } from '../data/exercises';
+import { Exercise } from '../types';
 
 export interface WorkoutSet {
     id: number;
@@ -12,23 +13,21 @@ export interface WorkoutSet {
 }
 
 export const useWorkoutLogger = () => {
-    const {
-        exerciseInput,
-        setExerciseInput,
-        sets,
-        addSet,
-        removeSet,
-        updateSet,
-        isResting,
-        setResting,
-        selectExercise
-    } = useWorkoutStore();
+    const exerciseInput = useWorkoutStore(state => state.exerciseInput);
+    const setExerciseInput = useWorkoutStore(state => state.setExerciseInput);
+    const sets = useWorkoutStore(state => state.sets);
+    const addSet = useWorkoutStore(state => state.addSet);
+    const removeSet = useWorkoutStore(state => state.removeSet);
+    const updateSet = useWorkoutStore(state => state.updateSet);
+    const isResting = useWorkoutStore(state => state.isResting);
+    const setResting = useWorkoutStore(state => state.setResting);
+    const selectExercise = useWorkoutStore(state => state.selectExercise);
 
     const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
-    const handleInputChange = (userInput: string) => {
+    const handleInputChange = useCallback((userInput: string) => {
         setExerciseInput(userInput);
         if (userInput.length > 0) {
             const filtered = EXERCISES.filter(
@@ -44,13 +43,13 @@ export const useWorkoutLogger = () => {
         } else {
             setShowSuggestions(false);
         }
-    };
+    }, [setExerciseInput]);
 
-    const handleSelectExercise = (exercise: Exercise) => {
+    const handleSelectExercise = useCallback((exercise: Exercise) => {
         selectExercise(exercise);
         setShowSuggestions(false);
         setHighlightedIndex(-1);
-    };
+    }, [selectExercise]);
 
     return {
         exerciseInput,

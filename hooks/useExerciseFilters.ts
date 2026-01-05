@@ -66,18 +66,33 @@ export const useExerciseFilters = () => {
     }, []);
 
     const filteredExercises = useMemo(() => {
+        if (!exercises.length) return [];
+
+        const searchLower = searchTerm.toLowerCase();
+        const activeMuscleFilters = activeFilters.filter(f => MUSCLE_FILTERS.includes(f));
+        const activeDifficultyFilters = activeFilters.filter(f => DIFFICULTY_FILTERS.includes(f));
+        const activeEquipmentFilters = activeFilters.filter(f => EQUIPMENT_FILTERS.includes(f));
+
+        const hasMuscleFilter = activeMuscleFilters.length > 0;
+        const hasDifficultyFilter = activeDifficultyFilters.length > 0;
+        const hasEquipmentFilter = activeEquipmentFilters.length > 0;
+
         return exercises.filter(exercise => {
-            const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
+            if (searchLower && !exercise.name.toLowerCase().includes(searchLower)) {
+                return false;
+            }
 
-            const activeMuscleFilters = activeFilters.filter(f => MUSCLE_FILTERS.includes(f));
-            const activeDifficultyFilters = activeFilters.filter(f => DIFFICULTY_FILTERS.includes(f));
-            const activeEquipmentFilters = activeFilters.filter(f => EQUIPMENT_FILTERS.includes(f));
+            if (hasMuscleFilter && !activeMuscleFilters.includes(exercise.muscle_group)) {
+                return false;
+            }
+            if (hasDifficultyFilter && !activeDifficultyFilters.includes(exercise.difficulty)) {
+                return false;
+            }
+            if (hasEquipmentFilter && !activeEquipmentFilters.includes(exercise.equipment)) {
+                return false;
+            }
 
-            const matchesMuscle = activeMuscleFilters.length === 0 || activeMuscleFilters.includes(exercise.muscle_group);
-            const matchesDifficulty = activeDifficultyFilters.length === 0 || activeDifficultyFilters.includes(exercise.difficulty);
-            const matchesEquipment = activeEquipmentFilters.length === 0 || activeEquipmentFilters.includes(exercise.equipment);
-
-            return matchesSearch && matchesMuscle && matchesDifficulty && matchesEquipment;
+            return true;
         });
     }, [searchTerm, activeFilters, exercises]);
 

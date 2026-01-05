@@ -19,6 +19,10 @@ export const loginSchema = z.object({
     password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres').max(50, 'Senha muito longa'),
 });
 
+export const signUpSchema = loginSchema.extend({
+    name: z.string().min(2, 'Nome muito curto').max(50, 'Nome muito longo').transform(sanitize),
+});
+
 // Perfil do Usuário
 export const profileSchema = z.object({
     name: z.string().min(2, 'Nome muito curto').max(50, 'Nome muito longo').transform(sanitize),

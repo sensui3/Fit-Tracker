@@ -1,120 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MUSCLE_FILTERS, DIFFICULTY_FILTERS, EQUIPMENT_FILTERS } from '../data/exercises';
-import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { OptimizedImage } from '../components/ui/OptimizedImage';
-import { dbService } from '../services/databaseService';
 import { useExerciseStore } from '../stores/useExerciseStore';
-
 import { useExerciseFilters } from '../hooks/useExerciseFilters';
+import { ExerciseCard } from '../components/exercise/ExerciseCard';
+// @ts-ignore
+import { FixedSizeList } from 'react-window';
+// @ts-ignore
+import { AutoSizer } from 'react-virtualized-auto-sizer';
+
+// Row renderer for virtualization moved outside to avoid recreation on each render
+const ExerciseRow = ({ index, style, data }: any) => {
+  const { items, columns, isFavorite, onToggleFavorite, onClick } = data;
+  const startIndex = index * columns;
+  const rowItems = items.slice(startIndex, startIndex + columns);
+
+  return (
+    <div style={style} className="flex gap-6 px-4 md:px-0">
+      {rowItems.map((exercise: any) => (
+        <div key={exercise.id} style={{ width: `${100 / columns}%` }} className="h-full">
+          <ExerciseCard
+            exercise={exercise}
+            isFavorite={isFavorite(exercise.id)}
+            onToggleFavorite={onToggleFavorite}
+            onClick={() => onClick(exercise.id)}
+          />
+        </div>
+      ))}
+      {/* Fill empty spaces in the last row to maintain grid alignment */}
+      {rowItems.length < columns && Array.from({ length: columns - rowItems.length }).map((_, i) => (
+        <div key={`empty-${i}`} style={{ width: `${100 / columns}%` }} />
+      ))}
+    </div>
+  );
+};
 
 const ExerciseLibrary: React.FC = () => {
   const navigate = useNavigate();
   const { toggleFavorite, isFavorite } = useExerciseStore();
-  const [dbExercises, setDbExercises] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const EXAMPLE_EXERCISE = {
-    id: 'example-1',
-    name: 'Supino Reto (Exemplo)',
-    muscle: 'Peito',
-    equipment: 'Barra',
-    difficulty: 'Intermediário',
-    image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80',
-    description: 'Exercício composto fundamental para desenvolvimento do peitoral, ombros e tríceps.',
-    instructions: ['Deite-se no banco', 'Segure a barra', 'Desça controlando', 'Empurre para cima'],
-    isExample: true
-  };
-
-  // Load exercises from database
-  useEffect(() => {
-    const loadExercises = async () => {
-      try {
-        const exercisesData = await dbService.query`
-          SELECT
-            id,
-            name,
-            muscle_group as muscle,
-            equipment,
-            difficulty,
-            image_url as image,
-            description,
-            instructions
-          FROM exercises
-          ORDER BY name
-        `;
-
-        const mappedExercises = exercisesData.map((exercise: any) => ({
-          id: exercise.id,
-          name: exercise.name,
-          muscle: exercise.muscle,
-          equipment: exercise.equipment,
-          difficulty: exercise.difficulty,
-          image: exercise.image,
-          description: exercise.description,
-          instructions: exercise.instructions || [],
-          isExample: false
-        }));
-
-        if (mappedExercises.length > 0) {
-          setDbExercises(mappedExercises);
-        } else {
-          setDbExercises([EXAMPLE_EXERCISE]);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar exercícios:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadExercises();
-  }, []);
-
-  const allExercises = dbExercises;
 
   const {
     searchTerm,
     setSearchTerm,
     activeFilters,
-    setActiveFilters,
     toggleFilter,
     filteredExercises,
-    clearFilters
+    clearFilters,
+    loading
   } = useExerciseFilters();
 
-  // Apply filters manually since we're using database data
-  const manualFilteredExercises = allExercises.filter(exercise => {
-    if (searchTerm && !exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !exercise.muscle.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
+  const handleToggleFavorite = useCallback((id: string) => {
+    toggleFavorite(id);
+  }, [toggleFavorite]);
 
-    if (activeFilters.length > 0) {
-      const matchesMuscle = activeFilters.some(filter => MUSCLE_FILTERS.includes(filter) && exercise.muscle === filter);
-      const matchesDifficulty = activeFilters.some(filter => DIFFICULTY_FILTERS.includes(filter) && exercise.difficulty === filter);
-      const matchesEquipment = activeFilters.some(filter => EQUIPMENT_FILTERS.includes(filter) && exercise.equipment === filter);
-
-      if (!matchesMuscle && !matchesDifficulty && !matchesEquipment) {
-        return false;
-      }
-    }
-
-    return true;
-  });
+  const handleNavigate = useCallback((id: string) => {
+    navigate(`/exercise/${id}`);
+  }, [navigate]);
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col h-full">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col h-screen overflow-hidden">
       {/* Page Heading & Search */}
-      <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between shrink-0">
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white md:text-4xl">
             Biblioteca de Exercícios
           </h1>
           <p className="mt-2 text-slate-500 dark:text-slate-400 text-base max-w-xl truncate">
-            Explore {allExercises.length} exercícios em nosso catálogo completo.
+            Explore {filteredExercises.length} exercícios em nosso catálogo completo.
           </p>
         </div>
 
@@ -128,14 +82,17 @@ const ExerciseLibrary: React.FC = () => {
               className="h-12 shadow-sm border-slate-200 dark:border-white/10"
             />
           </div>
-          <Button icon="add" className="w-full sm:w-auto shrink-0 shadow-lg">
+          <Button
+            leftIcon={<span className="material-symbols-outlined">add</span>}
+            className="w-full sm:w-auto shrink-0 shadow-lg"
+          >
             Sugerir Novo
           </Button>
         </div>
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="sticky top-0 z-10 -mx-4 mb-6 bg-background-light/95 dark:bg-background-dark/95 px-4 py-4 backdrop-blur-sm md:mx-0 md:rounded-xl md:px-0 md:bg-transparent md:backdrop-blur-none space-y-4">
+      <div className="mb-6 space-y-4 shrink-0">
         {/* Filters Row */}
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center justify-between">
           <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar items-center">
@@ -229,104 +186,60 @@ const ExerciseLibrary: React.FC = () => {
         )}
       </div>
 
-      {/* Grid Layout */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-10">
-        {manualFilteredExercises.map((exercise) => (
-          <Card
-            key={exercise.id}
-            onClick={() => navigate(`/exercise/${exercise.id}`)}
-            className="group flex flex-col p-0 overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-          >
-            <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100 dark:bg-black/40 relative rounded-xl">
-              <div className="absolute top-3 left-3 z-10 flex gap-2">
-                <span className="inline-flex items-center rounded-md bg-white/90 dark:bg-black/60 px-2 py-1 text-[10px] font-bold text-slate-900 dark:text-white shadow-sm backdrop-blur-md">
-                  {exercise.muscle}
-                </span>
-              </div>
-              <OptimizedImage
-                src={exercise.image}
-                alt={exercise.name}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-            </div>
-            <div className="flex flex-1 flex-col p-5">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
-                    {exercise.name}
-                  </h3>
-                  {exercise.isExample && (
-                    <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">
-                      Exemplo
-                    </span>
-                  )}
-                </div>
-                <button
-                  className={`transition-colors ${isFavorite(exercise.id) ? 'text-[#16a34a]' : 'text-slate-400 hover:text-[#16a34a]'}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(exercise.id);
+      {/* Grid Layout with Virtualization */}
+      <div className="flex-1 min-h-0 -mx-4 md:mx-0">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#16a34a]"></div>
+          </div>
+        ) : filteredExercises.length > 0 ? (
+          /* @ts-ignore - types are broken for AutoSizer in some react versions */
+          <AutoSizer>
+            {({ height, width }: { height: number; width: number }) => {
+              let columns = 1;
+              if (width >= 1024) columns = 3;
+              else if (width >= 640) columns = 2;
+
+              const rowCount = Math.ceil(filteredExercises.length / columns);
+              const rowHeight = 460; // Approximate height of ExerciseCard + gap
+
+              return (
+                <FixedSizeList
+                  height={height}
+                  itemCount={rowCount}
+                  itemSize={rowHeight}
+                  width={width}
+                  itemData={{
+                    items: filteredExercises,
+                    columns,
+                    isFavorite,
+                    onToggleFavorite: handleToggleFavorite,
+                    onClick: handleNavigate
                   }}
+                  className="pb-10 custom-scrollbar"
                 >
-                  <span className={`material-symbols-outlined text-xl ${isFavorite(exercise.id) ? 'filled' : ''}`}>
-                    {isFavorite(exercise.id) ? 'bookmark' : 'bookmark_border'}
-                  </span>
-                </button>
-              </div>
-              <div className="mt-2 flex items-center gap-3 text-[10px] text-slate-500 dark:text-text-secondary">
-                <span className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">
-                  <span className="material-symbols-outlined text-[14px]">fitness_center</span>
-                  {exercise.equipment}
-                </span>
-                <span className={`flex items-center gap-1 px-2 py-1 rounded ${exercise.difficulty === 'Iniciante' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
-                  exercise.difficulty === 'Intermediário' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
-                    'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
-                  <span className="material-symbols-outlined text-[14px]">equalizer</span>
-                  {exercise.difficulty}
-                </span>
-              </div>
-              <p className="mt-3 text-xs leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
-                {exercise.description}
-              </p>
-              <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center text-xs font-bold text-[#16a34a] group/link">
-                Ver Detalhes
-                <span className="material-symbols-outlined ml-1 text-[16px] transition-transform group-hover/link:translate-x-1">arrow_forward</span>
-              </div>
+                  {ExerciseRow}
+                </FixedSizeList>
+              );
+            }}
+          </AutoSizer>
+        ) : (
+          /* Empty State */
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="size-20 bg-slate-100 dark:bg-surface-dark rounded-full flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-4xl text-slate-400">search_off</span>
             </div>
-          </Card>
-        ))}
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Nenhum exercício encontrado</h3>
+            <p className="text-slate-500 dark:text-text-secondary mt-2">Tente buscar por outro termo ou limpe os filtros.</p>
+            <button
+              onClick={clearFilters}
+              className="mt-6 text-[#16a34a] font-bold hover:underline"
+            >
+              Limpar busca
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* Empty State */}
-      {manualFilteredExercises.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="size-20 bg-slate-100 dark:bg-surface-dark rounded-full flex items-center justify-center mb-4">
-            <span className="material-symbols-outlined text-4xl text-slate-400">search_off</span>
-          </div>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">Nenhum exercício encontrado</h3>
-          <p className="text-slate-500 dark:text-text-secondary mt-2">Tente buscar por outro termo ou limpe os filtros.</p>
-          <button
-            onClick={clearFilters}
-            className="mt-6 text-[#16a34a] font-bold hover:underline"
-          >
-            Limpar busca
-          </button>
-        </div>
-      )}
-
-      {/* Simplified Pagination */}
-      {manualFilteredExercises.length > 0 && (
-        <div className="mt-auto flex items-center justify-center border-t border-slate-200 dark:border-border-dark pt-8">
-          <div className="flex gap-3">
-            <Button variant="outline" size="sm" icon="chevron_left">
-              Anterior
-            </Button>
-            <Button variant="outline" size="sm" icon="chevron_right" iconPosition="right">
-              Próximo
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
