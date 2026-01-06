@@ -126,11 +126,11 @@ const LogWorkout: React.FC = () => {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-10 gap-2 px-2 text-xs font-bold text-slate-400 dark:text-text-secondary uppercase tracking-wider text-center mb-1">
-                      <div className="col-span-1">Set</div>
-                      <div className="col-span-3">Kg</div>
-                      <div className="col-span-3">Reps</div>
-                      <div className="col-span-3">Ações</div>
+                    <div className="grid grid-cols-12 gap-3 px-2 text-[10px] font-black text-slate-400 dark:text-text-secondary uppercase tracking-widest mb-3">
+                      <div className="col-span-2 text-center">Set</div>
+                      <div className="col-span-3 text-center">Carga (kg)</div>
+                      <div className="col-span-3 text-center">Reps</div>
+                      <div className="col-span-4 text-center">Status</div>
                     </div>
 
                     <div className="flex flex-col gap-3">

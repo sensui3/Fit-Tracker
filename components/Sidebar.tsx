@@ -22,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
     { icon: 'dashboard', label: 'Painel', path: '/' },
     { icon: 'fitness_center', label: 'Treinos', path: '/workouts' },
     { icon: 'flag', label: 'Metas', path: '/goals' },
-    { icon: 'assignment', label: 'Planos', path: '/create-plan' },
+    { icon: 'assignment', label: 'Criar Treino', path: '/create-plan' },
     { icon: 'bar_chart', label: 'Relatórios', path: '/reports' },
     { icon: 'menu_book', label: 'Exercícios', path: '/exercises' },
   ];

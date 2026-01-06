@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { EXERCISES } from '../data/exercises';
+import { dbService } from '../services/databaseService';
+import { useAuth } from '../context/AuthContext';
+import { Exercise } from '../hooks/useExerciseFilters';
 
 const ExerciseDetails: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const [showAddModal, setShowAddModal] = useState(false);
-
-  const exercise = EXERCISES.find(ex => ex.id === id);
+  const [exercise, setExercise] = useState<Exercise | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Estado para configuração do exercício
   const [workoutConfig, setWorkoutConfig] = useState({
@@ -17,6 +20,43 @@ const ExerciseDetails: React.FC = () => {
     weight: 20
   });
 
+  // Carregar dados do exercício
+  useEffect(() => {
+    const loadExercise = async () => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        const result = await dbService.findOne<Exercise>`
+          SELECT id::text, name, muscle_group, equipment, difficulty, image_url, description, instructions, is_custom, user_id::text
+          FROM exercises
+          WHERE id = ${id}
+        `;
+        setExercise(result);
+      } catch (error) {
+        console.error('Erro ao carregar exercício:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExercise();
+  }, [id]);
+
+  const handleSave = () => {
+    if (!exercise) return;
+    // Aqui iria a lógica real de salvar no backend/contexto
+    alert(`Exercício "${exercise.name}" adicionado ao plano "${workoutConfig.plan}" com sucesso!`);
+    setShowAddModal(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#16a34a]"></div>
+      </div>
+    );
+  }
+
   if (!exercise) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
@@ -24,12 +64,12 @@ const ExerciseDetails: React.FC = () => {
           <span className="material-symbols-outlined text-4xl text-slate-400">search_off</span>
         </div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Exercício não encontrado</h1>
-        <p className="text-slate-500 dark:text-text-secondary mb-6 text-center">
+        <p className="text-slate-500 dark:text-text-secondary dark:text-slate-400 mb-6 text-center">
           O exercício que você está procurando não existe ou foi removido.
         </p>
         <button
-          onClick={() => navigate('/workouts')}
-          className="px-6 py-3 bg-primary-DEFAULT hover:bg-primary-hover text-white dark:text-black font-bold rounded-xl transition-colors"
+          onClick={() => navigate('/exercises')}
+          className="px-6 py-3 bg-[#16a34a] hover:bg-[#15803d] text-white dark:text-black font-bold rounded-xl transition-colors"
         >
           Voltar para Biblioteca
         </button>
@@ -37,11 +77,8 @@ const ExerciseDetails: React.FC = () => {
     );
   }
 
-  const handleSave = () => {
-    // Aqui iria a lógica real de salvar no backend/contexto
-    alert(`Exercício "${exercise.name}" adicionado ao plano "${workoutConfig.plan}" com sucesso!\nConfiguração: ${workoutConfig.sets} séries de ${workoutConfig.reps} repetições.`);
-    setShowAddModal(false);
-  };
+  const exerciseImage = exercise.image_url || (exercise as any).image || "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=1000";
+  const exerciseMuscle = exercise.muscle_group || (exercise as any).muscle;
 
   return (
     <div className="flex flex-col items-center px-4 py-6 md:px-10 lg:px-40 relative">
@@ -181,17 +218,10 @@ const ExerciseDetails: React.FC = () => {
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gray-200 dark:bg-[#1c2e1c] group">
               <img
-                src={`${exercise.image}=s1200`}
-                srcSet={`
-                  ${exercise.image}=s480 480w,
-                  ${exercise.image}=s768 768w,
-                  ${exercise.image}=s1200 1200w
-                `}
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 60vw"
+                src={exerciseImage}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 alt={exercise.name}
                 loading="lazy"
-                decoding="async"
               />
               <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 flex items-center gap-2">
                 <span className="size-2 rounded-full bg-primary-DEFAULT animate-pulse"></span>
@@ -251,7 +281,7 @@ const ExerciseDetails: React.FC = () => {
                   <p className="text-xs uppercase text-gray-500 font-bold mb-2 tracking-wider">Primário</p>
                   <div className="flex flex-wrap gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#16a34a] dark:bg-[#13ec13] text-white dark:text-black font-bold text-sm">
-                      {exercise.muscle}
+                      {exerciseMuscle}
                       <span className="material-symbols-outlined text-[18px]">check_circle</span>
                     </span>
                   </div>

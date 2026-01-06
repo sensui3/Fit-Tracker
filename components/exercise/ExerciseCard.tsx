@@ -19,7 +19,7 @@ export const ExerciseCard = memo(({ exercise, isFavorite, onToggleFavorite, onCl
             <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100 dark:bg-black/40 relative rounded-xl">
                 <div className="absolute top-3 left-3 z-10 flex gap-2">
                     <span className="inline-flex items-center rounded-md bg-white/90 dark:bg-black/60 px-2 py-1 text-[10px] font-bold text-slate-900 dark:text-white shadow-sm backdrop-blur-md">
-                        {exercise.muscle}
+                        {exercise.muscle_group || exercise.muscle}
                     </span>
                 </div>
                 <OptimizedImage
