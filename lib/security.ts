@@ -76,7 +76,7 @@ export const scrubData = (data: any): any => {
         for (const key in scrubbed) {
             if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk))) {
                 scrubbed[key] = '[REDACTED]';
-            } else if (typeof scrubbed[key] === 'object') {
+            } else {
                 scrubbed[key] = scrubData(scrubbed[key]);
             }
         }

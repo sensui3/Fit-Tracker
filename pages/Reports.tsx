@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { AreaChart, Area, LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { dbService } from '../services/databaseService';
@@ -164,7 +164,7 @@ const EXAMPLE_HISTORY_ITEM = {
 
 const Reports: React.FC = () => {
 
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   // Estado para o gráfico principal (Área)
   const [period, setPeriod] = useState<PeriodType>('month');

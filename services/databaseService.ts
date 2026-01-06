@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { logDomainError } from '../lib/sentry';
+import { logDomainError } from '../lib/logrocket';
 
 /**
  * Serviço de conexão com o banco de dados Neon.

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { useGoalFilters, Goal, GoalTab, ViewMode } from '../hooks/useGoalFilters';
 import { dbService } from '../services/databaseService';
 
@@ -21,7 +21,7 @@ const EXAMPLE_GOAL: Goal = {
 };
 
 const Goals: React.FC = () => {
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [showAddGoalModal, setShowAddGoalModal] = useState(false);
   const [dbGoals, setDbGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);

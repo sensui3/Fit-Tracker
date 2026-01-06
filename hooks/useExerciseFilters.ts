@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { dbService } from '../services/databaseService';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 
 export interface Exercise {
     id: string;
@@ -21,7 +21,7 @@ export const DIFFICULTY_FILTERS = ['Iniciante', 'Intermediário', 'Avançado'];
 export const EQUIPMENT_FILTERS = ['Barra', 'Halteres', 'Máquina', 'Polia', 'Peso do Corpo', 'Barra W'];
 
 export const useExerciseFilters = () => {
-    const { user } = useAuth();
+    const { user } = useAuthStore();
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
     const [exercises, setExercises] = useState<Exercise[]>([]);

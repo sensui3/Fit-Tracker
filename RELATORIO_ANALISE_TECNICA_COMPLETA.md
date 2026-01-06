@@ -877,38 +877,29 @@ logger.info({ userId, action: 'workout_completed' }, 'User completed workout');
 logger.error({ error, userId }, 'Failed to save workout');
 ```
 
-#### 9.2 Falta de Error Tracking (Sentry, Bugsnag)
-**Descrição:** Erros não são capturados e reportados.
+#### 9.2 Monitoramento e Session Replay (LogRocket)
+**Descrição:** Erros e sessões de usuário são capturados para debug visual.
 
 **Impacto no Desenvolvedor:**
-- Bugs silenciosos em produção
-- Impossibilidade de priorizar correções
-- Experiência ruim para usuários
+- Bugs reproduzíveis via vídeo (session replay)
+- Rastreamento completo da jornada do usuário
+- Identificação proativa de problemas de UI/UX
 
-**Esforço de Correção:** 8 horas  
+**Esforço de Correção:** 2 horas (Implementado ✅)
 **Prioridade:** 🔴 CRÍTICA
 
-**Recomendações:**
+**Recomendações (Já Implementado):**
 ```typescript
-// Integrar Sentry
-import * as Sentry from '@sentry/react';
+// Integrar LogRocket
+import LogRocket from 'logrocket';
 
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_DSN,
-  environment: import.meta.env.MODE,
-  integrations: [
-    new Sentry.BrowserTracing(),
-    new Sentry.Replay(),
-  ],
-  tracesSampleRate: 0.1,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
+LogRocket.init(import.meta.env.VITE_LOGROCKET_ID);
+
+// Identificação de usuário
+LogRocket.identify(user.id, {
+  name: user.name,
+  email: user.email,
 });
-
-// ErrorBoundary
-<Sentry.ErrorBoundary fallback={<ErrorFallback />}>
-  <App />
-</Sentry.ErrorBoundary>
 ```
 
 #### 9.3 Ausência de Analytics e Métricas de Uso
@@ -1000,8 +991,8 @@ class ErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
-    // Enviar para Sentry
-  }
+    // Enviar para LogRocket
+    LogRocket.captureException(error, { extra: { ...errorInfo } });
 
   render() {
     if (this.state.hasError) {
@@ -1462,7 +1453,7 @@ updates:
 - [ ] Implementar rate limiting
 - [ ] Adicionar CSP headers
 - [ ] Configurar backups automatizados
-- [ ] Implementar Sentry para error tracking
+- [x] Implementar LogRocket para error tracking & session replay
 
 **Recursos Necessários:**
 - 1 DevOps Engineer (full-time)
@@ -1605,7 +1596,7 @@ updates:
 | Neon Database (Pro) | R$ 150 |
 | Cloudflare Pages (Pro) | R$ 100 |
 | Cloudflare R2 Storage | R$ 50 |
-| Sentry (Team) | R$ 130 |
+| LogRocket (Free/Team) | R$ 0 - 130 |
 | Vercel (opcional) | R$ 100 |
 | **TOTAL** | **R$ 530/mês** |
 
@@ -1707,7 +1698,7 @@ O projeto **Fit-Tracker** possui uma base sólida com stack tecnológico moderno
 
 ### Próximos Passos Imediatos (Semana 1)
 1. ✅ Configurar GitHub Actions para CI/CD
-2. ✅ Implementar Sentry para error tracking
+2. ✅ Implementar LogRocket para error tracking & session replay
 3. ✅ Configurar backups automatizados do Neon
 4. ✅ Mover secrets para Cloudflare Workers
 5. ✅ Adicionar Error Boundaries em toda a aplicação

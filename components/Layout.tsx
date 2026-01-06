@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { useTheme } from '../context/ThemeContext';
+import { useUIStore } from '../stores/useUIStore';
 import { Theme } from '../types';
 import { RestTimer } from './workout/RestTimer';
 import { useTimerStore } from '../stores/useTimerStore';
@@ -10,7 +10,7 @@ import { useWorkoutStore } from '../stores/useWorkoutStore';
 const Layout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useUIStore();
 
   const handleToggleTheme = () => {
     setTheme(theme === Theme.Dark ? Theme.Light : Theme.Dark);

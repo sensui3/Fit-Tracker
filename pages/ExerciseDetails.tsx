@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { dbService } from '../services/databaseService';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { Exercise } from '../hooks/useExerciseFilters';
 
 const ExerciseDetails: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const { id } = useParams<{ id: string }>();
   const [showAddModal, setShowAddModal] = useState(false);
   const [exercise, setExercise] = useState<Exercise | null>(null);

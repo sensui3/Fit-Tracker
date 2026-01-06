@@ -2,8 +2,8 @@ import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
+import { useUIStore } from '../stores/useUIStore';
+import { useAuthStore } from '../stores/useAuthStore';
 import { Theme } from '../types';
 import { dbService } from '../services/databaseService';
 
@@ -12,8 +12,8 @@ const WorkoutVolumeChart = lazy(() => import('../components/dashboard/WorkoutVol
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
-  const { user, isAuthenticated } = useAuth();
+  const { theme, setTheme } = useUIStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [userStats, setUserStats] = useState({
     totalWorkouts: 0,
     totalVolume: 0,

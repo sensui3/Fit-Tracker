@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { Button } from './ui/Button';
 import { OptimizedImage } from './ui/OptimizedImage';
 
@@ -11,7 +11,8 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout, user } = useAuthStore();
+
 
   const handleLogout = async () => {
     await logout();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { dbService } from '../services/databaseService';
 import { ExerciseSelectorModal } from '../components/exercise/ExerciseSelectorModal';
 import { Exercise } from '../types';
@@ -8,7 +8,7 @@ import { useToast } from '../components/ui/Toast';
 
 const CreatePlan: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [dbPlan, setDbPlan] = useState<any>(null);
   const [dbExercises, setDbExercises] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

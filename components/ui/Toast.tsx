@@ -21,6 +21,13 @@ export const useToast = () => {
 const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void }> = ({ toast, onRemove }) => {
     const [isExiting, setIsExiting] = useState(false);
 
+    const handleClose = () => {
+        setIsExiting(true);
+        setTimeout(() => {
+            onRemove(toast.id);
+        }, 300); // Animation duration
+    };
+
     useEffect(() => {
         const timer = setTimeout(() => {
             handleClose();
@@ -28,13 +35,6 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
 
         return () => clearTimeout(timer);
     }, [toast.duration]);
-
-    const handleClose = () => {
-        setIsExiting(true);
-        setTimeout(() => {
-            onRemove(toast.id);
-        }, 300); // Animation duration
-    };
 
     const icons = {
         success: 'check_circle',
