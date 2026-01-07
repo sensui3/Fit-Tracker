@@ -10,10 +10,12 @@ const Login: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleAction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ const Login: React.FC = () => {
         if (authError) throw authError;
         navigate('/');
       } else {
-        const { data, error: authError } = await signUpValidated({ email, password }, name);
+        const { data, error: authError } = await signUpValidated({ email, password, passwordConfirmation: confirmPassword }, name);
         if (authError) throw authError;
         setIsLogin(true); // Após cadastrar, muda para login
         addToast({
@@ -157,6 +159,36 @@ const Login: React.FC = () => {
                 </button>
               </div>
             </label>
+
+            {!isLogin && (
+              <label className="flex flex-col flex-1 gap-2">
+                <span className="text-sm font-medium leading-normal text-slate-700 dark:text-slate-200">Confirmar Senha</span>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#9db99d]">
+                    <span className="material-symbols-outlined text-[20px]">lock_reset</span>
+                  </span>
+                  <input
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 dark:border-[#3b543b] bg-slate-50 dark:bg-[#1c271c] h-12 pl-11 pr-14 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#5a6b5a] focus:border-[#15803d] focus:ring-1 focus:ring-[#15803d] outline-none transition-all"
+                    placeholder="••••••••"
+                    type={showConfirmPassword ? "text" : "password"}
+                    aria-label="Confirmar Senha"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-slate-400 dark:text-[#9db99d] hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    aria-label={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {showConfirmPassword ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
+              </label>
+            )}
 
             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 
