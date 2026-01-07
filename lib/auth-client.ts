@@ -39,7 +39,7 @@ export const signUpValidated = async (data: unknown, name: string) => {
  * Recuperação de senha
  */
 export const forgotPassword = async (email: string) => {
-    return await authClient.forgetPassword({
+    return await authClient.requestPasswordReset({
         email,
         redirectTo: "/reset-password",
     });
