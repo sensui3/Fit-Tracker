@@ -83,7 +83,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=fit-tracker-btx --branch=develop
+          command: pages deploy dist --project-name=fit-tracker --branch=develop
 
   deploy-production:
     name: Deploy to Production
@@ -105,4 +105,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=fit-tracker-btx --branch=main
+          command: pages deploy dist --project-name=fit-tracker --branch=main
