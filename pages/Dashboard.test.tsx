@@ -5,11 +5,15 @@ import { MemoryRouter } from 'react-router-dom';
 import { dbService } from '../services/databaseService';
 import { useAuthStore } from '../stores/useAuthStore';
 import { Theme } from '../types';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock dependências
 vi.mock('../services/databaseService', () => ({
     dbService: {
         query: vi.fn(),
+        getDashboardStats: vi.fn(),
+        getRecentWorkouts: vi.fn(),
+        getPersonalRecords: vi.fn(),
     }
 }));
 
@@ -31,6 +35,23 @@ vi.mock('../components/dashboard/WorkoutVolumeChart', () => ({
 
 describe('Dashboard Page', () => {
     const mockUser = { id: 'user-1', name: 'Pedro Secundo' };
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: false,
+            },
+        },
+    });
+
+    const renderWithProviders = (ui: React.ReactElement) => {
+        return render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    {ui}
+                </MemoryRouter>
+            </QueryClientProvider>
+        );
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -39,38 +60,30 @@ describe('Dashboard Page', () => {
             isAuthenticated: true,
         });
 
-        // Mock default responses for queries
-        (dbService.query as any).mockImplementation(async (strings: any) => {
-            const queryStr = Array.isArray(strings) ? strings[0] : strings;
-            if (queryStr.includes('COUNT(DISTINCT ws.id)')) {
-                return [{ total_workouts: '10', total_volume: '5000', avg_session_time: '45' }];
-            }
-            if (queryStr.includes('ws.start_time')) {
-                return [{
-                    id: 1,
-                    start_time: new Date().toISOString(),
-                    end_time: new Date().toISOString(),
-                    total_volume: 100,
-                    plan_name: 'Treino A',
-                    duration_minutes: 30,
-                    icon: 'fitness_center',
-                    color: 'orange',
-                    tag: 'Planejado'
-                }];
-            }
-            if (queryStr.includes('MAX(s.weight)')) {
-                return [{ name: 'Supino', max_weight: 80 }];
-            }
-            return [];
+        // Mock optimized methods
+        (dbService.getDashboardStats as any).mockResolvedValue({
+            total_workouts: '10',
+            total_volume: '5000',
+            avg_duration: '2700' // 45 minutes in seconds
         });
+
+        (dbService.getRecentWorkouts as any).mockResolvedValue([{
+            id: 'session-1',
+            start_time: new Date().toISOString(),
+            end_time: new Date().toISOString(),
+            total_volume: 100,
+            plan_name: 'Treino A',
+            duration_minutes: '30',
+        }]);
+
+        (dbService.getPersonalRecords as any).mockResolvedValue([{
+            name: 'Supino',
+            max_weight: 80
+        }]);
     });
 
     it('should render welcome message with user name', async () => {
-        render(
-            <MemoryRouter>
-                <Dashboard />
-            </MemoryRouter>
-        );
+        renderWithProviders(<Dashboard />);
 
         await waitFor(() => {
             expect(screen.getByText(/Bem-vindo de volta, Pedro!/i)).toBeInTheDocument();
@@ -78,26 +91,18 @@ describe('Dashboard Page', () => {
     });
 
     it('should display stats from database', async () => {
-        render(
-            <MemoryRouter>
-                <Dashboard />
-            </MemoryRouter>
-        );
+        renderWithProviders(<Dashboard />);
 
         await waitFor(() => {
-            // Busca por texto que contenha o número 10
-            expect(screen.getAllByText(/10/).length).toBeGreaterThanOrEqual(1);
-            // Busca por 5000 com possível separador de milhar
+            // "10" for total workouts
+            expect(screen.getByText('10')).toBeInTheDocument();
+            // "5.000 kg" or "5,000 kg" depending on locale, but "5000" should be there
             expect(screen.getByText(/5.*000/)).toBeInTheDocument();
         });
     });
 
     it('should render recent sessions', async () => {
-        render(
-            <MemoryRouter>
-                <Dashboard />
-            </MemoryRouter>
-        );
+        renderWithProviders(<Dashboard />);
 
         await waitFor(() => {
             expect(screen.getByText('Treino A')).toBeInTheDocument();
