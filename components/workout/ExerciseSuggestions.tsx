@@ -20,7 +20,7 @@ export const ExerciseSuggestions = memo(({ exercises, highlightedIndex, onSelect
                     onClick={() => onSelect(exercise)}
                 >
                     <OptimizedImage
-                        src={exercise.image}
+                        src={exercise.image_url || exercise.image}
                         alt={exercise.name}
                         className="w-full h-full object-cover"
                         containerClassName="size-10 rounded-md shrink-0 bg-slate-200 dark:bg-white/10"
