@@ -23,6 +23,21 @@ vi.mock('../components/ui/Toast', () => ({
     useToast: () => ({ addToast: vi.fn() }),
 }));
 
+// Mock useAuthStore
+vi.mock('../stores/useAuthStore', () => ({
+    useAuthStore: vi.fn(() => ({
+        user: { id: 'user-123', name: 'Test User' },
+        isAuthenticated: true
+    }))
+}));
+
+// Mock dbService
+vi.mock('../services/databaseService', () => ({
+    dbService: {
+        query: vi.fn(() => Promise.resolve([]))
+    }
+}));
+
 describe('LogWorkout Page', () => {
     const mockLogger = {
         exerciseInput: '',
@@ -37,6 +52,8 @@ describe('LogWorkout Page', () => {
         updateSet: vi.fn(),
         handleInputChange: vi.fn(),
         handleSelectExercise: vi.fn(),
+        finishWorkout: vi.fn(),
+        selectedExercise: null,
     };
 
     beforeEach(() => {
@@ -124,7 +141,14 @@ describe('LogWorkout Page', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/workouts');
     });
 
-    it('should save workout', () => {
+    it('should save workout', async () => {
+        const finishWorkout = vi.fn(() => Promise.resolve());
+        (useWorkoutLogger as any).mockReturnValue({
+            ...mockLogger,
+            selectedExercise: { id: '1', name: 'Supino' },
+            finishWorkout
+        });
+
         render(
             <MemoryRouter>
                 <LogWorkout />
@@ -134,6 +158,9 @@ describe('LogWorkout Page', () => {
         const saveBtn = screen.getByText('Salvar Registro');
         fireEvent.click(saveBtn);
 
-        expect(mockNavigate).toHaveBeenCalledWith('/workouts');
+        await vi.waitFor(() => {
+            expect(finishWorkout).toHaveBeenCalled();
+            expect(mockNavigate).toHaveBeenCalledWith('/workouts');
+        });
     });
 });

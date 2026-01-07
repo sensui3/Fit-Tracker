@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// Set environment variables for tests
+process.env.VITE_APP_URL = 'http://localhost:3000';
+process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+
 // Mock LogRocket
 vi.mock('logrocket', () => ({
     default: {
@@ -11,6 +15,40 @@ vi.mock('logrocket', () => ({
         warn: vi.fn(),
         captureException: vi.fn(),
     },
+}));
+
+// Mock better-auth/react to prevent "Invalid base URL" errors
+vi.mock('better-auth/react', () => ({
+    createAuthClient: vi.fn(() => ({
+        signIn: {
+            email: vi.fn(),
+        },
+        signUp: {
+            email: vi.fn(),
+        },
+        useSession: vi.fn(() => ({ data: null, status: 'unauthenticated' })),
+        signOut: vi.fn(),
+    })),
+    useSession: vi.fn(() => ({ data: null, status: 'unauthenticated' })),
+    signOut: vi.fn(),
+}));
+
+// Mock auth-client specifically
+vi.mock('./lib/auth-client', () => ({
+    authClient: {
+        signIn: {
+            email: vi.fn(),
+        },
+        signUp: {
+            email: vi.fn(),
+        },
+        useSession: vi.fn(() => ({ data: null, status: 'unauthenticated' })),
+        signOut: vi.fn(),
+    },
+    useSession: vi.fn(() => ({ data: null, status: 'unauthenticated' })),
+    signOut: vi.fn(),
+    signInValidated: vi.fn(),
+    signUpValidated: vi.fn(),
 }));
 
 // Mock window.matchMedia

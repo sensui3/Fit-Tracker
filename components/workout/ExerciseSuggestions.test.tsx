@@ -5,7 +5,7 @@ import { Exercise } from '../../types';
 
 // Mock OptimizedImage since we already tested it and want to focus on this component
 vi.mock('../ui/OptimizedImage', () => ({
-    OptimizedImage: ({ alt, ...props }: any) => <img alt={alt} {...props} />
+    OptimizedImage: ({ alt, containerClassName, ...props }: any) => <img alt={alt} {...props} />
 }));
 
 describe('ExerciseSuggestions Component', () => {
