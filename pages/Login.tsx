@@ -158,6 +158,17 @@ const Login: React.FC = () => {
                   </span>
                 </button>
               </div>
+              {isLogin && (
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/forgot-password')}
+                    className="text-[#16a34a] text-xs font-medium hover:underline mt-1"
+                  >
+                    Esqueceu sua senha?
+                  </button>
+                </div>
+              )}
             </label>
 
             {!isLogin && (
@@ -211,7 +222,7 @@ const Login: React.FC = () => {
           </div>
         </div>
       </section>
-    </main>
+    </main >
   );
 };
 
