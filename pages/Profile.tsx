@@ -6,9 +6,11 @@ import { OptimizedImage } from '../components/ui/OptimizedImage';
 import { useAuthStore } from '../stores/useAuthStore';
 import { dbService } from '../services/databaseService';
 import { sanitize, profileSchema } from '../lib/security';
+import { useToast } from '../components/ui/Toast';
 
 const Profile: React.FC = () => {
   const { user, isAuthenticated } = useAuthStore();
+  const { addToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -166,14 +168,29 @@ const Profile: React.FC = () => {
       }
 
       setIsEditing(false);
-      console.log('Perfil salvo com sucesso!');
+      addToast({
+        type: 'success',
+        title: 'Perfil Atualizado',
+        message: 'Suas informações foram salvas com sucesso!',
+        duration: 3000
+      });
 
     } catch (error: any) {
       console.error('Erro ao salvar perfil:', error);
       if (error.name === 'ZodError') {
-        alert(error.errors[0]?.message || 'Dados inválidos');
+        addToast({
+          type: 'error',
+          title: 'Erro de Validação',
+          message: error.errors[0]?.message || 'Dados inválidos',
+          duration: 4000
+        });
       } else {
-        alert('Erro ao salvar as informações.');
+        addToast({
+          type: 'error',
+          title: 'Erro ao Salvar',
+          message: 'Ocorreu um erro ao salvar as informações.',
+          duration: 4000
+        });
       }
     } finally {
       setSaving(false);

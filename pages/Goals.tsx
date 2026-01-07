@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useGoalFilters, Goal, GoalTab, ViewMode } from '../hooks/useGoalFilters';
 import { dbService } from '../services/databaseService';
+import { useToast } from '../components/ui/Toast';
 
 const EXAMPLE_GOAL: Goal = {
   id: 999,
@@ -22,6 +23,7 @@ const EXAMPLE_GOAL: Goal = {
 
 const Goals: React.FC = () => {
   const { user } = useAuthStore();
+  const { addToast } = useToast();
   const [showAddGoalModal, setShowAddGoalModal] = useState(false);
   const [dbGoals, setDbGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -479,7 +481,12 @@ const Goals: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    alert('Meta criada com sucesso!');
+                    addToast({
+                      type: 'success',
+                      title: 'Meta Criada',
+                      message: 'Sua meta foi criada com sucesso!',
+                      duration: 3000
+                    });
                     setShowAddGoalModal(false);
                   }}
                   className="flex-1 py-3 px-4 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold rounded-xl shadow-lg shadow-green-600/20 transition-all transform active:scale-[0.98]"

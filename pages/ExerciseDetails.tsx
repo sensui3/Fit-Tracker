@@ -3,10 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { dbService } from '../services/databaseService';
 import { useAuthStore } from '../stores/useAuthStore';
 import { Exercise } from '../hooks/useExerciseFilters';
+import { useToast } from '../components/ui/Toast';
 
 const ExerciseDetails: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { addToast } = useToast();
   const { id } = useParams<{ id: string }>();
   const [showAddModal, setShowAddModal] = useState(false);
   const [exercise, setExercise] = useState<Exercise | null>(null);
@@ -45,7 +47,12 @@ const ExerciseDetails: React.FC = () => {
   const handleSave = () => {
     if (!exercise) return;
     // Aqui iria a lógica real de salvar no backend/contexto
-    alert(`Exercício "${exercise.name}" adicionado ao plano "${workoutConfig.plan}" com sucesso!`);
+    addToast({
+      type: 'success',
+      title: 'Exercício Adicionado',
+      message: `Exercício "${exercise.name}" adicionado ao plano "${workoutConfig.plan}" com sucesso!`,
+      duration: 4000
+    });
     setShowAddModal(false);
   };
 

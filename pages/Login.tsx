@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInValidated, signUpValidated } from '../lib/auth-client';
 import { checkRateLimit } from '../lib/security';
+import { useToast } from '../components/ui/Toast';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +36,12 @@ const Login: React.FC = () => {
         const { data, error: authError } = await signUpValidated({ email, password }, name);
         if (authError) throw authError;
         setIsLogin(true); // Após cadastrar, muda para login
-        alert('Conta criada com sucesso! Agora você pode entrar.');
+        addToast({
+          type: 'success',
+          title: 'Conta criada!',
+          message: 'Conta criada com sucesso! Agora você pode entrar.',
+          duration: 5000
+        });
       }
     } catch (err: any) {
       console.error('Auth error:', err);
