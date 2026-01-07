@@ -159,3 +159,8 @@ CREATE INDEX IF NOT EXISTS idx_plan_exercises_plan_id ON plan_exercises(plan_id)
 CREATE INDEX IF NOT EXISTS idx_user_metrics_user_id ON user_metrics(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_goals_user_id ON user_goals(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+
+-- Otimização Dashboard
+CREATE INDEX IF NOT EXISTS idx_workout_sessions_user_start ON workout_sessions(user_id, start_time DESC);
+CREATE INDEX IF NOT EXISTS idx_workout_sessions_user_end ON workout_sessions(user_id, end_time);
+CREATE INDEX IF NOT EXISTS idx_workout_logs_session_exercise ON workout_logs(session_id, exercise_id);
