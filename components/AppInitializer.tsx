@@ -3,7 +3,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { useUIStore } from '../stores/useUIStore';
 import { useSession } from '../lib/auth-client';
 import { Theme } from '../types';
-import { setSentryUser } from '../lib/sentry';
+import { setLogRocketUser } from '../lib/logrocket';
 
 export const AppInitializer = () => {
     const { setUser, setLoading } = useAuthStore();
@@ -22,10 +22,10 @@ export const AppInitializer = () => {
                     createdAt: new Date(authUser.createdAt).toISOString(),
                     updatedAt: new Date(authUser.updatedAt).toISOString(),
                 } as any);
-                setSentryUser(authUser);
+                setLogRocketUser(authUser);
             } else {
                 setUser(null);
-                setSentryUser(null);
+                setLogRocketUser(null);
             }
             setLoading(false);
         }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -23,7 +23,7 @@ const MOCK_WORKOUT_EXAMPLE = [
 const WorkoutHistory: React.FC = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
-    const { user } = useAuth();
+    const { user } = useAuthStore();
     const [dbWorkouts, setDbWorkouts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 

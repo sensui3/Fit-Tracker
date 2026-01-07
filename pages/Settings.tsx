@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useTheme } from '../context/ThemeContext';
+import { useUIStore } from '../stores/useUIStore';
 import { Theme } from '../types';
 import { useNavigate } from 'react-router-dom';
 
 const Settings: React.FC = () => {
     const navigate = useNavigate();
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme } = useUIStore();
     const [activeSection, setActiveSection] = useState('general');
 
     // Mock states for other settings
@@ -194,14 +194,14 @@ const Settings: React.FC = () => {
                             </div>
                             <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl p-6 shadow-sm space-y-6">
                                 <div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white mb-2">Teste de Integração Sentry</h4>
+                                    <h4 className="font-bold text-slate-900 dark:text-white mb-2">Teste de Integração LogRocket</h4>
                                     <p className="text-sm text-slate-500 dark:text-text-secondary mb-4">
                                         Utilize os botões abaixo para validar se a captura de erros e o monitoramento de performance estão operando corretamente.
                                     </p>
                                     <div className="flex flex-wrap gap-4">
                                         <button
                                             onClick={() => {
-                                                throw new Error("Erro Sintético de Teste - Sentry Integration");
+                                                throw new Error("Erro Sintético de Teste - LogRocket Integration");
                                             }}
                                             className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-sm font-bold transition-all"
                                         >
@@ -211,7 +211,7 @@ const Settings: React.FC = () => {
                                             onClick={() => {
                                                 console.log("Simulando operação pesada...");
                                                 const start = Date.now();
-                                                while (Date.now() - start < 100) { }
+                                                while (Date.now() - start < 100) { /* busy wait */ }
                                                 console.log("Teste concluído.");
                                             }}
                                             className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 rounded-lg text-sm font-bold transition-all"

@@ -8,12 +8,17 @@ import { useToast } from '../components/ui/Toast';
 import { useWorkoutLogger } from '../hooks/useWorkoutLogger';
 import { WorkoutSetItem } from '../components/workout/WorkoutSetItem';
 import { ExerciseSuggestions } from '../components/workout/ExerciseSuggestions';
+import { useAuthStore } from '../stores/useAuthStore';
+import { dbService } from '../services/databaseService';
 
 const LogWorkout: React.FC = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { user } = useAuthStore();
+  const [isSaving, setIsSaving] = useState(false);
 
   const {
     exerciseInput,
@@ -28,6 +33,8 @@ const LogWorkout: React.FC = () => {
     updateSet,
     handleInputChange,
     handleSelectExercise,
+    finishWorkout,
+    selectedExercise
   } = useWorkoutLogger();
 
   // Fecha o dropdown se clicar fora
@@ -44,15 +51,40 @@ const LogWorkout: React.FC = () => {
     };
   }, [setShowSuggestions]);
 
-  const onSave = useCallback(() => {
-    addToast({
-      type: 'success',
-      title: 'Sucesso!',
-      message: 'Treino salvo com sucesso.',
-      duration: 4000
-    });
-    navigate('/workouts');
-  }, [addToast, navigate]);
+  const onSave = useCallback(async () => {
+    if (!user?.id) return;
+    if (!selectedExercise) {
+      addToast({
+        type: 'error',
+        title: 'Erro',
+        message: 'Selecione um exercício primeiro.',
+        duration: 3000
+      });
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await finishWorkout(user.id);
+
+      addToast({
+        type: 'success',
+        title: 'Sucesso!',
+        message: 'Treino salvo com sucesso.',
+        duration: 4000
+      });
+      navigate('/workouts');
+    } catch (error) {
+      addToast({
+        type: 'error',
+        title: 'Erro ao salvar',
+        message: 'Não foi possível salvar seu treino. Tente novamente.',
+        duration: 5000
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [addToast, navigate, finishWorkout, user?.id, selectedExercise]);
 
   return (
     <>
@@ -78,42 +110,74 @@ const LogWorkout: React.FC = () => {
               <Card>
                 <form className="flex flex-col gap-8" onSubmit={(e) => e.preventDefault()}>
                   {/* Exercise Input com Autocomplete */}
+                  {/* Exercise Input com Autocomplete */}
                   <div className="flex flex-col gap-2 relative" ref={dropdownRef}>
-                    <Input
-                      label="Exercício"
-                      placeholder="Ex: Supino Reto, Agachamento..."
-                      value={exerciseInput}
-                      onChange={(e) => handleInputChange(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (!showSuggestions || filteredExercises.length === 0) return;
-                        if (e.key === 'ArrowDown') {
-                          e.preventDefault();
-                          setHighlightedIndex(prev => (prev < filteredExercises.length - 1 ? prev + 1 : 0));
-                        } else if (e.key === 'ArrowUp') {
-                          e.preventDefault();
-                          setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredExercises.length - 1));
-                        } else if (e.key === 'Enter') {
-                          e.preventDefault();
-                          if (highlightedIndex >= 0) {
-                            handleSelectExercise(filteredExercises[highlightedIndex]);
-                          }
-                        } else if (e.key === 'Escape') {
-                          setShowSuggestions(false);
-                        }
-                      }}
-                      onFocus={() => {
-                        if (exerciseInput) setShowSuggestions(true);
-                      }}
-                      leftIcon={<span className="material-symbols-outlined">search</span>}
-                    />
+                    {!selectedExercise ? (
+                      <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+                        <Input
+                          label="Exercício"
+                          placeholder="Ex: Supino Reto, Agachamento..."
+                          value={exerciseInput}
+                          onChange={(e) => handleInputChange(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (!showSuggestions || filteredExercises.length === 0) return;
+                            if (e.key === 'ArrowDown') {
+                              e.preventDefault();
+                              setHighlightedIndex(prev => (prev < filteredExercises.length - 1 ? prev + 1 : 0));
+                            } else if (e.key === 'ArrowUp') {
+                              e.preventDefault();
+                              setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredExercises.length - 1));
+                            } else if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (highlightedIndex >= 0) {
+                                handleSelectExercise(filteredExercises[highlightedIndex]);
+                              }
+                            } else if (e.key === 'Escape') {
+                              setShowSuggestions(false);
+                            }
+                          }}
+                          onFocus={() => {
+                            if (exerciseInput) setShowSuggestions(true);
+                          }}
+                          leftIcon={<span className="material-symbols-outlined">search</span>}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2 animate-in zoom-in-95 duration-300">
+                        <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide">Exercício Selecionado</label>
+                        <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-border-dark group transition-all hover:border-[#16a34a]/50">
+                          <OptimizedImage
+                            src={selectedExercise.image_url || selectedExercise.image}
+                            alt={selectedExercise.name}
+                            className="w-full h-full object-cover"
+                            containerClassName="size-16 rounded-xl shrink-0 bg-slate-200 dark:bg-white/10 shadow-sm"
+                          />
+                          <div className="flex flex-col flex-1">
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white leading-tight">{selectedExercise.name}</h3>
+                            <p className="text-sm text-slate-500 dark:text-text-secondary font-medium">{selectedExercise.muscle_group || selectedExercise.muscle}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSelectExercise(null as any)}
+                            className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-2"
+                            title="Trocar exercício"
+                          >
+                            <span className="material-symbols-outlined">sync</span>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Dropdown de Sugestões Memoizado */}
-                    {showSuggestions && (
-                      <ExerciseSuggestions
-                        exercises={filteredExercises}
-                        highlightedIndex={highlightedIndex}
-                        onSelect={handleSelectExercise}
-                      />
+                    {showSuggestions && !selectedExercise && (
+                      <div className="absolute top-[calc(100%+8px)] left-0 w-full z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
+                        <ExerciseSuggestions
+                          exercises={filteredExercises}
+                          highlightedIndex={highlightedIndex}
+                          onSelect={handleSelectExercise}
+                        />
+                      </div>
                     )}
                   </div>
 
@@ -157,7 +221,9 @@ const LogWorkout: React.FC = () => {
                   <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-border-dark mt-2">
                     <Button
                       onClick={onSave}
-                      leftIcon={<span className="material-symbols-outlined">check</span>}
+                      isLoading={isSaving}
+                      disabled={isSaving}
+                      leftIcon={!isSaving && <span className="material-symbols-outlined">check</span>}
                     >
                       Salvar Registro
                     </Button>
@@ -191,31 +257,79 @@ const LogWorkout: React.FC = () => {
 };
 
 // Sub-componentes memoizados para evitar re-render da página inteira
-const LastLogs = memo(({ navigate }: { navigate: any }) => (
-  <Card noPadding>
-    <div className="p-4 border-b border-slate-100 dark:border-border-dark flex justify-between items-center">
-      <h3 className="text-slate-900 dark:text-white font-bold text-lg">Últimos Registros</h3>
-      <button onClick={() => navigate('/workouts')} className="text-[#16a34a] text-sm font-medium hover:underline">Ver tudo</button>
-    </div>
-    <div className="flex flex-col">
-      <div className="flex gap-4 p-4 border-b border-slate-100 dark:border-border-dark/50 hover:bg-slate-50 dark:hover:bg-background-dark/50 transition-colors cursor-pointer" onClick={() => navigate('/workouts')}>
-        <OptimizedImage
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw"
-          alt="Supino Reto"
-          className="w-full h-full object-cover"
-          containerClassName="size-14 rounded-lg shrink-0"
-        />
-        <div className="flex flex-col justify-center flex-1">
-          <h4 className="text-slate-900 dark:text-white font-semibold leading-tight">Supino Reto</h4>
-          <p className="text-slate-500 dark:text-text-secondary text-sm">4 séries • 80kg</p>
-        </div>
-        <div className="text-xs font-medium text-slate-400 dark:text-text-secondary pt-1">
-          10:42
-        </div>
+const LastLogs = memo(({ navigate }: { navigate: any }) => {
+  const { user } = useAuthStore();
+  const [sessions, setSessions] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchRecentSessions = async () => {
+      if (!user?.id) return;
+      try {
+        const result = await dbService.query`
+          SELECT 
+            ws.id,
+            e.name as exercise_name,
+            e.image_url,
+            e.image,
+            ws.total_volume,
+            ws.end_time,
+            COUNT(s.id) as sets_count
+          FROM workout_sessions ws
+          JOIN workout_logs wl ON wl.session_id = ws.id
+          JOIN exercises e ON wl.exercise_id = e.id
+          JOIN sets s ON s.log_id = wl.id
+          WHERE ws.user_id = ${user.id}
+          GROUP BY ws.id, e.name, e.image_url, e.image, ws.total_volume, ws.end_time
+          ORDER BY ws.end_time DESC
+          LIMIT 5
+        `;
+        setSessions(result);
+      } catch (error) {
+        console.error('Erro ao buscar treinos recentes:', error);
+      }
+    };
+
+    fetchRecentSessions();
+  }, [user?.id]);
+
+  return (
+    <Card noPadding>
+      <div className="p-4 border-b border-slate-100 dark:border-border-dark flex justify-between items-center">
+        <h3 className="text-slate-900 dark:text-white font-bold text-lg">Últimos Registros</h3>
+        <button onClick={() => navigate('/workouts')} className="text-[#16a34a] text-sm font-medium hover:underline">Ver tudo</button>
       </div>
-    </div>
-  </Card>
-));
+      <div className="flex flex-col">
+        {sessions.length > 0 ? sessions.map((session) => (
+          <div
+            key={session.id}
+            className="flex gap-4 p-4 border-b border-slate-100 dark:border-border-dark/50 hover:bg-slate-50 dark:hover:bg-background-dark/50 transition-colors cursor-pointer group"
+            onClick={() => navigate('/workouts')}
+          >
+            <OptimizedImage
+              src={session.image_url || session.image || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=200'}
+              alt={session.exercise_name}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              containerClassName="size-14 rounded-xl shrink-0 bg-slate-200 dark:bg-white/10"
+            />
+            <div className="flex flex-col justify-center flex-1 min-w-0">
+              <h4 className="text-slate-900 dark:text-white font-bold leading-tight truncate">{session.exercise_name}</h4>
+              <p className="text-slate-500 dark:text-text-secondary text-sm font-medium">
+                {session.sets_count} séries • {session.total_volume}kg
+              </p>
+            </div>
+            <div className="text-[10px] font-bold text-slate-400 dark:text-text-secondary pt-1">
+              {new Date(session.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </div>
+          </div>
+        )) : (
+          <div className="p-8 text-center text-slate-400 dark:text-slate-500 italic text-sm">
+            Nenhum registro recente
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+});
 
 const DeleteModal = memo(({ onClose, onConfirm }: { onClose: () => void, onConfirm: () => void }) => (
   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

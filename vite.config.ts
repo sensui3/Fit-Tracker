@@ -28,14 +28,15 @@ export default defineConfig(({ mode }) => {
         'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
       },
       proxy: {
-        // Proxy Neon Auth requests to avoid CORS issues in development
+        // Proxy Neon Auth requests to avoid CORS issues and hide the destination URL
         '/api/auth': {
-          target: 'https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech',
+          target: process.env.VITE_BETTER_AUTH_URL?.replace('/neondb/auth', '') || 'https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/auth/, '/neondb/auth'),
-          configure: (proxy, options) => {
-            proxy.on('error', (err, req, res) => {
-              console.log('proxy error', err);
+          secure: true,
+          configure: (proxy) => {
+            proxy.on('error', (err) => {
+              console.error('Auth Proxy Error:', err);
             });
           },
         }

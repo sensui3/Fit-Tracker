@@ -58,7 +58,7 @@ Implemente Error Boundaries completos no projeto Fit-Tracker:
 1. Crie componente ErrorBoundary em components/ErrorBoundary.tsx com:
    - Captura de erros de renderização
    - UI de fallback amigável com botão de reload
-   - Log de erros no console (preparado para Sentry)
+   - Log de erros no console (preparado para LogRocket)
    - Suporte a dark mode
 
 2. Envolva toda a aplicação no App.tsx com ErrorBoundary
@@ -88,7 +88,7 @@ Substitua todos os console.log por sistema de logging estruturado:
    - Níveis de log (debug, info, warn, error)
    - Formatação estruturada (timestamp, level, message, context)
    - Suporte a diferentes ambientes (dev mostra tudo, prod apenas warn/error)
-   - Preparado para integração com Sentry
+   - Preparado para integração com LogRocket
 
 2. Substitua todos os console.log/error/warn no projeto por:
    - logger.info() para informações
@@ -477,37 +477,33 @@ Permita uso completo offline da aplicação.
 
 ## 📊 FASE 6: MONITORAMENTO (Semana 9)
 
-### 6.1 Integrar Sentry para Error Tracking
+### 6.1 Integrar LogRocket para Error Tracking & Session Replay
 **Prioridade:** 🔴 Crítica  
 **Esforço:** 3 horas  
 **Arquivos afetados:** `App.tsx`, `vite.config.ts`
 
 **PROMPT:**
 ```
-Integre Sentry para rastreamento de erros em produção:
+Integre LogRocket para rastreamento de erros e reprodução de sessões:
 
-1. Crie conta no Sentry.io (plano gratuito)
+1. Crie conta no LogRocket.com (plano gratuito)
 
-2. Instale SDK: npm install @sentry/react
+2. Instale SDK: npm install logrocket
 
-3. Configure Sentry em App.tsx:
-   - DSN do projeto
-   - Environment (dev/staging/prod)
-   - Release version
-   - User context (userId, email)
-   - Breadcrumbs habilitados
+3. Configure LogRocket em App.tsx:
+   - App ID do projeto
+   - Identificação de usuário (userId, email, name)
+   - Scrubbing de dados sensíveis
 
-4. Configure source maps para produção:
-   - Adicionar plugin Sentry no vite.config.ts
-   - Upload automático de source maps
+4. Configure LogRocket em AppInitializer para identificar usuários logados
 
 5. Integre com ErrorBoundary existente
 
-6. Configure alertas para erros críticos
+6. Configure alertas para erros críticos no painel do LogRocket
 
-7. Adicione tags customizadas (page, action)
+7. Use session replay para debugar problemas de UX
 
-Capture e monitore todos os erros em produção.
+Capture e monitore todos os erros e sessões em produção com visualização completa.
 ```
 
 ---
@@ -710,7 +706,7 @@ npm install zod dompurify @types/dompurify
 npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom @playwright/test
 
 # Monitoramento
-npm install @sentry/react
+npm install logrocket
 
 # PWA
 npm install -D vite-plugin-pwa
@@ -748,7 +744,7 @@ npm install framer-motion
 14. ✅ PWA (5.1)
 
 **Semana 9 (Observabilidade):**
-15. ✅ Sentry (6.1)
+15. ✅ LogRocket (6.1)
 16. ✅ Analytics (6.2)
 
 **Semana 10 (Docs):**

@@ -1,11 +1,16 @@
 import { createAuthClient } from "better-auth/react";
 import { loginSchema, signUpSchema } from "./security";
 
-// Use Neon Auth service URL
-const baseURL = import.meta.env.VITE_BETTER_AUTH_URL;
+// Use current domain with /api/auth proxy - must be absolute for Better Auth
+const getBaseURL = () => {
+    if (typeof window !== 'undefined') {
+        return `${window.location.origin}/api/auth`;
+    }
+    return "/api/auth";
+};
 
 export const authClient = createAuthClient({
-    baseURL,
+    baseURL: getBaseURL(),
 });
 
 export const { useSession, signOut } = authClient;

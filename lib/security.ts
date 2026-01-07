@@ -21,6 +21,10 @@ export const loginSchema = z.object({
 
 export const signUpSchema = loginSchema.extend({
     name: z.string().min(2, 'Nome muito curto').max(50, 'Nome muito longo').transform(sanitize),
+    passwordConfirmation: z.string()
+}).refine((data) => data.password === data.passwordConfirmation, {
+    message: "As senhas não coincidem",
+    path: ["passwordConfirmation"],
 });
 
 // Perfil do Usuário
@@ -76,7 +80,7 @@ export const scrubData = (data: any): any => {
         for (const key in scrubbed) {
             if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk))) {
                 scrubbed[key] = '[REDACTED]';
-            } else if (typeof scrubbed[key] === 'object') {
+            } else {
                 scrubbed[key] = scrubData(scrubbed[key]);
             }
         }

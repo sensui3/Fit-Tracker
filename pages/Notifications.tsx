@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
 import { dbService } from '../services/databaseService';
 import { Notification } from '../types';
 
 const Notifications: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState('todas');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -192,8 +192,8 @@ const Notifications: React.FC = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`flex flex-col items-center justify-center pb-3 pt-2 min-w-[60px] relative capitalize text-sm font-bold tracking-wide transition-colors ${activeTab === tab
-                      ? 'text-slate-900 dark:text-white'
-                      : 'text-slate-500 dark:text-text-secondary hover:text-slate-700 dark:hover:text-gray-300'
+                    ? 'text-slate-900 dark:text-white'
+                    : 'text-slate-500 dark:text-text-secondary hover:text-slate-700 dark:hover:text-gray-300'
                     }`}
                 >
                   {tab}
