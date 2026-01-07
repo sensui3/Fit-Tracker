@@ -1,11 +1,16 @@
 import { createAuthClient } from "better-auth/react";
 import { loginSchema, signUpSchema } from "./security";
 
-// Use current domain with /api/auth proxy
-const baseURL = "/api/auth";
+// Use current domain with /api/auth proxy - must be absolute for Better Auth
+const getBaseURL = () => {
+    if (typeof window !== 'undefined') {
+        return `${window.location.origin}/api/auth`;
+    }
+    return "/api/auth";
+};
 
 export const authClient = createAuthClient({
-    baseURL,
+    baseURL: getBaseURL(),
 });
 
 export const { useSession, signOut } = authClient;
