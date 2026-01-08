@@ -5,33 +5,51 @@ import { useSession } from '../lib/auth-client';
 import { Theme } from '../types';
 import { setLogRocketUser } from '../lib/logrocket';
 
+/**
+ * Componente responsável pela inicialização do estado global da aplicação.
+ * Sincroniza autenticação, tema e outros estados críticos no carregamento inicial.
+ */
 export const AppInitializer = () => {
     const { setUser, setLoading } = useAuthStore();
     const { theme } = useUIStore();
     const session = useSession();
 
-    // Sync Auth
+    /**
+     * Sincronização de Autenticação
+     * Monitora a sessão do Neon Auth e atualiza o Store global.
+     */
     useEffect(() => {
-        // useSession returns data and isPending
         if (!session.isPending) {
             const authUser = session.data?.user;
+
             if (authUser) {
+                // Mapeamento robusto para o tipo User do sistema
                 setUser({
-                    ...authUser,
-                    plan: 'Free', // Default plan
+                    id: authUser.id,
+                    email: authUser.email,
+                    name: authUser.name || 'Usuário',
+                    image: authUser.image || undefined,
+                    plan: 'Free', // Default, pode ser expandido com lógica de assinatura
                     createdAt: new Date(authUser.createdAt).toISOString(),
                     updatedAt: new Date(authUser.updatedAt).toISOString(),
-                } as any);
+                    emailVerified: authUser.emailVerified
+                });
+
+                // Identifica usuário no LogRocket para debugging
                 setLogRocketUser(authUser);
             } else {
                 setUser(null);
                 setLogRocketUser(null);
             }
+
             setLoading(false);
         }
     }, [session.data, session.isPending, setUser, setLoading]);
 
-    // Sync Theme
+    /**
+     * Sincronização de Tema
+     * Aplica as classes CSS de tema ao elemento raiz do documento.
+     */
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove('light', 'dark');

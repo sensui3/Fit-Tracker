@@ -20,8 +20,13 @@ jobs:
           node-version: 20
           cache: 'npm'
 
+      - name: Debug Project State
+        run: |
+          ls -R
+          cat package.json
+
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Lint Check
         run: npm run lint

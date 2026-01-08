@@ -7,6 +7,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { dbService } from '../services/databaseService';
 import { sanitize, profileSchema } from '../lib/security';
 import { useToast } from '../components/ui/Toast';
+import { datePickerMask, dateToIso, isoToDate } from '../lib/formatters';
 
 const Profile: React.FC = () => {
   const { user, isAuthenticated } = useAuthStore();
@@ -60,7 +61,7 @@ const Profile: React.FC = () => {
             ...prev,
             name: u.name || user.name || '',
             email: u.email || user.email || '',
-            birthDate: u.birth_date ? new Date(u.birth_date).toISOString().split('T')[0] : '',
+            birthDate: u.birth_date ? isoToDate(u.birth_date) : '',
             gender: u.gender || 'Masculino',
             location: u.location || '',
             goal: u.goal || 'Hipertrofia',
@@ -154,7 +155,7 @@ const Profile: React.FC = () => {
         UPDATE users
         SET
             name = ${sanitizedName},
-            birth_date = ${profileData.birthDate || null},
+            birth_date = ${dateToIso(profileData.birthDate) || null},
             gender = ${profileData.gender},
             location = ${sanitizedLocation},
             goal = ${profileData.goal},
@@ -262,7 +263,7 @@ const Profile: React.FC = () => {
           <Card className="flex flex-col items-center text-center relative overflow-hidden shadow-sm pt-12">
             <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-primary-DEFAULT/20 to-green-600/5 dark:from-primary-neon/20 dark:to-transparent"></div>
 
-            <div className="relative mb-6 group">
+            <div className="relative mb-6 group mx-auto">
               <div className="relative size-40 sm:size-48 flex items-center justify-center">
                 {user?.image ? (
                   <OptimizedImage
@@ -370,9 +371,9 @@ const Profile: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label="Data de Nasc."
-                  type="date"
+                  placeholder="DD/MM/AAAA"
                   value={profileData.birthDate}
-                  onChange={(e) => setProfileData(prev => ({ ...prev, birthDate: e.target.value }))}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, birthDate: datePickerMask(e.target.value) }))}
                   disabled={!isEditing}
                   className="h-12"
                 />
@@ -470,11 +471,16 @@ const Profile: React.FC = () => {
                   disabled={!isEditing}
                   className="h-12 px-4 bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
                 >
-                  <option>Perda de Peso</option>
-                  <option>Hipertrofia</option>
-                  <option>Resistência / Cardio</option>
+                  <option>Perda de Peso / Definição</option>
+                  <option>Hipertrofia (Ganho de Massa)</option>
+                  <option>Força Máxima / Powerlifting</option>
+                  <option>Condicionamento Físico / Cardio</option>
+                  <option>Performance Esportiva</option>
+                  <option>Saúde e Bem-Estar Geral</option>
+                  <option>Flexibilidade e Mobilidade</option>
+                  <option>Reabilitação de Lesão</option>
+                  <option>Treino de Resistência (Endurance)</option>
                   <option>Manutenção</option>
-                  <option>Flexibilidade</option>
                 </select>
               </div>
               <div className="flex flex-col gap-2">

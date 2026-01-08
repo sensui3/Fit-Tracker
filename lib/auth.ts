@@ -1,9 +1,3 @@
-// Este arquivo não é mais usado pois migramos para Neon Auth (serviço gerenciado)
-// Todas as funcionalidades de autenticação são tratadas pelo serviço Neon Auth:
-// https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth
-
-// Código anterior comentado para referência:
-/*
 import { betterAuth } from "better-auth";
 import { dbService } from "../services/databaseService";
 
@@ -64,4 +58,3 @@ export const auth = betterAuth({
         enabled: true
     }
 });
-*/

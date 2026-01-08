@@ -1,12 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+/// <reference types="vitest" />
 import ProtectedRoute from './ProtectedRoute';
-import { useAuthStore } from '../stores/useAuthStore';
+import { useAuth } from '../hooks/useAuth';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 
-// Mock useAuthStore
-vi.mock('../stores/useAuthStore', () => ({
-    useAuthStore: vi.fn(),
+// Mock useAuth hook
+vi.mock('../hooks/useAuth', () => ({
+    useAuth: vi.fn(),
 }));
 
 describe('ProtectedRoute', () => {
@@ -15,7 +17,7 @@ describe('ProtectedRoute', () => {
     });
 
     it('should show loading spinner when loading', () => {
-        (useAuthStore as any).mockReturnValue({
+        (useAuth as any).mockReturnValue({
             isLoading: true,
             isAuthenticated: false,
         });
@@ -33,7 +35,7 @@ describe('ProtectedRoute', () => {
     });
 
     it('should redirect to login when not authenticated', () => {
-        (useAuthStore as any).mockReturnValue({
+        (useAuth as any).mockReturnValue({
             isLoading: false,
             isAuthenticated: false,
         });
@@ -59,7 +61,7 @@ describe('ProtectedRoute', () => {
     });
 
     it('should render children when authenticated', () => {
-        (useAuthStore as any).mockReturnValue({
+        (useAuth as any).mockReturnValue({
             isLoading: false,
             isAuthenticated: true,
         });

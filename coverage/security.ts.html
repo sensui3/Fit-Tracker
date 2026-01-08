@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for sistema/services/databaseService.ts</title>
+    <title>Code coverage report for security.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../sort-arrow-sprite.png);
+            background-image: url(sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">sistema/services</a> databaseService.ts</h1>
+        <h1><a href="index.html">All files</a> security.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.41% </span>
+                <span class="strong">91.3% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>21/29</span>
+                <span class='fraction'>42/46</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.1% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/19</span>
+                <span class='fraction'>21/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/6</span>
+                <span class='fraction'>6/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">71.42% </span>
+                <span class="strong">90.47% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/28</span>
+                <span class='fraction'>38/42</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -196,36 +196,24 @@
 <a name='L131'></a><a href='#L131'>131</a>
 <a name='L132'></a><a href='#L132'>132</a>
 <a name='L133'></a><a href='#L133'>133</a>
-<a name='L134'></a><a href='#L134'>134</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -235,233 +223,275 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { neon } from '@neondatabase/serverless';
-import { logDomainError } from '../lib/logrocket';
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { z } from 'zod';
+import DOMPurify from 'dompurify';
 &nbsp;
 /**
- * Serviço de conexão com o banco de dados Neon.
- * Utiliza o driver serverless otimizado para Cloudflare Workers/Pages.
+ * Utilitário de Sanitização Centralizado
+ */
+export const sanitize = (text: string): string =&gt; {
+    if (!text || typeof text !== 'string') return text;
+    // Remove tags HTML maliciosas mantendo o texto puro
+    return DOMPurify.sanitize(text, { ALLOWED_TAGS: ['b', 'i', 'strong', 'em'], ALLOWED_ATTR: [] });
+};
+&nbsp;
+/**
+ * Esquemas de Validação (Zod) - Centralizados e Fortemente Tipados
  */
 &nbsp;
-let sqlInstance: any = null;
+// Base para campos comuns
+export const passwordSchema = z.string()
+    .min(8, 'A senha deve ter pelo menos 8 caracteres')
+    .max(50, 'Senha muito longa (máx 50 caracteres)')
+    .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula')
+    .regex(/[0-9]/, 'A senha deve conter pelo menos um número')
+    .regex(/[^a-zA-Z0-9]/, 'A senha deve conter pelo menos um caractere especial');
 &nbsp;
-const getSql = () =&gt; {
-    if (sqlInstance) return sqlInstance;
+const emailSchema = z.string()
+    .email('Formato de e-mail inválido')
+    .min(5, 'E-mail muito curto')
+    .max(100, 'E-mail muito longo')
+    .toLowerCase()
+    .trim();
 &nbsp;
-    // Tenta pegar de várias fontes conforme o ambiente (Node, Vite, Cloudflare)
-    const connectionString =
-        (typeof process !== 'undefined' ? process.env.DATABASE_URL : undefined) ||
-        (<span class="branch-1 cbranch-no" title="branch not covered" >typeof globalThis !== 'undefined' &amp;&amp; (<span class="branch-2 cbranch-no" title="branch not covered" >g</span>lobalThis as any).process?.env?.DATABASE_URL) ||</span>
-        (<span class="branch-3 cbranch-no" title="branch not covered" >import.meta.env ? import.meta.env.VITE_DATABASE_URL : undefined) ||</span>
-<span class="branch-4 cbranch-no" title="branch not covered" >        '';</span>
+const nameSchema = z.string()
+    .min(2, 'O nome deve ter pelo menos 2 caracteres')
+    .max(60, 'O nome é muito longo')
+    .transform(<span class="fstat-no" title="function not covered" >val =&gt; <span class="cstat-no" title="statement not covered" >s</span>anitize(val).trim())</span>;
 &nbsp;
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!connectionString) {
-<span class="cstat-no" title="statement not covered" >        if (typeof window === 'undefined') {</span>
-<span class="cstat-no" title="statement not covered" >            console.error('❌ DATABASE_URL não encontrada. Certifique-se de configurar o arquivo .env.local');</span>
+// Esquemas específicos
+export const loginSchema = z.object({
+    email: emailSchema,
+    password: passwordSchema,
+});
+&nbsp;
+export const signUpSchema = z.object({
+    email: emailSchema,
+    password: passwordSchema,
+    name: nameSchema,
+    passwordConfirmation: z.string()
+}).refine(<span class="fstat-no" title="function not covered" >(d</span>ata) =&gt; <span class="cstat-no" title="statement not covered" >data.password === data.passwordConfirmation, {</span>
+    message: "As senhas não coincidem",
+    path: ["passwordConfirmation"],
+});
+&nbsp;
+export const profileUpdateSchema = z.object({
+    name: nameSchema.optional(),
+    image: z.string().url('URL da imagem inválida').optional().or(z.literal('')),
+});
+&nbsp;
+export const forgotPasswordSchema = z.object({
+    email: emailSchema,
+});
+&nbsp;
+export const profileSchema = profileUpdateSchema;
+&nbsp;
+// Workout schema for tests
+export const workoutSchema = z.object({
+    exerciseName: z.string().min(1, 'Nome do exercício é obrigatório'),
+    sets: z.array(z.object({
+        reps: z.number().int().positive('Repetições devem ser positivas'),
+        weight: z.number().positive('Peso deve ser positivo'),
+    })).min(1, 'Pelo menos um set é necessário'),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de data inválido'),
+});
+&nbsp;
+/**
+ * Rate Limiting (Client-side)
+ * Implementação leve para evitar spam de requisições.
+ */
+class RateLimiter {
+    private limits = new Map&lt;string, number&gt;();
+&nbsp;
+    check(key: string, limitMs: number = 2000): boolean {
+        const now = Date.now();
+        const lastCall = this.limits.get(key) || 0;
+&nbsp;
+        if (now - lastCall &lt; limitMs) {
+            return false;
         }
-<span class="cstat-no" title="statement not covered" >        throw new Error('No database connection string provided');</span>
+&nbsp;
+        this.limits.set(key, now);
+        return true;
     }
 &nbsp;
-    sqlInstance = neon(connectionString, { disableWarningInBrowsers: true });
-    return sqlInstance;
-};
+<span class="fstat-no" title="function not covered" >    reset(k</span>ey: string) {
+<span class="cstat-no" title="statement not covered" >        this.limits.delete(key);</span>
+    }
+}
 &nbsp;
-export const dbService = {
-    /**
-     * Executa uma query SQL simples
-     */
-    /**
-     * DataService para Neon
-     */
-    async query&lt;T = any&gt;(strings: string | TemplateStringsArray, ...params: any[]): Promise&lt;T[]&gt; {
-        const sql = getSql();
-        try {
-            let result;
-            if (typeof strings === 'string') {
-                // Adaptação para driver mais recente que exige TemplateStringsArray
-                const raw = [strings];
-                (raw as any).raw = [strings];
-                result = await sql(raw as unknown as TemplateStringsArray, ...params);
-            } else <span class="missing-if-branch" title="else path not taken" >E</span>{
-<span class="cstat-no" title="statement not covered" >                result = await sql(strings, ...params);</span>
+export const limiter = new RateLimiter();
+export const checkRateLimit = (key: string, limitMs?: number) =&gt; limiter.check(key, limitMs);
+&nbsp;
+/**
+ * Utilitário para Limpeza de Dados Sensíveis (Logging)
+ */
+export const scrub = (data: unknown): unknown =&gt; {
+    if (!data) return data;
+&nbsp;
+    if (typeof data === 'string') {
+        return data
+            .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL_REDACTED]')
+            .replace(/(password|senha|token|key|secret)=[^&amp;\s]+/gi, '$1=[REDACTED]');
+    }
+&nbsp;
+    if (Array.isArray(data)) {
+        return data.map(scrub);
+    }
+&nbsp;
+    if (data &amp;&amp; typeof data === 'object') {
+        const result: Record&lt;string, unknown&gt; = {};
+        const sensitiveKeys = ['password', 'senha', 'token', 'key', 'secret', 'email', 'auth', 'cookie', 'authorization'];
+&nbsp;
+        for (const [key, value] of Object.entries(data)) {
+            if (sensitiveKeys.some(sk =&gt; key.toLowerCase().includes(sk))) {
+                result[key] = '[REDACTED]';
+            } else {
+                result[key] = scrub(value);
             }
-            return result as unknown as T[];
-        } catch (error) {
-            console.error('Database Query Error:', error);
-            logDomainError(error as Error, 'database_query', {
-                query: typeof strings === 'string' ? strings : <span class="branch-1 cbranch-no" title="branch not covered" >strings.join('?'),</span>
-                params
-            });
-            throw error;
         }
-    },
-&nbsp;
-    /**
-     * Atalho para buscar um único registro
-     */
-    async findOne&lt;T = any&gt;(strings: string | TemplateStringsArray, ...params: any[]): Promise&lt;T | null&gt; {
-        const results = await this.query(strings, ...params);
-        return (results[0] as T) || null;
-    },
-&nbsp;
-    /**
-     * Dashboard: Obtém estatísticas consolidadas do usuário (Otimizado)
-     * Utiliza índices para cálculo rápido de totais
-     */
-    async <span class="fstat-no" title="function not covered" >getDashboardStats(u</span>serId: string) {
-        // Query unificada e simplificada com agregações diretas
-        const result = <span class="cstat-no" title="statement not covered" >await this.query`</span>
-            SELECT 
-                COUNT(ws.id) as total_workouts,
-                COALESCE(SUM(ws.total_volume), 0) as total_volume,
-                COALESCE(AVG(EXTRACT(EPOCH FROM (ws.end_time - ws.start_time))), 0) as avg_duration
-            FROM workout_sessions ws
-            WHERE ws.user_id = ${userId}
-            AND ws.end_time IS NOT NULL
-        `;
-<span class="cstat-no" title="statement not covered" >        return result[0];</span>
-    },
-&nbsp;
-    /**
-     * Dashboard: Obtém histórico recente com paginação
-     * Substitui carregar tudo de uma vez
-     */
-    async <span class="fstat-no" title="function not covered" >getRecentWorkouts(u</span>serId: string, limit = <span class="branch-0 cbranch-no" title="branch not covered" >5, o</span>ffset = <span class="branch-0 cbranch-no" title="branch not covered" >0) {</span>
-<span class="cstat-no" title="statement not covered" >        return this.query`</span>
-          SELECT
-            ws.id,
-            ws.start_time,
-            ws.end_time,
-            ws.total_volume,
-            tp.name as plan_name,
-            COUNT(wl.id) as exercises_count,
-            EXTRACT(EPOCH FROM (ws.end_time - ws.start_time))/60 as duration_minutes
-          FROM workout_sessions ws
-          LEFT JOIN training_plans tp ON ws.plan_id = tp.id
-          LEFT JOIN workout_logs wl ON wl.session_id = ws.id
-          WHERE ws.user_id = ${userId}
-          AND ws.end_time IS NOT NULL
-          GROUP BY ws.id, ws.start_time, ws.end_time, ws.total_volume, tp.name
-          ORDER BY ws.start_time DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `;
-    },
-&nbsp;
-    /**
-     * Dashboard: Obtém recordes pessoais (Top 3)
-     */
-    async <span class="fstat-no" title="function not covered" >getPersonalRecords(u</span>serId: string) {
-<span class="cstat-no" title="statement not covered" >        return this.query`</span>
-          SELECT
-            e.name,
-            MAX(s.weight) as max_weight
-          FROM sets s
-          JOIN workout_logs wl ON s.log_id = wl.id
-          JOIN exercises e ON wl.exercise_id = e.id
-          JOIN workout_sessions ws ON wl.session_id = ws.id
-          WHERE ws.user_id = ${userId}
-          GROUP BY e.name
-          ORDER BY max_weight DESC
-          LIMIT 3
-        `;
+        return result;
     }
+&nbsp;
+    return data;
 };
 &nbsp;
-export default dbService;
+/**
+ * Proteção CSRF básica para requisições manuais (se necessário)
+ */
+export const getCsrfToken = <span class="fstat-no" title="function not covered" >() =&gt; {</span>
+    // Em uma aplicação real, isso viria de um cookie ou meta tag
+<span class="cstat-no" title="statement not covered" >    return (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content;</span>
+};
+&nbsp;
+// Aliases for tests
+export const scrubData = scrub;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -469,16 +499,16 @@ export default dbService;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-08T01:44:10.190Z
+                at 2026-01-08T17:52:49.799Z
             </div>
-        <script src="../../prettify.js"></script>
+        <script src="prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../sorter.js"></script>
-        <script src="../../block-navigation.js"></script>
+        <script src="sorter.js"></script>
+        <script src="block-navigation.js"></script>
     </body>
 </html>
     

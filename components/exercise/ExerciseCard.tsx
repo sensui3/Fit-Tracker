@@ -1,9 +1,10 @@
 import React, { memo } from 'react';
+import { Exercise } from '../../types';
 import { Card } from '../ui/Card';
 import { OptimizedImage } from '../ui/OptimizedImage';
 
 interface ExerciseCardProps {
-    exercise: any;
+    exercise: Exercise;
     isFavorite: boolean;
     onToggleFavorite: (id: string) => void;
     onClick: () => void;
@@ -41,13 +42,13 @@ export const ExerciseCard = memo(({ exercise, isFavorite, onToggleFavorite, onCl
                         )}
                     </div>
                     <button
-                        className={`transition-colors ${isFavorite ? 'text-[#16a34a]' : 'text-slate-400 hover:text-[#16a34a]'}`}
+                        className={`transition - colors ${isFavorite ? 'text-[#16a34a]' : 'text-slate-400 hover:text-[#16a34a]'} `}
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleFavorite(exercise.id);
                         }}
                     >
-                        <span className={`material-symbols-outlined text-xl ${isFavorite ? 'filled' : ''}`}>
+                        <span className={`material - symbols - outlined text - xl ${isFavorite ? 'filled' : ''} `}>
                             {isFavorite ? 'bookmark' : 'bookmark_border'}
                         </span>
                     </button>
@@ -57,9 +58,10 @@ export const ExerciseCard = memo(({ exercise, isFavorite, onToggleFavorite, onCl
                         <span className="material-symbols-outlined text-[14px]">fitness_center</span>
                         {exercise.equipment}
                     </span>
-                    <span className={`flex items-center gap-1 px-2 py-1 rounded ${exercise.difficulty === 'Iniciante' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
-                        exercise.difficulty === 'Intermediário' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
-                            'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
+                    <span className={`flex items - center gap - 1 px - 2 py - 1 rounded ${exercise.difficulty === 'Iniciante' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                            exercise.difficulty === 'Intermediário' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
+                                'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                        } `}>
                         <span className="material-symbols-outlined text-[14px]">equalizer</span>
                         {exercise.difficulty}
                     </span>

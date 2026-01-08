@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+/// <reference types="vitest" />
 import Layout from './Layout';
 import { MemoryRouter } from 'react-router-dom';
 import { useUIStore } from '../stores/useUIStore';
@@ -8,7 +10,7 @@ import { Theme } from '../types';
 
 // Mock dependencies
 vi.mock('./Sidebar', () => ({
-    default: ({ className }: any) => <div data-testid="sidebar" className={className} role="navigation">Sidebar</div>
+    default: ({ className }: { className?: string }) => <div data-testid="sidebar" className={className} role="navigation">Sidebar</div>
 }));
 
 vi.mock('./workout/RestTimer', () => ({

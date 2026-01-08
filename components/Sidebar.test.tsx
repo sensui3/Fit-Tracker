@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+/// <reference types="vitest" />
 import Sidebar from './Sidebar';
 import { MemoryRouter } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';

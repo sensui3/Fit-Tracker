@@ -62,6 +62,7 @@ export interface Exercise {
   description?: string;
   instructions?: string[] | { title: string; text: string }[];
   is_custom: boolean;
+  isExample?: boolean;
   user_id?: string;
   created_at?: string;
 }
