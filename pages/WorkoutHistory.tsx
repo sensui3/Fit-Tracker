@@ -15,11 +15,23 @@ interface WorkoutSessionRecord {
     plan_description: string | null;
 }
 
+interface DisplayWorkout {
+    id: string;
+    date: string;
+    time: string;
+    title: string;
+    type: string;
+    duration: string;
+    volume: string;
+    status: string;
+    isExample: boolean;
+}
+
 const WorkoutHistory: React.FC = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const { user } = useAuthStore();
-    const [dbWorkouts, setDbWorkouts] = useState<WorkoutSessionRecord[]>([]);
+    const [dbWorkouts, setDbWorkouts] = useState<DisplayWorkout[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Load workout sessions from database
