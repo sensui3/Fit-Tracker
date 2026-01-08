@@ -92,7 +92,6 @@ export const useAuth = () => {
     const forgotPassword = useCallback(async (email: string) => {
         setLoading(true);
         try {
-            // @ts-expect-error - forgetPassword exist at runtime
             const { error: authError } = await (authClient as any).forgetPassword({
                 email,
                 redirectTo: `${window.location.origin}/#/reset-password`,
@@ -119,7 +118,6 @@ export const useAuth = () => {
     const resetPassword = useCallback(async (data: { newPassword: string; token: string }) => {
         setLoading(true);
         try {
-            // @ts-expect-error - resetPassword exist at runtime
             const { error: authError } = await (authClient as any).resetPassword({
                 newPassword: data.newPassword,
                 token: data.token
