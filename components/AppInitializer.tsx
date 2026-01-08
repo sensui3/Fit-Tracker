@@ -33,7 +33,7 @@ export const AppInitializer = () => {
                     createdAt: new Date(authUser.createdAt).toISOString(),
                     updatedAt: new Date(authUser.updatedAt).toISOString(),
                     emailVerified: authUser.emailVerified
-                } as any);
+                });
 
                 // Identifica usuário no LogRocket para debugging
                 setLogRocketUser(authUser);

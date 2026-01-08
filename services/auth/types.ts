@@ -1,6 +1,6 @@
-import { User, Session } from '../../types';
+import { Session } from '../../types';
 
-export interface AuthResponse<T = any> {
+export interface AuthResponse<T = unknown> {
     data: T | null;
     error: AuthError | null;
 }

@@ -21,20 +21,22 @@ export class NeonAuthService implements IAuthService {
         return NeonAuthService.instance;
     }
 
-    private handleError(error: any): AuthError {
+    private handleError(error: unknown): AuthError {
         console.error('NeonAuthService Error:', error);
 
-        if (error.name === 'ZodError') {
+        const err = error as { name?: string; message?: string; issues?: any[]; code?: string; status?: number };
+
+        if (err.name === 'ZodError') {
             return {
-                message: error.issues?.[0]?.message || 'Dados de entrada inválidos',
+                message: err.issues?.[0]?.message || 'Dados de entrada inválidos',
                 code: 'VALIDATION_ERROR'
             };
         }
 
         return {
-            message: error.message || 'Ocorreu um erro inesperado na autenticação',
-            code: error.code || 'UNKNOWN_ERROR',
-            status: error.status
+            message: err.message || 'Ocorreu um erro inesperado na autenticação',
+            code: err.code || 'UNKNOWN_ERROR',
+            status: err.status
         };
     }
 

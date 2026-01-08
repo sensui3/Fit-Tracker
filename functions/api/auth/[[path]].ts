@@ -71,11 +71,12 @@ export const onRequest = async ({ request, env }: { request: Request; env: { VIT
             headers: responseHeaders
         });
 
-    } catch (error: any) {
-        console.error('Auth Proxy Panic:', error);
+    } catch (error) {
+        const err = error as Error;
+        console.error('Auth Proxy Panic:', err);
         return new Response(JSON.stringify({
             error: 'Authentication Gateway Error',
-            message: error.message,
+            message: err.message,
             timestamp: new Date().toISOString()
         }), {
             status: 502,

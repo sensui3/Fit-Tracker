@@ -90,7 +90,7 @@ export const checkRateLimit = (key: string, limitMs?: number) => limiter.check(k
 /**
  * Utilitário para Limpeza de Dados Sensíveis (Logging)
  */
-export const scrub = (data: any): any => {
+export const scrub = (data: unknown): unknown => {
     if (!data) return data;
 
     if (typeof data === 'string') {
@@ -103,8 +103,8 @@ export const scrub = (data: any): any => {
         return data.map(scrub);
     }
 
-    if (typeof data === 'object') {
-        const result: any = {};
+    if (data && typeof data === 'object') {
+        const result: Record<string, unknown> = {};
         const sensitiveKeys = ['password', 'senha', 'token', 'key', 'secret', 'email', 'auth', 'cookie', 'authorization'];
 
         for (const [key, value] of Object.entries(data)) {

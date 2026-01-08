@@ -11,17 +11,20 @@ const ResetPassword: React.FC = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [token, setToken] = useState<string | null>(null);
-    const [validationError, setValidationError] = useState('');
+    const [token, setToken] = useState<string | null>(() => searchParams.get('token'));
+    const [validationError, setValidationError] = useState(() => searchParams.get('token') ? '' : 'Link de redefinição inválido ou expirado.');
 
     useEffect(() => {
         const t = searchParams.get('token');
         if (!t) {
-            setValidationError('Link de redefinição inválido ou expirado.');
-        } else {
+            if (validationError !== 'Link de redefinição inválido ou expirado.') {
+                setValidationError('Link de redefinição inválido ou expirado.');
+            }
+        } else if (t !== token) {
             setToken(t);
+            setValidationError('');
         }
-    }, [searchParams]);
+    }, [searchParams, token, validationError]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

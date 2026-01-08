@@ -15,7 +15,7 @@ describe('ProtectedRoute', () => {
     });
 
     it('should show loading spinner when loading', () => {
-        (useAuth as any).mockReturnValue({
+        (useAuth as vi.Mock).mockReturnValue({
             isLoading: true,
             isAuthenticated: false,
         });
@@ -33,7 +33,7 @@ describe('ProtectedRoute', () => {
     });
 
     it('should redirect to login when not authenticated', () => {
-        (useAuth as any).mockReturnValue({
+        (useAuth as vi.Mock).mockReturnValue({
             isLoading: false,
             isAuthenticated: false,
         });
@@ -59,7 +59,7 @@ describe('ProtectedRoute', () => {
     });
 
     it('should render children when authenticated', () => {
-        (useAuth as any).mockReturnValue({
+        (useAuth as vi.Mock).mockReturnValue({
             isLoading: false,
             isAuthenticated: true,
         });

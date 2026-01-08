@@ -15,7 +15,6 @@ export const useAuth = () => {
         isAuthenticated,
         isLoading,
         error,
-        setUser,
         setLoading,
         setError,
         clearError,
@@ -42,7 +41,7 @@ export const useAuth = () => {
             // O estado será sincronizado pelo AppInitializer ou manualmente se necessário
             // Aqui estamos apenas retornando o resultado
             return { success: true, data };
-        } catch (err: any) {
+        } catch (_err: unknown) {
             const genericError = { message: 'Erro inesperado no login', code: 'INTERNAL_ERROR' };
             setError(genericError);
             return { success: false, error: genericError };
@@ -98,9 +97,10 @@ export const useAuth = () => {
                 message: 'As instruções de recuperação foram enviadas para seu e-mail.',
             });
             return { success: true };
-        } catch (err: any) {
-            setError(err);
-            return { success: false, error: err };
+        } catch (err: unknown) {
+            const authError = err as { message: string; code?: string };
+            setError({ message: authError.message || 'Erro inesperado', code: authError.code });
+            return { success: false, error: authError };
         } finally {
             setLoading(false);
         }
@@ -121,9 +121,10 @@ export const useAuth = () => {
                 message: 'Sua senha foi redefinida com sucesso!',
             });
             return { success: true };
-        } catch (err: any) {
-            setError(err);
-            return { success: false, error: err };
+        } catch (err: unknown) {
+            const authError = err as { message: string; code?: string };
+            setError({ message: authError.message || 'Erro inesperado', code: authError.code });
+            return { success: false, error: authError };
         } finally {
             setLoading(false);
         }
