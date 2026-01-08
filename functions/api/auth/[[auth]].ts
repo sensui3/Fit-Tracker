@@ -5,27 +5,51 @@
 export const onRequest = async ({ request, env }: { request: Request; env: { VITE_BETTER_AUTH_URL: string } }) => {
     const url = new URL(request.url);
 
-    // URL base do serviço Neon Auth (Tenta pegar do env, senão usa o padrão)
-    const neonAuthBaseUrl = env.VITE_BETTER_AUTH_URL || 'https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth';
+    // URL base do serviço Neon Auth (Tenta pegar do env, senão usa o padrão do .env.example)
+    let neonAuthBaseUrl = (env.VITE_BETTER_AUTH_URL || 'https://epf-oldsexc-waterfall-56ds45f4.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth').trim();
+
+    // Remove barra final se existir para evitar duplicação no join
+    if (neonAuthBaseUrl.endsWith('/')) {
+        neonAuthBaseUrl = neonAuthBaseUrl.slice(0, -1);
+    }
 
     // Reconstrói a URL de destino: substitui /api/auth pela URL do Neon
     const path = url.pathname.replace(/^\/api\/auth/, '');
-    const targetUrl = new URL(neonAuthBaseUrl + path + url.search);
 
-    // Prepara os novos headers: removemos o 'host' para o Neon não rejeitar a requisição
+    // Garante que o path comece com barra e o join seja limpo
+    const targetPath = path.startsWith('/') ? path : '/' + path;
+    const targetUrl = new URL(neonAuthBaseUrl + targetPath + url.search);
+
+    // Prepara os novos headers: removemos o 'host' e 'content-length' para o fetch recalcular
     const newHeaders = new Headers(request.headers);
     newHeaders.delete('host');
-    newHeaders.set('Origin', 'https://fit-tracker-btx.pages.dev'); // Opcional, ajuda no CORS
+    newHeaders.delete('content-length');
 
-    const proxyRequest = new Request(targetUrl.toString(), {
-        method: request.method,
+    // Tenta usar o origin real da requisição para maior compatibilidade CORS
+    const requestOrigin = request.headers.get('origin');
+    if (requestOrigin) {
+        newHeaders.set('Origin', requestOrigin);
+    } else {
+        newHeaders.set('Origin', 'https://fit-tracker-btx.pages.dev');
+    }
+
+    // Só lemos o corpo para métodos que permitem corpo (POST, PUT, PATCH)
+    const method = request.method.toUpperCase();
+    const hasBody = ['POST', 'PUT', 'PATCH'].includes(method);
+
+    const proxyRequestInit: RequestInit = {
+        method,
         headers: newHeaders,
-        body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.arrayBuffer() : undefined,
         redirect: 'manual'
-    });
+    };
+
+    if (hasBody) {
+        // Importante: lemos o corpo apenas uma vez
+        proxyRequestInit.body = await request.arrayBuffer();
+    }
 
     try {
-        const response = await fetch(proxyRequest);
+        const response = await fetch(targetUrl.toString(), proxyRequestInit);
 
         // Copia a resposta para poder manipular
         const newResponse = new Response(response.body, response);

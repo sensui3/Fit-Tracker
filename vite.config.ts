@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         // Proxy Neon Auth requests to avoid CORS issues and hide the destination URL
         '/api/auth': {
-          target: process.env.VITE_BETTER_AUTH_URL?.replace('/neondb/auth', '') || 'https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech',
+          target: (process.env.VITE_BETTER_AUTH_URL || 'https://epf-oldsexc-waterfall-56ds45f4.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth').replace(/\/neondb\/auth\/?$/, ''),
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/auth/, '/neondb/auth'),
           secure: true,
