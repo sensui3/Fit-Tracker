@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { AreaChart, Area, LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import React, { useState, useRef, useEffect } from 'react';
+import { ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import jsPDF from 'jspdf';
@@ -11,56 +11,6 @@ type ProgressPeriodType = 'week' | 'month' | 'year';
 type ExerciseType = 'all' | 'strength' | 'cardio' | 'flexibility';
 
 // Custom Tooltip Component para o gráfico de linha (Enhanced)
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    const realEntry = payload.find((p: any) => p.dataKey === 'real');
-    const metaEntry = payload.find((p: any) => p.dataKey === 'meta');
-
-    const realVal = realEntry ? realEntry.value : 0;
-    const metaVal = metaEntry ? metaEntry.value : 0;
-
-    const diff = realVal - metaVal;
-    const isPositive = diff >= 0;
-
-    return (
-      <div className="bg-white dark:bg-[#1c271c] border border-slate-200 dark:border-[#283928] p-4 rounded-xl shadow-xl backdrop-blur-md bg-opacity-95 dark:bg-opacity-95 min-w-[200px]">
-        <p className="text-slate-500 dark:text-slate-400 font-bold mb-4 text-xs uppercase tracking-wider border-b border-slate-100 dark:border-white/5 pb-2">{label}</p>
-
-        <div className="flex flex-col gap-4">
-          <div className="flex items-end justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-1.5 mb-1">
-                <div className="w-2 h-2 rounded-full bg-[#16a34a]"></div>
-                <p className="text-xs font-bold text-slate-500 dark:text-slate-400">Realizado</p>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-slate-900 dark:text-white">{realVal}%</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center justify-end gap-1.5 mb-1">
-                <div className="w-2 h-2 rounded-full bg-slate-400"></div>
-                <p className="text-xs font-bold text-slate-500 dark:text-slate-400">Meta</p>
-              </div>
-              <span className="text-xl font-bold text-slate-400 dark:text-slate-500">{metaVal}%</span>
-            </div>
-          </div>
-
-          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${isPositive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
-            <span className="material-symbols-outlined text-lg">
-              {isPositive ? 'trending_up' : 'trending_down'}
-            </span>
-            <span className="text-xs font-bold leading-tight">
-              {Math.abs(diff)}% {isPositive ? 'acima' : 'abaixo'} do planejado
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
 const Reports: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
@@ -75,7 +25,6 @@ const Reports: React.FC = () => {
 
   const [dbHistory, setDbHistory] = useState<any[]>([]);
   const [dbStats, setDbStats] = useState({ totalWorkouts: 0, totalVolume: 0, avgDuration: 0 });
-  const [loading, setLoading] = useState(true);
 
   // Load report data from database
   useEffect(() => {
@@ -131,8 +80,6 @@ const Reports: React.FC = () => {
         }
       } catch (error) {
         console.error('Erro ao carregar dados dos relatórios:', error);
-      } finally {
-        setLoading(false);
       }
     };
 

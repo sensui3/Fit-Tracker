@@ -131,7 +131,7 @@ const Profile: React.FC = () => {
     if (isAuthenticated) {
       loadUserData();
     }
-  }, [user?.id, isAuthenticated]);
+  }, [user?.id, user?.email, user?.name, isAuthenticated]);
 
   // Função para salvar alterações
   const handleSave = async () => {

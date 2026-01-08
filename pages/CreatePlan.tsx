@@ -11,8 +11,6 @@ const CreatePlan: React.FC = () => {
   const { user } = useAuthStore();
   const [dbPlan, setDbPlan] = useState<any>(null);
   const [dbExercises, setDbExercises] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isExampleMode, setIsExampleMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addToast } = useToast();
 
@@ -62,8 +60,6 @@ const CreatePlan: React.FC = () => {
         console.error('Erro ao carregar plano:', error);
         setDbPlan({ name: 'Meu Novo Plano', description: '' });
         setDbExercises([]);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -110,11 +106,6 @@ const CreatePlan: React.FC = () => {
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
             <h1 className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Criar Novo Plano</h1>
-            {isExampleMode && (
-              <span className="text-sm font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full">
-                Modo Exemplo
-              </span>
-            )}
           </div>
           <p className="text-slate-500 dark:text-text-secondaryDark text-base font-normal">Monte seu treino personalizado selecionando exercícios e definindo as metas.</p>
         </div>
@@ -185,11 +176,6 @@ const CreatePlan: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-slate-900 dark:text-white font-medium text-base truncate">{exercise.name}</p>
-                        {isExampleMode && (
-                          <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">
-                            Exemplo
-                          </span>
-                        )}
                       </div>
                       <p className="text-slate-500 dark:text-text-secondaryDark text-xs">{exercise.muscle} • {exercise.equipment}</p>
                     </div>

@@ -1,5 +1,4 @@
-import React from 'react';
-import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface ChartData {
     day: string;

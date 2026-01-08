@@ -12,6 +12,19 @@ import { dbService } from '../services/databaseService';
 // Lazy load heavy chart component
 const WorkoutVolumeChart = lazy(() => import('../components/dashboard/WorkoutVolumeChart'));
 
+interface SessionRecord {
+  id: string;
+  plan_name: string | null;
+  start_time: string;
+  duration_minutes: string | number;
+  total_volume: number;
+}
+
+interface PersonalRecord {
+  name: string;
+  max_weight: number;
+}
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useUIStore();
@@ -46,7 +59,7 @@ const Dashboard: React.FC = () => {
     avgSessionTime: Math.round((parseFloat(rawStats?.avg_duration || '0') / 60)),
   };
 
-  const recentSessions = rawRecentSessions?.map((session: any) => ({
+  const recentSessions = rawRecentSessions?.map((session: SessionRecord) => ({
     id: session.id,
     title: session.plan_name || 'Treino Livre',
     time: new Date(session.start_time).toLocaleDateString('pt-BR', {
@@ -55,13 +68,13 @@ const Dashboard: React.FC = () => {
       month: 'short'
     }),
     tag: session.plan_name ? 'Planejado' : 'Livre',
-    duration: `${Math.round(parseFloat(session.duration_minutes || '0'))} min`,
+    duration: `${Math.round(Number(session.duration_minutes || '0'))} min`,
     value: `${session.total_volume} kg`,
     icon: session.plan_name ? 'fitness_center' : 'directions_run',
     color: session.plan_name ? 'orange' : 'blue'
   })) || [];
 
-  const personalRecords = rawRecords?.map((record: any) => ({
+  const personalRecords = rawRecords?.map((record: PersonalRecord) => ({
     label: record.name,
     value: `${record.max_weight}kg`
   })) || [];

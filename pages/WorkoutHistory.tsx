@@ -5,11 +5,21 @@ import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { dbService } from '../services/databaseService';
 
+interface WorkoutSessionRecord {
+    id: string;
+    start_time: string;
+    end_time: string | null;
+    total_volume: number;
+    notes: string | null;
+    plan_name: string | null;
+    plan_description: string | null;
+}
+
 const WorkoutHistory: React.FC = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const { user } = useAuthStore();
-    const [dbWorkouts, setDbWorkouts] = useState<any[]>([]);
+    const [dbWorkouts, setDbWorkouts] = useState<WorkoutSessionRecord[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Load workout sessions from database
@@ -32,7 +42,7 @@ const WorkoutHistory: React.FC = () => {
                     ORDER BY ws.start_time DESC
                 `;
 
-                const mappedWorkouts = workoutsData.map((workout: any) => {
+                const mappedWorkouts = workoutsData.map((workout: WorkoutSessionRecord) => {
                     const startTime = new Date(workout.start_time);
                     const endTime = workout.end_time ? new Date(workout.end_time) : null;
                     const duration = endTime ? Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60)) : 0;

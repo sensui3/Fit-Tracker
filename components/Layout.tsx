@@ -4,7 +4,6 @@ import Sidebar from './Sidebar';
 import { useUIStore } from '../stores/useUIStore';
 import { Theme } from '../types';
 import { RestTimer } from './workout/RestTimer';
-import { useTimerStore } from '../stores/useTimerStore';
 import { useWorkoutStore } from '../stores/useWorkoutStore';
 
 const Layout: React.FC = () => {

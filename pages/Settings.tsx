@@ -185,8 +185,6 @@ const Settings: React.FC = () => {
                                 </div>
                             </div>
                         </section>
-
-                        </section>
                     </div>
                 </div>
             </div>
