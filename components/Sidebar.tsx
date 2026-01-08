@@ -13,13 +13,19 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuthStore();
 
+  type NavItem = {
+    icon: string;
+    label: string;
+    path: string;
+  };
+
 
   const handleLogout = async () => {
     await logout();
     if (onItemClick) onItemClick();
   };
 
-  const navItems = [
+  const navItems: NavItem[] = [
     { icon: 'dashboard', label: 'Painel', path: '/' },
     { icon: 'fitness_center', label: 'Treinos', path: '/workouts' },
     { icon: 'flag', label: 'Metas', path: '/goals' },
@@ -28,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
     { icon: 'menu_book', label: 'Exercícios', path: '/exercises' },
   ];
 
-  const systemItems = [
+  const systemItems: NavItem[] = [
     { icon: 'notifications', label: 'Notificações', path: '/notifications' },
     { icon: 'person', label: 'Perfil', path: '/profile' },
     { icon: 'settings', label: 'Configurações', path: '/settings' },
@@ -112,11 +118,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
           >
             <span className="material-symbols-outlined" aria-hidden="true">{item.icon}</span>
             <span className="flex-1">{item.label}</span>
-            {item.count && (
-              <span className="bg-[#16a34a] text-[#102210] text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto" aria-label={`${item.count} notificações não lidas`}>
-                {item.count}
-              </span>
-            )}
           </NavLink>
         ))}
       </nav>
