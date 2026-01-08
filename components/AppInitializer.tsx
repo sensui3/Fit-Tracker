@@ -2,13 +2,14 @@ import { useEffect } from 'react';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useUIStore } from '../stores/useUIStore';
 import { useSession } from '../lib/auth-client';
+import { useAtom } from 'jotai';
 import { Theme } from '../types';
 import { setLogRocketUser } from '../lib/logrocket';
 
 export const AppInitializer = () => {
     const { setUser, setLoading } = useAuthStore();
     const { theme } = useUIStore();
-    const session = useSession();
+    const [session] = useAtom(useSession);
 
     // Sync Auth
     useEffect(() => {

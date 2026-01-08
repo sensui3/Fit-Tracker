@@ -4,9 +4,7 @@ import { loginSchema, signUpSchema } from "./security";
 // URL do Neon Auth vinda das variáveis de ambiente ou fallback
 const neonAuthUrl = import.meta.env.VITE_NEON_AUTH_URL || import.meta.env.VITE_BETTER_AUTH_URL || "https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth";
 
-export const authClient = createAuthClient({
-    baseURL: neonAuthUrl,
-});
+export const authClient = createAuthClient(neonAuthUrl);
 
 export const { useSession, signOut } = authClient;
 
