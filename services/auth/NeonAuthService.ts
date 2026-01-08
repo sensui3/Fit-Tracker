@@ -24,7 +24,13 @@ export class NeonAuthService implements IAuthService {
     private handleError(error: unknown): AuthError {
         console.error('NeonAuthService Error:', error);
 
-        const err = error as { name?: string; message?: string; issues?: any[]; code?: string; status?: number };
+        const err = error as {
+            name?: string;
+            message?: string;
+            issues?: Array<{ message: string }>;
+            code?: string;
+            status?: number
+        };
 
         if (err.name === 'ZodError') {
             return {

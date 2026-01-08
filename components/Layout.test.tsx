@@ -8,7 +8,7 @@ import { Theme } from '../types';
 
 // Mock dependencies
 vi.mock('./Sidebar', () => ({
-    default: ({ className }: any) => <div data-testid="sidebar" className={className} role="navigation">Sidebar</div>
+    default: ({ className }: { className?: string }) => <div data-testid="sidebar" className={className} role="navigation">Sidebar</div>
 }));
 
 vi.mock('./workout/RestTimer', () => ({
@@ -34,11 +34,11 @@ describe('Layout Component', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        (useUIStore as any).mockReturnValue({
+        (useUIStore as vi.Mock).mockReturnValue({
             theme: Theme.Dark,
             setTheme: mockSetTheme,
         });
-        (useTimerStore as any).mockReturnValue({
+        (useTimerStore as vi.Mock).mockReturnValue({
             isActive: false,
         });
     });

@@ -4,7 +4,7 @@ import { WorkoutSetDraft } from '../../stores/useWorkoutStore';
 interface WorkoutSetItemProps {
     set: WorkoutSetDraft;
     index: number;
-    onUpdate: (id: number, field: keyof WorkoutSetDraft, value: any) => void;
+    onUpdate: (id: number, field: keyof WorkoutSetDraft, value: string | number | boolean) => void;
     onRemove: (id: number) => void;
 }
 

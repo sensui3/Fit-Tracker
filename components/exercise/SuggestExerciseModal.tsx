@@ -7,7 +7,7 @@ import { useToast } from '../ui/Toast';
 interface SuggestExerciseModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSuggest: (data: any) => Promise<any>;
+    onSuggest: (data: unknown) => Promise<unknown>;
 }
 
 export const SuggestExerciseModal: React.FC<SuggestExerciseModalProps> = ({
@@ -62,7 +62,7 @@ export const SuggestExerciseModal: React.FC<SuggestExerciseModalProps> = ({
                 description: '',
                 image_url: ''
             });
-        } catch (error) {
+        } catch (_error) {
             addToast({
                 type: 'error',
                 title: 'Erro',

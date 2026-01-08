@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useUIStore } from '../../stores/useUIStore';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -23,12 +23,12 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
     const [progress, setProgress] = useState(100);
     const duration = toast.duration || 3000;
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setIsExiting(true);
         setTimeout(() => {
             onRemove(toast.id);
         }, 300); // Animation duration
-    };
+    }, [onRemove, toast.id]);
 
     useEffect(() => {
         const startTime = Date.now();
@@ -44,7 +44,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
         }, 10);
 
         return () => clearInterval(timer);
-    }, [duration]);
+    }, [duration, handleClose]);
 
     const iconConfig = {
         success: { icon: 'check_circle', color: 'text-green-500', bg: 'bg-green-500/20', bar: 'bg-green-500' },

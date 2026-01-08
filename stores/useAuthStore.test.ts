@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAuthStore } from './useAuthStore';
+import { User } from '../types';
 
 // Mock NeonAuthService
 vi.mock('../services/auth/NeonAuthService', () => ({
@@ -29,7 +30,7 @@ describe('useAuthStore', () => {
 
     it('should set user and isAuthenticated correctly', () => {
         const user = { id: '1', email: 'test@test.com', name: 'Test User' };
-        useAuthStore.getState().setUser(user as Parameters<typeof useAuthStore.getState()['setUser'] > [0]);
+        useAuthStore.getState().setUser(user as User);
 
         const state = useAuthStore.getState();
         expect(state.user).toEqual(user);
@@ -46,22 +47,22 @@ describe('useAuthStore', () => {
 
     it('should clear user and session on logout', async () => {
         useAuthStore.setState({
-            user: { id: '1' } as Parameters<typeof useAuthStore.getState()['setUser'] > [0],
+            user: { id: '1' } as User,
             isAuthenticated: true
         });
 
-    await useAuthStore.getState().logout();
+        await useAuthStore.getState().logout();
 
-    const state = useAuthStore.getState();
-    expect(state.user).toBeNull();
-    expect(state.isAuthenticated).toBe(false);
-});
+        const state = useAuthStore.getState();
+        expect(state.user).toBeNull();
+        expect(state.isAuthenticated).toBe(false);
+    });
 
-it('should toggle loading state', () => {
-    useAuthStore.getState().setLoading(false);
-    expect(useAuthStore.getState().isLoading).toBe(false);
+    it('should toggle loading state', () => {
+        useAuthStore.getState().setLoading(false);
+        expect(useAuthStore.getState().isLoading).toBe(false);
 
-    useAuthStore.getState().setLoading(true);
-    expect(useAuthStore.getState().isLoading).toBe(true);
-});
+        useAuthStore.getState().setLoading(true);
+        expect(useAuthStore.getState().isLoading).toBe(true);
+    });
 });

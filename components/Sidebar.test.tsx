@@ -25,7 +25,7 @@ describe('Sidebar Component', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        (useAuthStore as any).mockReturnValue({
+        (useAuthStore as vi.Mock).mockReturnValue({
             user: mockUser,
             logout: mockLogout,
         });
