@@ -93,7 +93,7 @@ describe('Security Utils', () => {
             it('should validate correct login data', () => {
                 const result = loginSchema.safeParse({
                     email: 'test@example.com',
-                    password: 'password123'
+                    password: 'Password123!'
                 });
                 expect(result.success).toBe(true);
             });
@@ -101,7 +101,7 @@ describe('Security Utils', () => {
             it('should fail on invalid email', () => {
                 const result = loginSchema.safeParse({
                     email: 'invalid-email',
-                    password: 'password123'
+                    password: 'Password123!'
                 });
                 expect(result.success).toBe(false);
             });

@@ -7,7 +7,7 @@ import DOMPurify from 'dompurify';
 export const sanitize = (text: string): string => {
     if (!text || typeof text !== 'string') return text;
     // Remove tags HTML maliciosas mantendo o texto puro
-    return DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    return DOMPurify.sanitize(text, { ALLOWED_TAGS: ['b', 'i', 'strong', 'em'], ALLOWED_ATTR: [] });
 };
 
 /**
@@ -15,7 +15,7 @@ export const sanitize = (text: string): string => {
  */
 
 // Base para campos comuns
-const passwordSchema = z.string()
+export const passwordSchema = z.string()
     .min(8, 'A senha deve ter pelo menos 8 caracteres')
     .max(50, 'Senha muito longa (máx 50 caracteres)')
     .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula')
@@ -37,7 +37,7 @@ const nameSchema = z.string()
 // Esquemas específicos
 export const loginSchema = z.object({
     email: emailSchema,
-    password: z.string().min(1, 'Senha é obrigatória'),
+    password: passwordSchema,
 });
 
 export const signUpSchema = z.object({
