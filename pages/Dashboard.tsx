@@ -12,6 +12,19 @@ import { dbService } from '../services/databaseService';
 // Lazy load heavy chart component
 const WorkoutVolumeChart = lazy(() => import('../components/dashboard/WorkoutVolumeChart'));
 
+interface SessionRecord {
+  id: string;
+  plan_name: string | null;
+  start_time: string;
+  duration_minutes: string | number;
+  total_volume: number;
+}
+
+interface PersonalRecord {
+  name: string;
+  max_weight: number;
+}
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useUIStore();
@@ -46,7 +59,7 @@ const Dashboard: React.FC = () => {
     avgSessionTime: Math.round((parseFloat(rawStats?.avg_duration || '0') / 60)),
   };
 
-  const recentSessions = rawRecentSessions?.map((session: any) => ({
+  const recentSessions = rawRecentSessions?.map((session: SessionRecord) => ({
     id: session.id,
     title: session.plan_name || 'Treino Livre',
     time: new Date(session.start_time).toLocaleDateString('pt-BR', {
@@ -55,13 +68,13 @@ const Dashboard: React.FC = () => {
       month: 'short'
     }),
     tag: session.plan_name ? 'Planejado' : 'Livre',
-    duration: `${Math.round(parseFloat(session.duration_minutes || '0'))} min`,
+    duration: `${Math.round(Number(session.duration_minutes || '0'))} min`,
     value: `${session.total_volume} kg`,
     icon: session.plan_name ? 'fitness_center' : 'directions_run',
     color: session.plan_name ? 'orange' : 'blue'
   })) || [];
 
-  const personalRecords = rawRecords?.map((record: any) => ({
+  const personalRecords = rawRecords?.map((record: PersonalRecord) => ({
     label: record.name,
     value: `${record.max_weight}kg`
   })) || [];
@@ -80,7 +93,7 @@ const Dashboard: React.FC = () => {
           <h1 className="text-2xl md:text-3xl font-bold dark:text-white">
             Bem-vindo de volta, {user?.name?.split(' ')[0] || 'Usuário'}! 👋
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <div className="text-slate-500 dark:text-slate-400 mt-1">
             {loading ? (
               <Skeleton className="h-4 w-64 mt-2" />
             ) : userStats.totalWorkouts > 0 ? (
@@ -88,7 +101,7 @@ const Dashboard: React.FC = () => {
             ) : (
               'Comece seus treinos e veja suas estatísticas aqui.'
             )}
-          </p>
+          </div>
         </div>
         <div className="hidden md:flex items-center gap-4">
           <button
@@ -115,22 +128,17 @@ const Dashboard: React.FC = () => {
         <div className="absolute top-0 right-0 -mt-10 -mr-10 size-64 bg-[#13ec13]/10 rounded-full blur-3xl pointer-events-none"></div>
         <div className="relative z-10">
           <h3 className="text-2xl font-bold text-white mb-2">Continue focado!</h3>
-          <p className="text-slate-400 max-w-lg">Seus resultados estão melhorando a cada semana. Tente aumentar a carga no próximo treino de perna.</p>
+          <p className="text-slate-400 max-w-lg">Seus resultados começarão a aparecer conforme você registra seus treinos semanalmente.</p>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="flex flex-col">
+        <Card className="flex flex-col border border-border-light dark:border-border-dark">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 rounded-lg bg-blue-500/10 text-blue-500">
               <span className="material-symbols-outlined">timer</span>
             </div>
-            {!loading && userStats.totalWorkouts > 0 && (
-              <span className="text-xs font-medium px-2 py-1 rounded bg-green-500/20 text-green-500">
-                +12%
-              </span>
-            )}
           </div>
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Tempo Médio</p>
           {loading ? (
@@ -145,16 +153,11 @@ const Dashboard: React.FC = () => {
           )}
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex flex-col border border-border-light dark:border-border-dark">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 rounded-lg bg-orange-500/10 text-orange-500">
               <span className="material-symbols-outlined">directions_run</span>
             </div>
-            {!loading && userStats.totalWorkouts > 0 && (
-              <span className="text-xs font-medium px-2 py-1 rounded bg-green-500/20 text-green-500">
-                +5%
-              </span>
-            )}
           </div>
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Total de Treinos</p>
           {loading ? (
@@ -166,7 +169,7 @@ const Dashboard: React.FC = () => {
           )}
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex flex-col border border-border-light dark:border-border-dark">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 rounded-lg bg-[#16a34a]/10 text-[#16a34a] dark:text-[#13ec13]">
               <span className="material-symbols-outlined">fitness_center</span>
@@ -185,12 +188,14 @@ const Dashboard: React.FC = () => {
 
       {/* Chart & Records Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 !p-0 shadow-sm overflow-hidden flex flex-col">
+        <Card className="lg:col-span-2 !p-0 shadow-sm overflow-hidden flex flex-col border border-border-light dark:border-border-dark">
           <div className="p-6 border-b border-border-light dark:border-border-dark">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Volume de Treino</h3>
             <div className="flex items-baseline gap-2 mt-1">
-              <p className="text-[#16a34a] dark:text-[#13ec13] text-2xl font-bold">15,400kg</p>
-              <p className="text-slate-500 text-sm">nos últimos 30 dias</p>
+              <p className="text-[#16a34a] dark:text-[#13ec13] text-2xl font-bold">
+                {userStats.totalVolume > 0 ? `${userStats.totalVolume.toLocaleString()} kg` : '--'}
+              </p>
+              <p className="text-slate-500 text-sm">Volume total registrado</p>
             </div>
           </div>
           <div className="h-[250px] w-full mt-4 min-w-0 px-4">
@@ -203,7 +208,7 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-col gap-4">
           <Card
             onClick={() => navigate('/timer')}
-            className="p-6 bg-gradient-to-br from-green-50 to-white dark:from-surface-dark dark:to-surface-darker relative overflow-hidden group cursor-pointer shadow-sm border-none"
+            className="p-6 bg-gradient-to-br from-green-50 to-white dark:from-surface-dark dark:to-surface-darker relative overflow-hidden group cursor-pointer shadow-sm border border-border-light dark:border-border-dark"
           >
             <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
               <span className="material-symbols-outlined text-8xl text-[#16a34a] dark:text-[#13ec13]">timer</span>
@@ -219,7 +224,7 @@ const Dashboard: React.FC = () => {
             </Button>
           </Card>
 
-          <Card className="flex-1 shadow-sm">
+          <Card className="flex-1 shadow-sm border border-border-light dark:border-border-dark">
             <h3 className="text-slate-900 dark:text-white text-base font-bold mb-4 flex items-center gap-2">
               <span className="material-symbols-outlined text-[#16a34a] dark:text-[#13ec13] text-xl">emoji_events</span>
               Recordes Pessoais
@@ -250,7 +255,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Workout History Section */}
-      <Card className="!p-0 shadow-sm overflow-hidden">
+      <Card className="!p-0 shadow-sm overflow-hidden border border-border-light dark:border-border-dark">
         <div className="px-6 py-4 border-b border-border-light dark:border-border-dark flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-[#16a34a] dark:text-[#13ec13]">history</span>
@@ -276,8 +281,8 @@ const Dashboard: React.FC = () => {
               >
                 <div className="flex items-center gap-4">
                   <div className={`size-10 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform ${session.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400' :
-                      session.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' :
-                        'bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400'
+                    session.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' :
+                      'bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400'
                     }`}>
                     <span className="material-symbols-outlined">{session.icon}</span>
                   </div>

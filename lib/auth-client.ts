@@ -34,3 +34,20 @@ export const signUpValidated = async (data: unknown, name: string) => {
         name: validatedData.name,
     });
 };
+
+/**
+ * Recuperação de senha
+ */
+export const forgotPassword = async (email: string) => {
+    return await authClient.requestPasswordReset({
+        email,
+        redirectTo: "/reset-password",
+    });
+};
+
+export const resetPassword = async (password: string, token: string) => {
+    return await authClient.resetPassword({
+        newPassword: password,
+        token,
+    });
+};

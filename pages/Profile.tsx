@@ -26,7 +26,9 @@ const Profile: React.FC = () => {
     height: '',
     bodyFat: '',
     goal: 'Hipertrofia',
-    activityLevel: 'Ativo (3-5 dias/sem)'
+    activityLevel: 'Ativo (3-5 dias/sem)',
+    bio: '',
+    createdAt: null
   });
 
   // Estatísticas do usuário
@@ -47,7 +49,7 @@ const Profile: React.FC = () => {
 
         // Carregar dados básicos do usuário e informações complementares
         const userResult = await dbService.query`
-          SELECT name, email, birth_date, gender, location, goal, activity_level
+          SELECT name, email, birth_date, gender, location, goal, activity_level, bio, created_at
           FROM users
           WHERE id = ${user.id}
         `;
@@ -62,7 +64,9 @@ const Profile: React.FC = () => {
             gender: u.gender || 'Masculino',
             location: u.location || '',
             goal: u.goal || 'Hipertrofia',
-            activityLevel: u.activity_level || 'Ativo (3-5 dias/sem)'
+            activityLevel: u.activity_level || 'Ativo (3-5 dias/sem)',
+            bio: u.bio || '',
+            createdAt: u.created_at || null
           }));
         } else {
           // Caso não encontre no banco, usa dados do auth
@@ -127,7 +131,7 @@ const Profile: React.FC = () => {
     if (isAuthenticated) {
       loadUserData();
     }
-  }, [user?.id, isAuthenticated]);
+  }, [user?.id, user?.email, user?.name, isAuthenticated]);
 
   // Função para salvar alterações
   const handleSave = async () => {
@@ -260,11 +264,17 @@ const Profile: React.FC = () => {
 
             <div className="relative mb-6 group">
               <div className="relative size-40 sm:size-48 flex items-center justify-center">
-                <OptimizedImage
-                  src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=240&h=240"
-                  alt="Profile"
-                  className="h-full w-full rounded-full border-4 border-white dark:border-surface-dark shadow-xl object-cover transition-all duration-300 group-hover:brightness-50"
-                />
+                {user?.image ? (
+                  <OptimizedImage
+                    src={user.image}
+                    alt="Profile"
+                    className="h-full w-full rounded-full border-4 border-white dark:border-surface-dark shadow-xl object-cover transition-all duration-300 group-hover:brightness-50"
+                  />
+                ) : (
+                  <div className="h-full w-full rounded-full border-4 border-white dark:border-surface-dark shadow-xl bg-gradient-to-br from-[#16a34a] to-[#15803d] flex items-center justify-center text-white text-5xl font-black">
+                    {profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
                 <button className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="flex flex-col items-center gap-1">
                     <span className="material-symbols-outlined text-4xl">camera_alt</span>
@@ -283,13 +293,13 @@ const Profile: React.FC = () => {
                   Plano Free
                 </span>
                 <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-                  Membro desde {new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}
+                  Membro desde {profileData.createdAt ? new Date(profileData.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : '--'}
                 </span>
               </div>
             </div>
 
             <p className="text-slate-600 dark:text-slate-400 text-sm px-6 mb-8 italic leading-relaxed">
-              "Focado em hipertrofia e performance. Em busca dos 100kg no supino."
+              {profileData.bio ? `"${profileData.bio}"` : '"Pronto para esmagar mais um treino!"'}
             </p>
 
             <div className="grid grid-cols-1 gap-3 w-full border-t border-border-light dark:border-border-dark pt-6 px-6 pb-6 mt-2">

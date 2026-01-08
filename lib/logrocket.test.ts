@@ -1,6 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, vi, beforeEach } from 'vitest';
 import * as logrocketUtils from './logrocket';
-import LogRocket from 'logrocket';
 
 // Mock LogRocket
 vi.mock('logrocket', () => ({

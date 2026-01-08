@@ -74,7 +74,7 @@ const LogWorkout: React.FC = () => {
         duration: 4000
       });
       navigate('/workouts');
-    } catch (error) {
+    } catch {
       addToast({
         type: 'error',
         title: 'Erro ao salvar',

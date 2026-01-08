@@ -1,5 +1,4 @@
 import LogRocket from 'logrocket';
-import { scrubData } from "./security";
 
 const APP_ID = import.meta.env.VITE_LOGROCKET_ID;
 

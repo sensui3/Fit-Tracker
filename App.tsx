@@ -27,6 +27,8 @@ const Timer = lazy(() => import('./pages/Timer'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const Goals = lazy(() => import('./pages/Goals'));
 const Subscription = lazy(() => import('./pages/Subscription'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -46,6 +48,8 @@ const App: React.FC = () => {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
                 {/* Rotas Protegidas */}
                 <Route

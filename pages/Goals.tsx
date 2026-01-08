@@ -4,23 +4,6 @@ import { useGoalFilters, Goal, GoalTab, ViewMode } from '../hooks/useGoalFilters
 import { dbService } from '../services/databaseService';
 import { useToast } from '../components/ui/Toast';
 
-const EXAMPLE_GOAL: Goal = {
-  id: 999,
-  title: 'Supino Reto (Exemplo)',
-  category: 'Força • Curto Prazo',
-  icon: 'fitness_center',
-  current: 92,
-  target: 100,
-  unit: 'kg',
-  progress: 92,
-  statusIcon: 'schedule',
-  statusText: 'Restam 14 dias',
-  trend: '+2kg esta semana',
-  trendColor: 'text-green-600 dark:text-green-400',
-  shimmer: true,
-  isExample: true
-};
-
 const Goals: React.FC = () => {
   const { user } = useAuthStore();
   const { addToast } = useToast();
@@ -47,7 +30,7 @@ const Goals: React.FC = () => {
           ORDER BY created_at DESC
         `;
 
-        const mappedGoals: Goal[] = goalsData.map((goal: any, index: number) => {
+        const mappedGoals: Goal[] = goalsData.map((goal: any) => {
           const progress = goal.target_value > 0 ? (goal.current_value / goal.target_value) * 100 : 0;
           const isWeightGoal = goal.type === 'weight';
           const isCompleted = goal.is_completed || progress >= 100;
@@ -73,11 +56,11 @@ const Goals: React.FC = () => {
             statusText: isCompleted ? 'Concluída' :
               goal.deadline ? `Até ${new Date(goal.deadline).toLocaleDateString('pt-BR')}` :
                 'Em andamento',
-            trend: isCompleted ? 'Meta Atingida!' : '+5% esta semana',
-            trendColor: isCompleted ? 'text-[#16a34a]' : 'text-green-600 dark:text-green-400',
+            trend: isCompleted ? 'Meta Atingida!' : 'Em progresso',
+            trendColor: isCompleted ? 'text-[#16a34a]' : 'text-slate-500 dark:text-slate-400',
             completed: isCompleted,
             shimmer: !isCompleted,
-            reverse: isWeightGoal, // For weight goals, lower is better
+            reverse: isWeightGoal,
             isExample: false
           };
         });
@@ -93,9 +76,7 @@ const Goals: React.FC = () => {
     loadGoals();
   }, [user]);
 
-  // Combine database goals with initial goals
-  // Use database goals or fallback to example
-  const allGoals = dbGoals.length > 0 ? dbGoals : [EXAMPLE_GOAL];
+  const allGoals = dbGoals;
 
   const {
     activeTab,
@@ -105,13 +86,13 @@ const Goals: React.FC = () => {
     handleViewModeChange
   } = useGoalFilters(allGoals);
 
-  // Calculate stats based on current goals (DB or Example)
+  // Calculate stats based on current database goals
   const activeCount = allGoals.filter(g => !g.completed).length;
   const completedCount = allGoals.filter(g => g.completed).length;
   const successRate = allGoals.length > 0 ? Math.round((completedCount / allGoals.length) * 100) : 0;
 
   const stats = [
-    { label: 'Metas Ativas', value: activeCount.toString(), badge: 'Active', badgeColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: 'flag' },
+    { label: 'Metas Ativas', value: activeCount.toString(), badge: 'Ativo', badgeColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: 'flag' },
     { label: 'Concluídas', value: completedCount.toString(), sub: 'Total', subColor: 'text-[#16a34a]', icon: 'emoji_events' },
     { label: 'Taxa de Sucesso', value: `${successRate}%`, sub: 'Geral', subColor: 'text-[#16a34a]', icon: 'trending_up' },
     { label: 'Sequência Atual', value: '0 dias', sub: 'Recorde: 0 dias', subColor: 'text-slate-400', icon: 'local_fire_department' },
@@ -122,12 +103,12 @@ const Goals: React.FC = () => {
     { day: 'Ter', val: 0, target: 100 },
     { day: 'Qua', val: 0, target: 100 },
     { day: 'Qui', val: 0, target: 100 },
-    { day: 'Sex', val: 0, target: 100, active: true },
-    { day: 'Sab', val: 0, target: 100, future: true },
-    { day: 'Dom', val: 0, target: 100, future: true },
+    { day: 'Sex', val: 0, target: 100 },
+    { day: 'Sab', val: 0, target: 100 },
+    { day: 'Dom', val: 0, target: 100 },
   ];
 
-  const featuredGoal = allGoals[0];
+  const featuredGoal = allGoals.length > 0 ? allGoals[0] : null;
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8 pb-20">
@@ -156,7 +137,7 @@ const Goals: React.FC = () => {
             </div>
             <div className="flex items-end gap-2">
               <span className="text-3xl font-bold text-slate-900 dark:text-white">{stat.value}</span>
-              {stat.badge ? (
+              {stat.badge && parseInt(stat.value) > 0 ? (
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full mb-1 ${stat.badgeColor}`}>{stat.badge}</span>
               ) : (
                 <span className={`text-sm font-medium mb-1 ${stat.subColor}`}>{stat.sub}</span>
@@ -172,7 +153,7 @@ const Goals: React.FC = () => {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">Consistência Semanal</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Frequência de treinos vs Meta</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Comece a treinar para ver sua consistência.</p>
             </div>
             <div className="flex items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400">
               <div className="flex items-center gap-1">
@@ -191,12 +172,11 @@ const Goals: React.FC = () => {
               <div key={idx} className="flex flex-col items-center flex-1 gap-2 group cursor-pointer h-full justify-end">
                 <div className="relative w-full max-w-[40px] h-full rounded-t-sm bg-slate-100 dark:bg-white/5 overflow-hidden">
                   <div
-                    className={`absolute bottom-0 w-full rounded-t-sm transition-all duration-500 ${day.future ? 'bg-[#16a34a]/30' : 'bg-[#16a34a]'}`}
+                    className="absolute bottom-0 w-full rounded-t-sm transition-all duration-500 bg-[#16a34a]"
                     style={{ height: `${day.val}%` }}
                   ></div>
-                  <div className="absolute inset-0 bg-[#16a34a]/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
-                <span className={`text-xs font-medium ${day.active ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-400'}`}>
+                <span className="text-xs font-medium text-slate-400">
                   {day.day}
                 </span>
               </div>
@@ -204,14 +184,14 @@ const Goals: React.FC = () => {
           </div>
         </div>
 
-        {/* Featured Goal Card (Dynamic) */}
+        {/* Featured Goal Card */}
         <div className="lg:col-span-1 relative overflow-hidden rounded-xl bg-[#102210] p-6 shadow-lg flex flex-col group">
           <div className="absolute -top-10 -right-10 size-64 bg-[#16a34a]/20 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="relative z-10 flex justify-between items-start mb-6">
             <div>
               <span className="inline-block bg-[#16a34a] text-[#102210] text-xs font-bold px-2 py-1 rounded mb-2">
-                {featuredGoal?.isExample ? 'Exemplo' : 'Foco Principal'}
+                Foco Principal
               </span>
               <h3 className="text-white text-xl font-bold truncate pr-2">{featuredGoal?.title || 'Sem Metas'}</h3>
             </div>
@@ -300,90 +280,83 @@ const Goals: React.FC = () => {
           : 'flex flex-col gap-4'
         }
       `}>
-        {filteredGoals.map((goal) => (
-          <div
-            key={goal.id}
-            className={`
-              group bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm hover:shadow-md transition-all
-              ${viewMode === 'grid'
-                ? 'flex flex-col rounded-xl p-5'
-                : 'flex flex-col md:flex-row items-center gap-6 p-4 rounded-2xl relative overflow-hidden'
-              }
-            `}
-          >
-            {/* Action Bar for List View (Background indicator) */}
-            {viewMode === 'list' && (
-              <div className="absolute left-0 top-0 w-1.5 h-full bg-[#16a34a]"></div>
-            )}
+        {filteredGoals.length > 0 ? (
+          filteredGoals.map((goal) => (
+            <div
+              key={goal.id}
+              className={`
+                group bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm hover:shadow-md transition-all
+                ${viewMode === 'grid'
+                  ? 'flex flex-col rounded-xl p-5 relative'
+                  : 'flex flex-col md:flex-row items-center gap-6 p-4 rounded-2xl relative overflow-hidden'
+                }
+              `}
+            >
+              {viewMode === 'list' && (
+                <div className="absolute left-0 top-0 w-1.5 h-full bg-[#16a34a]"></div>
+              )}
 
-            <div className={`flex items-center gap-4 ${viewMode === 'list' ? 'flex-1 md:min-w-[200px]' : 'mb-4'}`}>
-              <div className="size-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-300 shrink-0">
-                <span className="material-symbols-outlined text-2xl">{goal.icon}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-bold text-slate-900 dark:text-white text-lg truncate">{goal.title}</h4>
-                  {goal.isExample && (
-                    <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">
-                      Exemplo
-                    </span>
-                  )}
+              <div className={`flex items-center gap-4 ${viewMode === 'list' ? 'flex-1 md:min-w-[200px]' : 'mb-4'}`}>
+                <div className="size-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-300 shrink-0">
+                  <span className="material-symbols-outlined text-2xl">{goal.icon}</span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-text-secondary font-medium tracking-wide uppercase">{goal.category}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-slate-900 dark:text-white text-lg truncate">{goal.title}</h4>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-text-secondary font-medium tracking-wide uppercase">{goal.category}</p>
+                </div>
+              </div>
+
+              <div className={`flex flex-col gap-2 ${viewMode === 'list' ? 'flex-[2]' : 'mb-3'}`}>
+                <div className="flex items-end justify-between text-sm mb-1">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-black text-slate-900 dark:text-white">{goal.current}</span>
+                    <span className="text-slate-500 font-bold">{goal.unit}</span>
+                  </div>
+                  <div className="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
+                    Meta: {goal.target}{goal.unit}
+                  </div>
+                </div>
+                <div className={`h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden ${goal.reverse ? 'flex justify-end' : ''}`}>
+                  <div
+                    className="h-full bg-[#16a34a] rounded-full relative overflow-hidden transition-all duration-1000"
+                    style={{ width: `${goal.progress}%` }}
+                  >
+                    {goal.shimmer && (
+                      <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className={`
+                ${viewMode === 'grid'
+                  ? 'pt-4 border-t border-slate-100 dark:border-border-dark flex items-center justify-between'
+                  : 'flex flex-row md:flex-col lg:flex-row items-center gap-4 md:items-end lg:items-center justify-between'
+                }
+              `}>
+                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium text-xs">
+                  <span className="material-symbols-outlined text-base text-[#16a34a]">{goal.statusIcon}</span>
+                  <span>{goal.statusText}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`text-xs font-bold px-2 py-1 rounded-lg bg-opacity-10 ${goal.trendColor} ${goal.trendColor.replace('text-', 'bg-')}`}>
+                    {goal.trend}
+                  </span>
+                </div>
               </div>
             </div>
-
-            <div className={`flex flex-col gap-2 ${viewMode === 'list' ? 'flex-[2]' : 'mb-3'}`}>
-              <div className="flex items-end justify-between text-sm mb-1">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-black text-slate-900 dark:text-white">{goal.current}</span>
-                  <span className="text-slate-500 font-bold">{goal.unit}</span>
-                </div>
-                <div className="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
-                  Meta: {goal.target}{goal.unit}
-                </div>
-              </div>
-              <div className={`h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden ${goal.reverse ? 'flex justify-end' : ''}`}>
-                <div
-                  className="h-full bg-[#16a34a] rounded-full relative overflow-hidden transition-all duration-1000"
-                  style={{ width: `${goal.progress}%` }}
-                >
-                  {goal.shimmer && (
-                    <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
-                  )}
-                </div>
-              </div>
+          ))
+        ) : !loading && (
+          <div className="col-span-full py-12 flex flex-col items-center justify-center text-center bg-slate-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10">
+            <div className="size-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center text-slate-400 mb-4">
+              <span className="material-symbols-outlined text-4xl">flag</span>
             </div>
-
-            <div className={`
-              ${viewMode === 'grid'
-                ? 'pt-4 border-t border-slate-100 dark:border-border-dark flex items-center justify-between'
-                : 'flex flex-row md:flex-col lg:flex-row items-center gap-4 md:items-end lg:items-center justify-between'
-              }
-            `}>
-              <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium text-xs">
-                <span className="material-symbols-outlined text-base text-[#16a34a]">{goal.statusIcon}</span>
-                <span>{goal.statusText}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={`text-xs font-bold px-2 py-1 rounded-lg bg-opacity-10 ${goal.trendColor} ${goal.trendColor.replace('text-', 'bg-')}`}>
-                  {goal.trend}
-                </span>
-                {viewMode === 'list' && (
-                  <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
-                    <span className="material-symbols-outlined">more_vert</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {viewMode === 'grid' && (
-              <button className="absolute top-4 right-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="material-symbols-outlined">more_vert</span>
-              </button>
-            )}
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Nenhuma meta encontrada</h3>
+            <p className="text-slate-500 dark:text-slate-400 max-w-xs mt-1">Você ainda não definiu nenhuma meta. Comece definindo seu primeiro objetivo!</p>
           </div>
-        ))}
+        )}
 
         {/* Add New Goal Card */}
         <button

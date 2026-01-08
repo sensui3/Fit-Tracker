@@ -36,7 +36,7 @@ const Subscription: React.FC = () => {
             <div className="p-6 md:p-8 flex-1 flex flex-col justify-center gap-4">
               <div className="flex items-center gap-2 mb-1">
                 <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold uppercase tracking-wider border border-green-200 dark:border-green-900/50">Ativo</span>
-                <span className="text-sm text-slate-500 dark:text-text-secondary">Desde 12 Out 2023</span>
+                <span className="text-sm text-slate-500 dark:text-text-secondary">Assinatura Gratuita</span>
               </div>
               <div>
                 <p className="text-sm font-medium text-slate-500 dark:text-text-secondary mb-1">Seu plano atual</p>
@@ -69,7 +69,7 @@ const Subscription: React.FC = () => {
               </div>
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-10 dark:opacity-5 mix-blend-overlay"
-                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBdmo_eM6lshNS-IXgCO0u1hrL1GOE28AvtcSbHDzYMxPaIBJVlx-Xvt1MPemt9MsqJ_zec6khIyaVhYzvs1LRXJ572bI4PtsOkwO0pu_-VFhhvAl9JcnZICOsfGO6hXXa8uFwFuQLq7GUl_oJVFFgoMkcxj_7kFr7DLiYXxaUmoyo-NTCZ6n_QqgQ26EKjUbUpdRSzqCmC5YQ21fpvnBSYMrwf1VAPMWBzJLWzDOVTTIDWHRMWQK7KCRc5ZVls21lvApwO6X3_UXo')" }}
+                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800')" }}
               ></div>
             </div>
           </div>

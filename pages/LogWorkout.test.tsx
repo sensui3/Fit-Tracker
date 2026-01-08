@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import LogWorkout from './LogWorkout';
 import { useWorkoutLogger } from '../hooks/useWorkoutLogger';
@@ -61,17 +61,19 @@ describe('LogWorkout Page', () => {
         (useWorkoutLogger as any).mockReturnValue(mockLogger);
     });
 
-    it('should render correctly', () => {
-        render(
-            <MemoryRouter>
-                <LogWorkout />
-            </MemoryRouter>
-        );
+    it('should render correctly', async () => {
+        await act(async () => {
+            render(
+                <MemoryRouter>
+                    <LogWorkout />
+                </MemoryRouter>
+            );
+        });
 
         expect(screen.getByText(/Novo Registro/i)).toBeInTheDocument();
     });
 
-    it('should handle keyboard navigation in suggestions', () => {
+    it('should handle keyboard navigation in suggestions', async () => {
         const setHighlightedIndex = vi.fn();
         const setShowSuggestions = vi.fn();
         const handleSelectExercise = vi.fn();
@@ -84,11 +86,13 @@ describe('LogWorkout Page', () => {
             handleSelectExercise
         });
 
-        render(
-            <MemoryRouter>
-                <LogWorkout />
-            </MemoryRouter>
-        );
+        await act(async () => {
+            render(
+                <MemoryRouter>
+                    <LogWorkout />
+                </MemoryRouter>
+            );
+        });
 
         const input = screen.getByPlaceholderText(/Supino Reto, Agachamento.../i);
 
@@ -102,7 +106,7 @@ describe('LogWorkout Page', () => {
         expect(setShowSuggestions).toHaveBeenCalledWith(false);
     });
 
-    it('should select suggestion on Enter', () => {
+    it('should select suggestion on Enter', async () => {
         const handleSelectExercise = vi.fn();
         (useWorkoutLogger as any).mockReturnValue({
             ...mockLogger,
@@ -111,11 +115,13 @@ describe('LogWorkout Page', () => {
             handleSelectExercise
         });
 
-        render(
-            <MemoryRouter>
-                <LogWorkout />
-            </MemoryRouter>
-        );
+        await act(async () => {
+            render(
+                <MemoryRouter>
+                    <LogWorkout />
+                </MemoryRouter>
+            );
+        });
 
         const input = screen.getByPlaceholderText(/Supino Reto, Agachamento.../i);
         fireEvent.keyDown(input, { key: 'Enter' });
@@ -123,12 +129,14 @@ describe('LogWorkout Page', () => {
         expect(handleSelectExercise).toHaveBeenCalledWith(mockLogger.filteredExercises[0]);
     });
 
-    it('should confirm deletion', () => {
-        render(
-            <MemoryRouter>
-                <LogWorkout />
-            </MemoryRouter>
-        );
+    it('should confirm deletion', async () => {
+        await act(async () => {
+            render(
+                <MemoryRouter>
+                    <LogWorkout />
+                </MemoryRouter>
+            );
+        });
 
         // Open modal
         fireEvent.click(screen.getByText('Excluir'));
@@ -149,11 +157,13 @@ describe('LogWorkout Page', () => {
             finishWorkout
         });
 
-        render(
-            <MemoryRouter>
-                <LogWorkout />
-            </MemoryRouter>
-        );
+        await act(async () => {
+            render(
+                <MemoryRouter>
+                    <LogWorkout />
+                </MemoryRouter>
+            );
+        });
 
         const saveBtn = screen.getByText('Salvar Registro');
         fireEvent.click(saveBtn);

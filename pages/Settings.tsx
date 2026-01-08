@@ -23,7 +23,6 @@ const Settings: React.FC = () => {
         { id: 'notifications', icon: 'notifications', label: 'Notificações' },
         { id: 'privacy', icon: 'lock', label: 'Privacidade' },
         { id: 'account', icon: 'person', label: 'Conta' },
-        { id: 'monitoring', icon: 'monitoring', label: 'Monitoramento' },
     ];
 
     const scrollToSection = (id: string) => {
@@ -186,42 +185,6 @@ const Settings: React.FC = () => {
                                 </div>
                             </div>
                         </section>
-
-                        <section id="monitoring" className="space-y-6 scroll-mt-32">
-                            <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
-                                <span className="material-symbols-outlined text-[#16a34a] text-2xl">monitoring</span>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Diagnóstico & Monitoramento</h3>
-                            </div>
-                            <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl p-6 shadow-sm space-y-6">
-                                <div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white mb-2">Teste de Integração LogRocket</h4>
-                                    <p className="text-sm text-slate-500 dark:text-text-secondary mb-4">
-                                        Utilize os botões abaixo para validar se a captura de erros e o monitoramento de performance estão operando corretamente.
-                                    </p>
-                                    <div className="flex flex-wrap gap-4">
-                                        <button
-                                            onClick={() => {
-                                                throw new Error("Erro Sintético de Teste - LogRocket Integration");
-                                            }}
-                                            className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-sm font-bold transition-all"
-                                        >
-                                            Trigger JS Error
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                console.log("Simulando operação pesada...");
-                                                const start = Date.now();
-                                                while (Date.now() - start < 100) { /* busy wait */ }
-                                                console.log("Teste concluído.");
-                                            }}
-                                            className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 rounded-lg text-sm font-bold transition-all"
-                                        >
-                                            Test Performance
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
                     </div>
                 </div>
             </div>
@@ -235,7 +198,7 @@ const Settings: React.FC = () => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

@@ -11,39 +11,21 @@ const CreatePlan: React.FC = () => {
   const { user } = useAuthStore();
   const [dbPlan, setDbPlan] = useState<any>(null);
   const [dbExercises, setDbExercises] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isExampleMode, setIsExampleMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addToast } = useToast();
 
-  const MOCK_PLAN = {
-    id: 'example-plan',
-    name: 'Plano de Exemplo (Hipertrofia)',
-    description: 'Este é um modelo de exemplo para demonstração.',
-    exercises: [
-      {
-        exercise_id: 'ex-1',
-        name: 'Supino Reto',
-        muscle: 'Peito',
-        equipment: 'Barra',
-        image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80',
-        target_sets: 4,
-        target_reps: '8-12',
-        target_weight: 80,
-        order: 1
-      }
-    ]
-  };
+
 
   // Load example plan from database
   useEffect(() => {
     const loadPlanData = async () => {
       if (!user) return;
       try {
-        // Load the example plan
+        // Load the example plan or first plan
         const planResult = await dbService.query`
           SELECT id, name, description FROM training_plans
-          WHERE user_id = ${user.id} AND name = 'Plano de Força - Peito e Tríceps'
+          WHERE user_id = ${user.id}
+          ORDER BY created_at DESC
           LIMIT 1
         `;
 
@@ -71,18 +53,13 @@ const CreatePlan: React.FC = () => {
 
           setDbExercises(exercisesResult);
         } else {
-          // Fallback to mock if plan not found
-          setDbPlan(MOCK_PLAN);
-          setDbExercises(MOCK_PLAN.exercises);
-          setIsExampleMode(true);
+          setDbPlan({ name: 'Meu Novo Plano', description: '' });
+          setDbExercises([]);
         }
       } catch (error) {
         console.error('Erro ao carregar plano:', error);
-        setDbPlan(MOCK_PLAN);
-        setDbExercises(MOCK_PLAN.exercises);
-        setIsExampleMode(true);
-      } finally {
-        setLoading(false);
+        setDbPlan({ name: 'Meu Novo Plano', description: '' });
+        setDbExercises([]);
       }
     };
 
@@ -129,11 +106,6 @@ const CreatePlan: React.FC = () => {
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
             <h1 className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Criar Novo Plano</h1>
-            {isExampleMode && (
-              <span className="text-sm font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full">
-                Modo Exemplo
-              </span>
-            )}
           </div>
           <p className="text-slate-500 dark:text-text-secondaryDark text-base font-normal">Monte seu treino personalizado selecionando exercícios e definindo as metas.</p>
         </div>
@@ -143,7 +115,12 @@ const CreatePlan: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <label className="flex flex-col gap-2">
               <span className="text-slate-700 dark:text-white text-sm font-semibold">Nome do Plano</span>
-              <input className="w-full rounded-lg bg-slate-50 dark:bg-[#1c271c] border border-slate-300 dark:border-[#3b543b] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#5a6b5a] px-4 py-3 focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-all" placeholder="Ex: Treino A - Hipertrofia Peito" type="text" defaultValue="Treino de Força - Membros Superiores" />
+              <input
+                className="w-full rounded-lg bg-slate-50 dark:bg-[#1c271c] border border-slate-300 dark:border-[#3b543b] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#5a6b5a] px-4 py-3 focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-all"
+                placeholder="Ex: Treino A - Hipertrofia Peito"
+                type="text"
+                defaultValue={dbPlan?.name || 'Meu Novo Plano'}
+              />
             </label>
             <label className="flex flex-col gap-2">
               <span className="text-slate-700 dark:text-white text-sm font-semibold">Foco Muscular (Opcional)</span>
@@ -199,11 +176,6 @@ const CreatePlan: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-slate-900 dark:text-white font-medium text-base truncate">{exercise.name}</p>
-                        {isExampleMode && (
-                          <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full">
-                            Exemplo
-                          </span>
-                        )}
                       </div>
                       <p className="text-slate-500 dark:text-text-secondaryDark text-xs">{exercise.muscle} • {exercise.equipment}</p>
                     </div>
