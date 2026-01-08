@@ -29,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
   ];
 
   const systemItems = [
-    { icon: 'notifications', label: 'Notificações', path: '/notifications', count: 3 },
+    { icon: 'notifications', label: 'Notificações', path: '/notifications' },
     { icon: 'person', label: 'Perfil', path: '/profile' },
     { icon: 'settings', label: 'Configurações', path: '/settings' },
   ];
