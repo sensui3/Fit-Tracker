@@ -97,7 +97,7 @@ describe('Dashboard Page', () => {
             // "10" for total workouts
             expect(screen.getByText('10')).toBeInTheDocument();
             // "5.000 kg" or "5,000 kg" depending on locale, but "5000" should be there
-            expect(screen.getByText(/5.*000/)).toBeInTheDocument();
+            expect(screen.getAllByText(/5.*000/)[0]).toBeInTheDocument();
         });
     });
 

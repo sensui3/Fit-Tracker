@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
           <h1 className="text-2xl md:text-3xl font-bold dark:text-white">
             Bem-vindo de volta, {user?.name?.split(' ')[0] || 'Usuário'}! 👋
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <div className="text-slate-500 dark:text-slate-400 mt-1">
             {loading ? (
               <Skeleton className="h-4 w-64 mt-2" />
             ) : userStats.totalWorkouts > 0 ? (
@@ -88,7 +88,7 @@ const Dashboard: React.FC = () => {
             ) : (
               'Comece seus treinos e veja suas estatísticas aqui.'
             )}
-          </p>
+          </div>
         </div>
         <div className="hidden md:flex items-center gap-4">
           <button
