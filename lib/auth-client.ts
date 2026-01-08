@@ -1,46 +1,17 @@
-import { createAuthClient } from "@neondatabase/neon-js/auth";
-import { loginSchema, signUpSchema } from "./security";
+import { createAuthClient } from "@neondatabase/neon-js/auth/react";
 
-// URL do Neon Auth vinda das variáveis de ambiente ou fallback
-const neonAuthUrl = import.meta.env.VITE_NEON_AUTH_URL || import.meta.env.VITE_BETTER_AUTH_URL || "https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth";
+/**
+ * Neon Auth Client Configuration
+ * This is the low-level client that interacts with the Neon Auth / Better Auth service.
+ */
+
+// We prioritize the proxy URL for better security and to avoid CORS issues in production.
+const neonAuthUrl = import.meta.env.VITE_NEON_AUTH_URL || "https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth";
 
 export const authClient = createAuthClient(neonAuthUrl);
 
-export const { useSession, signOut } = authClient;
-
 /**
- * Wrappers validados para funções de autenticação
+ * Re-exporting only essential hooks.
+ * All authentication actions (signIn, signUp, etc.) should be performed through the NeonAuthService.
  */
-export const signInValidated = async (data: unknown) => {
-    const validatedData = loginSchema.parse(data);
-    return await authClient.signIn.email({
-        email: validatedData.email,
-        password: validatedData.password,
-    });
-};
-
-export const signUpValidated = async (data: unknown, name: string) => {
-    const validatedData = signUpSchema.parse({ ...(data as Record<string, unknown>), name });
-    return await authClient.signUp.email({
-        email: validatedData.email,
-        password: validatedData.password,
-        name: validatedData.name,
-    });
-};
-
-/**
- * Recuperação de senha
- */
-export const forgotPassword = async (email: string) => {
-    return await authClient.requestPasswordReset({
-        email,
-        redirectTo: "/reset-password",
-    });
-};
-
-export const resetPassword = async (password: string, token: string) => {
-    return await authClient.resetPassword({
-        newPassword: password,
-        token,
-    });
-};
+export const { useSession } = authClient;

@@ -2,90 +2,128 @@ import { z } from 'zod';
 import DOMPurify from 'dompurify';
 
 /**
- * Utilitário para sanitização de strings contra ataques XSS.
+ * Utilitário de Sanitização Centralizado
  */
 export const sanitize = (text: string): string => {
-    if (!text) return text;
-    return DOMPurify.sanitize(text);
+    if (!text || typeof text !== 'string') return text;
+    // Remove tags HTML maliciosas mantendo o texto puro
+    return DOMPurify.sanitize(text, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
 };
 
 /**
- * Esquemas de validação robustos com Zod
+ * Esquemas de Validação (Zod) - Centralizados e Fortemente Tipados
  */
 
-// Login e Registro
+// Base para campos comuns
+const passwordSchema = z.string()
+    .min(8, 'A senha deve ter pelo menos 8 caracteres')
+    .max(50, 'Senha muito longa (máx 50 caracteres)')
+    .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula')
+    .regex(/[0-9]/, 'A senha deve conter pelo menos um número')
+    .regex(/[^a-zA-Z0-9]/, 'A senha deve conter pelo menos um caractere especial');
+
+const emailSchema = z.string()
+    .email('Formato de e-mail inválido')
+    .min(5, 'E-mail muito curto')
+    .max(100, 'E-mail muito longo')
+    .toLowerCase()
+    .trim();
+
+const nameSchema = z.string()
+    .min(2, 'O nome deve ter pelo menos 2 caracteres')
+    .max(60, 'O nome é muito longo')
+    .transform(sanitize)
+    .trim();
+
+// Esquemas específicos
 export const loginSchema = z.object({
-    email: z.string().email('Email inválido').min(5, 'Email muito curto').max(100, 'Email muito longo'),
-    password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres').max(50, 'Senha muito longa'),
+    email: emailSchema,
+    password: z.string().min(1, 'Senha é obrigatória'),
 });
 
-export const signUpSchema = loginSchema.extend({
-    name: z.string().min(2, 'Nome muito curto').max(50, 'Nome muito longo').transform(sanitize),
+export const signUpSchema = z.object({
+    email: emailSchema,
+    password: passwordSchema,
+    name: nameSchema,
     passwordConfirmation: z.string()
 }).refine((data) => data.password === data.passwordConfirmation, {
     message: "As senhas não coincidem",
     path: ["passwordConfirmation"],
 });
 
-// Perfil do Usuário
-export const profileSchema = z.object({
-    name: z.string().min(2, 'Nome muito curto').max(50, 'Nome muito longo').transform(sanitize),
+export const profileUpdateSchema = z.object({
+    name: nameSchema.optional(),
     image: z.string().url('URL da imagem inválida').optional().or(z.literal('')),
 });
 
-// Exercício / Treino
-export const workoutSchema = z.object({
-    exerciseName: z.string().min(1, 'Nome do exercício é obrigatório').max(100).transform(sanitize),
-    sets: z.array(z.object({
-        reps: z.number().int().min(0).max(1000),
-        weight: z.number().min(0).max(1000),
-    })),
-    date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
+export const forgotPasswordSchema = z.object({
+    email: emailSchema,
 });
 
 /**
- * Rate Limiting Simples (Client-side)
- * Protege contra cliques múltiplos/rápidos em botões sensíveis.
+ * Rate Limiting (Client-side)
+ * Implementação leve para evitar spam de requisições.
  */
-const rateLimits = new Map<string, number>();
+class RateLimiter {
+    private limits = new Map<string, number>();
 
-export const checkRateLimit = (key: string, limitMs: number = 2000): boolean => {
-    const now = Date.now();
-    const lastCall = rateLimits.get(key) || 0;
+    check(key: string, limitMs: number = 2000): boolean {
+        const now = Date.now();
+        const lastCall = this.limits.get(key) || 0;
 
-    if (now - lastCall < limitMs) {
-        return false;
+        if (now - lastCall < limitMs) {
+            return false;
+        }
+
+        this.limits.set(key, now);
+        return true;
     }
 
-    rateLimits.set(key, now);
-    return true;
-};
+    reset(key: string) {
+        this.limits.delete(key);
+    }
+}
+
+export const limiter = new RateLimiter();
+export const checkRateLimit = (key: string, limitMs?: number) => limiter.check(key, limitMs);
 
 /**
- * Limpeza de dados sensíveis para logs e monitoramento.
- * Remove senhas, emails e chaves de API de objetos ou strings.
+ * Utilitário para Limpeza de Dados Sensíveis (Logging)
  */
-export const scrubData = (data: any): any => {
+export const scrub = (data: any): any => {
+    if (!data) return data;
+
     if (typeof data === 'string') {
-        // Regex básica para emails e senhas em strings
         return data
             .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL_REDACTED]')
-            .replace(/(password|senha|token|key)=[^&\s]+/gi, '$1=[REDACTED]');
+            .replace(/(password|senha|token|key|secret)=[^&\s]+/gi, '$1=[REDACTED]');
     }
 
-    if (data && typeof data === 'object') {
-        const scrubbed = Array.isArray(data) ? [...data] : { ...data };
-        const sensitiveKeys = ['password', 'senha', 'token', 'key', 'secret', 'email', 'auth'];
+    if (Array.isArray(data)) {
+        return data.map(scrub);
+    }
 
-        for (const key in scrubbed) {
+    if (typeof data === 'object') {
+        const result: any = {};
+        const sensitiveKeys = ['password', 'senha', 'token', 'key', 'secret', 'email', 'auth', 'cookie', 'authorization'];
+
+        for (const [key, value] of Object.entries(data)) {
             if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk))) {
-                scrubbed[key] = '[REDACTED]';
+                result[key] = '[REDACTED]';
             } else {
-                scrubbed[key] = scrubData(scrubbed[key]);
+                result[result[key] = scrub(value)];
             }
         }
-        return scrubbed;
+        return result;
     }
 
     return data;
+};
+
+/**
+ * Proteção CSRF básica para requisições manuais (se necessário)
+ */
+export const getCsrfToken = () => {
+    // Em uma aplicação real, isso viria de um cookie ou meta tag
+    return (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content;
 };
