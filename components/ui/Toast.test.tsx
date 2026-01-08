@@ -8,6 +8,8 @@ vi.mock('../../stores/useUIStore', () => ({
     useUIStore: vi.fn(),
 }));
 
+const mockUseUIStore = vi.mocked(useUIStore);
+
 describe('Toast Component', () => {
     const mockRemoveToast = vi.fn();
     const mockToasts = [
@@ -17,7 +19,7 @@ describe('Toast Component', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        (useUIStore as any).mockReturnValue({
+        mockUseUIStore.mockReturnValue({
             toasts: mockToasts,
             removeToast: mockRemoveToast,
             addToast: vi.fn(),

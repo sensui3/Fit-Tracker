@@ -8,6 +8,8 @@ vi.mock('../../stores/useTimerStore', () => ({
     useTimerStore: vi.fn(),
 }));
 
+const mockUseTimerStore = vi.mocked(useTimerStore);
+
 describe('RestTimer Component', () => {
     const mockOnClose = vi.fn();
     const mockStopTimer = vi.fn();
@@ -15,7 +17,7 @@ describe('RestTimer Component', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        (useTimerStore as any).mockReturnValue({
+        mockUseTimerStore.mockReturnValue({
             timeLeft: 60,
             isActive: true,
             tick: vi.fn(),
@@ -32,9 +34,9 @@ describe('RestTimer Component', () => {
     });
 
     it('should return null when not active', () => {
-        (useTimerStore as any).mockReturnValue({
+        mockUseTimerStore.mockReturnValue({
             isActive: false,
-        });
+        } as any);
         const { container } = render(<RestTimer onClose={mockOnClose} />);
         expect(container.firstChild).toBeNull();
     });

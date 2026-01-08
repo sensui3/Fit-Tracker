@@ -1,21 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useUIStore } from '../../stores/useUIStore';
-
-export type ToastType = 'success' | 'error' | 'info' | 'warning';
-
-export interface ToastMessage {
-    id: string;
-    type: ToastType;
-    title?: string;
-    message: string;
-    duration?: number;
-}
-
-// Hook wrapper
-export const useToast = () => {
-    const { addToast, removeToast } = useUIStore();
-    return { addToast, removeToast };
-};
+import { ToastMessage } from './toast-utils';
 
 // UI Component for individual toast
 const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void }> = ({ toast, onRemove }) => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { MUSCLE_FILTERS, DIFFICULTY_FILTERS, EQUIPMENT_FILTERS } from '../../data/exercises';
-import { useToast } from '../ui/Toast';
+import { useToast } from '../ui/toast-utils';
 
 interface SuggestExerciseModalProps {
     isOpen: boolean;
@@ -62,7 +62,7 @@ export const SuggestExerciseModal: React.FC<SuggestExerciseModalProps> = ({
                 description: '',
                 image_url: ''
             });
-        } catch (_error) {
+        } catch {
             addToast({
                 type: 'error',
                 title: 'Erro',

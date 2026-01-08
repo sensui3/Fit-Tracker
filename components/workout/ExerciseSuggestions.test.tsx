@@ -5,7 +5,7 @@ import { Exercise } from '../../types';
 
 // Mock OptimizedImage since we already tested it and want to focus on this component
 vi.mock('../ui/OptimizedImage', () => ({
-    OptimizedImage: ({ alt, containerClassName, ...props }: any) => <img alt={alt} {...props} />
+    OptimizedImage: ({ alt, _containerClassName, ...props }: { alt: string; _containerClassName?: string;[key: string]: unknown }) => <img alt={alt} {...props} />
 }));
 
 describe('ExerciseSuggestions Component', () => {
@@ -15,14 +15,14 @@ describe('ExerciseSuggestions Component', () => {
     ];
 
     it('should not render when exercises list is empty', () => {
-        const { container } = render(
+        const rendered = render(
             <ExerciseSuggestions
                 exercises={[]}
                 highlightedIndex={-1}
                 onSelect={vi.fn()}
             />
         );
-        expect(container.firstChild).toBeNull();
+        expect(rendered.container.firstChild).toBeNull();
     });
 
     it('should render suggestions list', () => {
@@ -40,7 +40,7 @@ describe('ExerciseSuggestions Component', () => {
     });
 
     it('should highlight the item with highlightedIndex', () => {
-        const { container } = render(
+        render(
             <ExerciseSuggestions
                 exercises={mockExercises}
                 highlightedIndex={0}

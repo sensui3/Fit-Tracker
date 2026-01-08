@@ -41,7 +41,7 @@ export const useAuth = () => {
             // O estado será sincronizado pelo AppInitializer ou manualmente se necessário
             // Aqui estamos apenas retornando o resultado
             return { success: true, data };
-        } catch (_err: unknown) {
+        } catch {
             const genericError = { message: 'Erro inesperado no login', code: 'INTERNAL_ERROR' };
             setError(genericError);
             return { success: false, error: genericError };
@@ -73,7 +73,7 @@ export const useAuth = () => {
             });
 
             return { success: true, data };
-        } catch (err: any) {
+        } catch {
             const genericError = { message: 'Erro inesperado no cadastro', code: 'INTERNAL_ERROR' };
             setError(genericError);
             return { success: false, error: genericError };
