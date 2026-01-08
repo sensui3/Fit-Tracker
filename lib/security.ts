@@ -111,7 +111,7 @@ export const scrub = (data: any): any => {
             if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk))) {
                 result[key] = '[REDACTED]';
             } else {
-                result[result[key] = scrub(value)];
+                result[key] = scrub(value);
             }
         }
         return result;
