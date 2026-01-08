@@ -49,7 +49,7 @@ const ResetPassword: React.FC = () => {
             return;
         }
 
-        const { success } = await resetPassword({ password, token });
+        const { success } = await resetPassword({ newPassword: password, token });
         if (success) {
             navigate('/login');
         }

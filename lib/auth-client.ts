@@ -1,17 +1,14 @@
-import { createAuthClient } from "@neondatabase/neon-js/auth/react";
+import { createAuthClient } from "better-auth/react";
 
 /**
- * Neon Auth Client Configuration
- * This is the low-level client that interacts with the Neon Auth / Better Auth service.
+ * Better Auth Client Configuration
+ * This interacts with our self-hosted Better Auth instance running on Cloudflare Functions.
  */
-
-// We prioritize the proxy URL for better security and to avoid CORS issues in production.
-const neonAuthUrl = import.meta.env.VITE_NEON_AUTH_URL || "https://ep-young-waterfall-adzgojue.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth";
-
-export const authClient = createAuthClient(neonAuthUrl);
+export const authClient = createAuthClient({
+    baseURL: import.meta.env.VITE_BETTER_AUTH_URL || window.location.origin
+});
 
 /**
- * Re-exporting only essential hooks.
- * All authentication actions (signIn, signUp, etc.) should be performed through the NeonAuthService.
+ * Exporting essential hooks and the client
  */
-export const { useSession } = authClient;
+export const { useSession, signIn, signUp, signOut, getSession } = authClient;

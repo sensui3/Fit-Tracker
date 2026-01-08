@@ -1,18 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useUIStore } from '../../stores/useUIStore';
-import { ToastMessage } from './toast-utils';
+import { ToastMessage, useToast } from './toast-utils';
 
-// UI Component for individual toast
-const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void }> = ({ toast, onRemove }) => {
+function ToastItem({ toast, onRemove }: { toast: ToastMessage; onRemove: (id: string) => void }) {
     const [isExiting, setIsExiting] = useState(false);
     const [progress, setProgress] = useState(100);
     const duration = toast.duration || 3000;
 
     const handleClose = useCallback(() => {
         setIsExiting(true);
-        setTimeout(() => {
-            onRemove(toast.id);
-        }, 300); // Animation duration
+        setTimeout(() => onRemove(toast.id), 300);
     }, [onRemove, toast.id]);
 
     useEffect(() => {
@@ -21,13 +18,11 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
             setProgress(remaining);
-
             if (remaining <= 0) {
                 clearInterval(timer);
                 handleClose();
             }
         }, 10);
-
         return () => clearInterval(timer);
     }, [duration, handleClose]);
 
@@ -37,57 +32,32 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
         warning: { icon: 'warning', color: 'text-amber-500', bg: 'bg-amber-500/20', bar: 'bg-amber-500' },
         info: { icon: 'info', color: 'text-blue-500', bg: 'bg-blue-500/20', bar: 'bg-blue-500' }
     };
-
     const config = iconConfig[toast.type];
 
     return (
-        <div
-            className={`relative flex flex-col w-full max-w-sm mb-4 rounded-2xl border border-white/10 dark:border-white/5 shadow-2xl backdrop-blur-md transition-all duration-300 ease-out transform
-        ${toast.type === 'success' ? 'bg-white/90 dark:bg-[#1c271c]/90' :
-                    toast.type === 'error' ? 'bg-white/90 dark:bg-[#271c1c]/90' :
-                        'bg-white/90 dark:bg-slate-900/90'}
-        ${isExiting ? 'translate-x-12 opacity-0 scale-95' : 'translate-x-0 opacity-100 scale-100'}
-        animate-in slide-in-from-right-8 fade-in duration-300
-      `}
-            role="alert"
-        >
+        <div className={`relative flex flex-col w-full max-w-sm mb-4 rounded-2xl border border-white/10 dark:border-white/5 shadow-2xl backdrop-blur-md transition-all duration-300 transform ${toast.type === 'success' ? 'bg-white/90 dark:bg-[#1c271c]/90' : toast.type === 'error' ? 'bg-white/90 dark:bg-[#271c1c]/90' : 'bg-white/90 dark:bg-slate-900/90'} ${isExiting ? 'translate-x-12 opacity-0 scale-95' : 'translate-x-0 opacity-100 scale-100'}`} role="alert">
             <div className="flex items-center p-4">
-                <div className={`inline-flex items-center justify-center shrink-0 w-10 h-10 rounded-xl ${config.bg} ${config.color} shadow-inner`}>
-                    <span className="material-symbols-outlined text-2xl">
-                        {config.icon}
-                    </span>
+                <div className={`inline-flex items-center justify-center shrink-0 w-10 h-10 rounded-xl ${config.bg} ${config.color}`}>
+                    <span className="material-symbols-outlined text-2xl">{config.icon}</span>
                 </div>
                 <div className="ml-4 text-sm font-normal flex-1">
-                    {toast.title && <div className="font-black text-slate-900 dark:text-white mb-0.5 tracking-tight">{toast.title}</div>}
+                    {toast.title && <div className="font-black text-slate-900 dark:text-white mb-0.5">{toast.title}</div>}
                     <div className="text-slate-600 dark:text-slate-300 leading-tight font-medium">{toast.message}</div>
                 </div>
-                <button
-                    type="button"
-                    className="ml-auto -mx-1 -my-1 rounded-xl p-1.5 inline-flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-                    onClick={handleClose}
-                    aria-label="Close"
-                >
+                <button type="button" className="ml-auto p-1.5 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all" onClick={handleClose}>
                     <span className="material-symbols-outlined text-xl">close</span>
                 </button>
             </div>
-
-            {/* Progress Bar */}
             <div className="absolute bottom-0 left-0 h-1 bg-slate-100 dark:bg-white/5 w-full rounded-b-2xl overflow-hidden">
-                <div
-                    className={`h-full ${config.bar} transition-all duration-100 ease-linear`}
-                    style={{ width: `${progress}%` }}
-                />
+                <div className={`h-full ${config.bar} transition-all duration-100 ease-linear`} style={{ width: `${progress}%` }} />
             </div>
         </div>
     );
-};
+}
 
-// Global Toast Container
-export const GlobalToast: React.FC = () => {
+export function GlobalToast() {
     const { toasts, removeToast } = useUIStore();
-
     if (toasts.length === 0) return null;
-
     return (
         <div className="fixed top-4 right-4 z-[9999] flex flex-col items-end w-full max-w-sm pointer-events-none">
             <div className="pointer-events-auto w-full">
@@ -97,14 +67,15 @@ export const GlobalToast: React.FC = () => {
             </div>
         </div>
     );
-};
+}
 
-// Deprecated Provider for compatibility (optional)
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function ToastProvider({ children }: { children: React.ReactNode }) {
     return (
         <>
             {children}
             <GlobalToast />
         </>
     );
-};
+}
+
+export { useToast };

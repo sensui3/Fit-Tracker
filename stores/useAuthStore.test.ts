@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAuthStore } from './useAuthStore';
 import { User } from '../types';
 
-// Mock NeonAuthService
-vi.mock('../services/auth/NeonAuthService', () => ({
-    authService: {
+// Mock authClient
+vi.mock('../lib/auth-client', () => ({
+    authClient: {
         signOut: vi.fn().mockResolvedValue(undefined)
     }
 }));

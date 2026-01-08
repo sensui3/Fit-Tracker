@@ -1,21 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User, Session } from '../types';
-import { authService } from '../services/auth/NeonAuthService';
-import { AuthError } from '../services/auth/types';
+import { authClient } from '../lib/auth-client';
 
 interface AuthState {
     user: User | null;
     session: Session | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    error: AuthError | null;
+    error: any | null;
 
     // Actions
     setUser: (user: User | null) => void;
     setSession: (session: Session | null) => void;
     setLoading: (loading: boolean) => void;
-    setError: (error: AuthError | null) => void;
+    setError: (error: any | null) => void;
 
     // Auth Operations
     logout: () => Promise<void>;
@@ -48,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
             logout: async () => {
                 set({ isLoading: true });
                 try {
-                    await authService.signOut();
+                    await authClient.signOut();
                 } catch (error) {
                     console.error('Erro ao sair:', error);
                 } finally {

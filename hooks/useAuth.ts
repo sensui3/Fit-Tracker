@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useAuthStore } from '../stores/useAuthStore';
-import { authService } from '../services/auth/NeonAuthService';
-import { AuthCredentials, ResetPasswordData } from '../services/auth/types';
+import { authClient } from '../lib/auth-client';
 import { useToast } from '../components/ui/Toast';
 
 /**
@@ -26,20 +25,21 @@ export const useAuth = () => {
     /**
      * Login de usuário
      */
-    const login = useCallback(async (credentials: AuthCredentials) => {
+    const login = useCallback(async (credentials: { email: string; password: string }) => {
         setLoading(true);
         clearError();
 
         try {
-            const { data, error: authError } = await authService.signIn(credentials);
+            const { data, error: authError } = await authClient.signIn.email({
+                email: credentials.email,
+                password: credentials.password,
+            });
 
             if (authError) {
                 setError(authError);
                 return { success: false, error: authError };
             }
 
-            // O estado será sincronizado pelo AppInitializer ou manualmente se necessário
-            // Aqui estamos apenas retornando o resultado
             return { success: true, data };
         } catch {
             const genericError = { message: 'Erro inesperado no login', code: 'INTERNAL_ERROR' };
@@ -53,12 +53,16 @@ export const useAuth = () => {
     /**
      * Cadastro de usuário
      */
-    const register = useCallback(async (credentials: AuthCredentials) => {
+    const register = useCallback(async (credentials: { email: string; password: string; name?: string }) => {
         setLoading(true);
         clearError();
 
         try {
-            const { data, error: authError } = await authService.signUp(credentials);
+            const { data, error: authError } = await authClient.signUp.email({
+                email: credentials.email,
+                password: credentials.password,
+                name: credentials.name || credentials.email.split('@')[0],
+            });
 
             if (authError) {
                 setError(authError);
@@ -88,7 +92,11 @@ export const useAuth = () => {
     const forgotPassword = useCallback(async (email: string) => {
         setLoading(true);
         try {
-            const { error: authError } = await authService.requestPasswordReset(email);
+            // @ts-ignore - forgetPassword exist at runtime
+            const { error: authError } = await (authClient as any).forgetPassword({
+                email,
+                redirectTo: `${window.location.origin}/#/reset-password`,
+            });
             if (authError) throw authError;
 
             addToast({
@@ -97,10 +105,9 @@ export const useAuth = () => {
                 message: 'As instruções de recuperação foram enviadas para seu e-mail.',
             });
             return { success: true };
-        } catch (err: unknown) {
-            const authError = err as { message: string; code?: string };
-            setError({ message: authError.message || 'Erro inesperado', code: authError.code });
-            return { success: false, error: authError };
+        } catch (err: any) {
+            setError({ message: err.message || 'Erro inesperado', code: err.code });
+            return { success: false, error: err };
         } finally {
             setLoading(false);
         }
@@ -109,10 +116,14 @@ export const useAuth = () => {
     /**
      * Redefinição de senha
      */
-    const resetPassword = useCallback(async (data: ResetPasswordData) => {
+    const resetPassword = useCallback(async (data: { newPassword: string; token: string }) => {
         setLoading(true);
         try {
-            const { error: authError } = await authService.resetPassword(data);
+            // @ts-ignore - resetPassword exist at runtime
+            const { error: authError } = await (authClient as any).resetPassword({
+                newPassword: data.newPassword,
+                token: data.token
+            });
             if (authError) throw authError;
 
             addToast({
@@ -121,10 +132,9 @@ export const useAuth = () => {
                 message: 'Sua senha foi redefinida com sucesso!',
             });
             return { success: true };
-        } catch (err: unknown) {
-            const authError = err as { message: string; code?: string };
-            setError({ message: authError.message || 'Erro inesperado', code: authError.code });
-            return { success: false, error: authError };
+        } catch (err: any) {
+            setError({ message: err.message || 'Erro inesperado', code: err.code });
+            return { success: false, error: err };
         } finally {
             setLoading(false);
         }

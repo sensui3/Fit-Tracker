@@ -32,8 +32,7 @@ const emailSchema = z.string()
 const nameSchema = z.string()
     .min(2, 'O nome deve ter pelo menos 2 caracteres')
     .max(60, 'O nome é muito longo')
-    .transform(sanitize)
-    .trim();
+    .transform(val => sanitize(val).trim());
 
 // Esquemas específicos
 export const loginSchema = z.object({
@@ -58,6 +57,18 @@ export const profileUpdateSchema = z.object({
 
 export const forgotPasswordSchema = z.object({
     email: emailSchema,
+});
+
+export const profileSchema = profileUpdateSchema;
+
+// Workout schema for tests
+export const workoutSchema = z.object({
+    exerciseName: z.string().min(1, 'Nome do exercício é obrigatório'),
+    sets: z.array(z.object({
+        reps: z.number().int().positive('Repetições devem ser positivas'),
+        weight: z.number().positive('Peso deve ser positivo'),
+    })).min(1, 'Pelo menos um set é necessário'),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de data inválido'),
 });
 
 /**
@@ -127,3 +138,6 @@ export const getCsrfToken = () => {
     // Em uma aplicação real, isso viria de um cookie ou meta tag
     return (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content;
 };
+
+// Aliases for tests
+export const scrubData = scrub;

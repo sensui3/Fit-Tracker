@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+/// <reference types="vitest" />
 import Layout from './Layout';
 import { MemoryRouter } from 'react-router-dom';
 import { useUIStore } from '../stores/useUIStore';
@@ -34,11 +36,11 @@ describe('Layout Component', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        (useUIStore as vi.Mock).mockReturnValue({
+        (useUIStore as any).mockReturnValue({
             theme: Theme.Dark,
             setTheme: mockSetTheme,
         });
-        (useTimerStore as vi.Mock).mockReturnValue({
+        (useTimerStore as any).mockReturnValue({
             isActive: false,
         });
     });
