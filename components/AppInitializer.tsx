@@ -9,7 +9,8 @@ import { setLogRocketUser } from '../lib/logrocket';
 export const AppInitializer = () => {
     const { setUser, setLoading } = useAuthStore();
     const { theme } = useUIStore();
-    const [session] = useAtom(useSession);
+    const [sessionValue] = useAtom(useSession as any);
+    const session = sessionValue as any;
 
     // Sync Auth
     useEffect(() => {
