@@ -17,7 +17,6 @@
     "@aws-sdk/client-s3": "^3.958.0",
     "@nanostores/query": "^0.3.4",
     "@nanostores/react": "^1.0.0",
-    "@neondatabase/neon-js": "^0.1.0-beta.21",
     "@neondatabase/serverless": "^1.0.2",
     "@tanstack/react-query": "^5.90.16",
     "@types/react-virtualized-auto-sizer": "^1.0.4",
