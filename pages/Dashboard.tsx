@@ -30,27 +30,46 @@ const Dashboard: React.FC = () => {
   const { theme, setTheme } = useUIStore();
   const { user } = useAuthStore();
 
+  const { addToast } = useUIStore();
+
   // Queries otimizadas com React Query (Cache + Validations)
-  const { data: rawStats, isLoading: isLoadingStats } = useQuery({
+  const { data: rawStats, isLoading: isLoadingStats, isError: isErrorStats } = useQuery({
     queryKey: ['dashboard-stats', user?.id],
     queryFn: () => dbService.getDashboardStats(user!.id),
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    retry: 1
   });
 
-  const { data: rawRecentSessions, isLoading: isLoadingSessions } = useQuery({
+  const { data: rawRecentSessions, isLoading: isLoadingSessions, isError: isErrorSessions } = useQuery({
     queryKey: ['dashboard-recent-workouts', user?.id],
     queryFn: () => dbService.getRecentWorkouts(user!.id, 5),
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    retry: 1
   });
 
-  const { data: rawRecords, isLoading: isLoadingRecords } = useQuery({
+  const { data: rawRecords, isLoading: isLoadingRecords, isError: isErrorRecords } = useQuery({
     queryKey: ['dashboard-records', user?.id],
     queryFn: () => dbService.getPersonalRecords(user!.id),
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 60 * 24,
+    refetchOnWindowFocus: false,
+    retry: 1
   });
+
+  React.useEffect(() => {
+    if (isErrorStats || isErrorSessions || isErrorRecords) {
+      addToast({
+        type: 'error',
+        title: 'Erro ao carregar dados',
+        message: 'Houve um problema ao conectar com o servidor. Tente recarregar.',
+        duration: 5000
+      });
+    }
+  }, [isErrorStats, isErrorSessions, isErrorRecords, addToast]);
 
   // Transformação de dados
   const userStats = {

@@ -38,17 +38,27 @@ export const dbService = {
      */
     async query<T = any>(strings: string | TemplateStringsArray, ...params: any[]): Promise<T[]> {
         const sql = getSql();
+        const timeoutMs = 15000; // 15 seconds timeout
+
         try {
-            let result;
-            if (typeof strings === 'string') {
-                // Adaptação para driver mais recente que exige TemplateStringsArray
-                const raw = [strings];
-                (raw as any).raw = [strings];
-                result = await sql(raw as unknown as TemplateStringsArray, ...params);
-            } else {
-                result = await sql(strings, ...params);
-            }
-            return result as unknown as T[];
+            const queryPromise = (async () => {
+                let result;
+                if (typeof strings === 'string') {
+                    // Adaptação para driver mais recente que exige TemplateStringsArray
+                    const raw = [strings];
+                    (raw as any).raw = [strings];
+                    result = await sql(raw as unknown as TemplateStringsArray, ...params);
+                } else {
+                    result = await sql(strings, ...params);
+                }
+                return result as unknown as T[];
+            })();
+
+            const timeoutPromise = new Promise<T[]>((_, reject) => {
+                setTimeout(() => reject(new Error('Database query timed out after 15s')), timeoutMs);
+            });
+
+            return await Promise.race([queryPromise, timeoutPromise]);
         } catch (error) {
             console.error('Database Query Error:', error);
             logDomainError(error as Error, 'database_query', {
