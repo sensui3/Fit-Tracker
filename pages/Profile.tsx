@@ -385,7 +385,7 @@ const Profile: React.FC = () => {
                     value={profileData.gender}
                     onChange={(e) => setProfileData(prev => ({ ...prev, gender: e.target.value }))}
                     disabled={!isEditing}
-                    className="h-12 px-4 bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none disabled:opacity-60 transition-all font-medium appearance-none cursor-pointer"
+                    className="h-12 px-4 text-base bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none disabled:opacity-60 transition-all font-medium appearance-none cursor-pointer"
                   >
                     <option>Masculino</option>
                     <option>Feminino</option>
@@ -471,7 +471,7 @@ const Profile: React.FC = () => {
                   value={profileData.goal}
                   onChange={(e) => setProfileData(prev => ({ ...prev, goal: e.target.value }))}
                   disabled={!isEditing}
-                  className="h-12 px-4 bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
+                  className="h-12 px-4 text-base bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
                 >
                   <option>Perda de Peso / Definição</option>
                   <option>Hipertrofia (Ganho de Massa)</option>
@@ -491,7 +491,7 @@ const Profile: React.FC = () => {
                   value={profileData.activityLevel}
                   onChange={(e) => setProfileData(prev => ({ ...prev, activityLevel: e.target.value }))}
                   disabled={!isEditing}
-                  className="h-12 px-4 bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
+                  className="h-12 px-4 text-base bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
                 >
                   <option>Sedentário</option>
                   <option>Leve (1-2 dias/sem)</option>

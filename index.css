@@ -5,10 +5,39 @@
 @layer base {
   * {
     @apply transition-colors duration-300 ease-in-out;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Utility para áreas seguras */
+  .p-safe {
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+
+  /* Melhora a responsividade do toque em botões e links */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
   }
 }
 
@@ -35,10 +64,13 @@
   background-color: #283928;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
-}
+/* Somente aplicar hover em dispositivos que suportam ponteiro */
+@media (hover: hover) {
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+  }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background-color: #3b543b;
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #3b543b;
+  }
 }
