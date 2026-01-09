@@ -254,67 +254,25 @@ const Notifications: React.FC = () => {
 
         {/* Widget 1: Next Workout */}
         <h3 className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mb-4">Próximo Treino</h3>
-        <div className="bg-slate-50 dark:bg-surface-darker rounded-2xl p-5 mb-8 border border-slate-100 dark:border-transparent">
-          <div className="flex justify-between items-start mb-3">
-            <span className="bg-white dark:bg-surface-dark text-slate-900 dark:text-white text-xs font-bold px-2 py-1 rounded shadow-sm border border-slate-100 dark:border-transparent">
-              Hoje, 18:00
-            </span>
-            <span className="material-symbols-outlined text-slate-400">more_horiz</span>
+        <div className="bg-slate-50 dark:bg-surface-darker rounded-2xl p-6 mb-8 border border-slate-100 dark:border-transparent flex flex-col items-center text-center gap-3">
+          <div className="size-10 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400">
+            <span className="material-symbols-outlined text-xl">event_upcoming</span>
           </div>
-          <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Pernas e Ombros</h4>
-          <p className="text-sm text-slate-500 dark:text-text-secondary mb-4">60 min • Intensidade Alta</p>
-
-          <div className="space-y-2 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="size-2 rounded-full bg-[#16a34a]"></div>
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Agachamento Livre</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="size-2 rounded-full bg-[#16a34a]"></div>
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Leg Press 45°</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="size-2 rounded-full bg-[#16a34a]/40"></div>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">+ 5 exercícios</p>
-            </div>
+          <div>
+            <p className="text-sm font-bold text-slate-900 dark:text-white">Nenhum treino agendado</p>
+            <p className="text-xs text-slate-500 dark:text-text-secondary mt-1">Seus treinos planejados aparecerão aqui.</p>
           </div>
-
-          <button
-            onClick={() => navigate('/create-plan')}
-            className="w-full bg-slate-900 dark:bg-white text-white dark:text-black font-bold py-2.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
-          >
-            Ver Detalhes
-          </button>
         </div>
 
         {/* Widget 2: Active Friends */}
         <h3 className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mb-4">Amigos Ativos</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between group cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="size-10 rounded-full bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCbBBLr7VLAoAsqVdXPGXq8V6BWXtwi1JcJKF5mmo0x_uyBQ40uyWLQdiZumyXif1eM59tfA70h0Aqtvy-XjkUPa5IXTMWfnOcff013OvV05lH_jndWcwYlZFfqJj4bEbrwA-O77YcwfrYzFIico5KcNgKxLsWNNWX3OmhvxCzkl7ZDqsVs-qom1QyUdqdhheP49Tsw6A3-7RVFlW1NT1N8vxVjcGQTb9faYWO3ViKxffgS9cGVjnyHsl0-BuWKNEkh62JvAGzXkjg")' }}></div>
-                <div className="absolute bottom-0 right-0 size-2.5 bg-[#16a34a] border-2 border-white dark:border-surface-dark rounded-full"></div>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-[#16a34a] transition-colors">Carla Dias</p>
-                <p className="text-xs text-slate-500 dark:text-text-secondary">Treinando Costas</p>
-              </div>
-            </div>
-            <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 text-lg group-hover:text-[#16a34a] transition-colors">chat_bubble</span>
+        <div className="bg-slate-50 dark:bg-surface-darker rounded-2xl p-6 border border-slate-100 dark:border-transparent flex flex-col items-center text-center gap-3">
+          <div className="size-10 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400">
+            <span className="material-symbols-outlined text-xl">group</span>
           </div>
-
-          <div className="flex items-center justify-between group cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="size-10 rounded-full bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDbXO0Zx3xBcQ8RNF03yhhX6Y0RYiWoZqQLn4BgCLX1C2tl6sNpxuprOikQF0tZU53hMHLK_hqhQAXtXRdeaSd4sGacJnAafCJ2XliqHvBKNZpcVhypIQLMmxkvMVDxe9MvUfUl1MRg9rOM9l8_T_v2qsnYENS2W9LZdQ8H5CHaSGNEyzIkuf7r_0g9V1A8pDRkfBiZoiJ-D5xi7g_5qmBKcuqT3Bf4SMcoNZTzZfoMhI2XbyvpAjPamFvzz-gy7baNM9lyehOLGaM")' }}></div>
-                <div className="absolute bottom-0 right-0 size-2.5 bg-slate-400 border-2 border-white dark:border-surface-dark rounded-full"></div>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-[#16a34a] transition-colors">Marcos V.</p>
-                <p className="text-xs text-slate-500 dark:text-text-secondary">Visto há 10 min</p>
-              </div>
-            </div>
+          <div>
+            <p className="text-sm font-bold text-slate-900 dark:text-white">Nenhum amigo online</p>
+            <p className="text-xs text-slate-500 dark:text-text-secondary mt-1">Conecte-se com amigos para ver suas atividades.</p>
           </div>
         </div>
       </aside>

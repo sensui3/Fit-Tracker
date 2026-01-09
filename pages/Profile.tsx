@@ -260,64 +260,66 @@ const Profile: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Avatar & Stats */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="flex flex-col items-center text-center relative overflow-hidden shadow-sm pt-12">
+          <Card noPadding className="relative overflow-hidden shadow-sm">
             <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-primary-DEFAULT/20 to-green-600/5 dark:from-primary-neon/20 dark:to-transparent"></div>
 
-            <div className="relative mb-6 group mx-auto">
-              <div className="relative size-40 sm:size-48 flex items-center justify-center">
-                {user?.image ? (
-                  <OptimizedImage
-                    src={user.image}
-                    alt="Profile"
-                    className="h-full w-full rounded-full border-4 border-white dark:border-surface-dark shadow-xl object-cover transition-all duration-300 group-hover:brightness-50"
-                  />
-                ) : (
-                  <div className="h-full w-full rounded-full border-4 border-white dark:border-surface-dark shadow-xl bg-gradient-to-br from-[#16a34a] to-[#15803d] flex items-center justify-center text-white text-5xl font-black">
-                    {profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                )}
-                <button className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="material-symbols-outlined text-4xl">camera_alt</span>
-                    <span className="text-[10px] font-black uppercase tracking-tighter">Alterar Foto</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            <div className="z-10 relative">
-              <h2 className="text-slate-900 dark:text-white text-2xl font-black mb-1">
-                {loading ? 'Carregando...' : (profileData.name || 'Usuário')}
-              </h2>
-              <div className="flex flex-col items-center gap-2 mb-6">
-                <span className="px-3 py-1 rounded-full bg-primary-DEFAULT/10 text-primary-DEFAULT dark:text-primary-neon text-[10px] font-black uppercase tracking-widest">
-                  Plano Free
-                </span>
-                <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-                  Membro desde {profileData.createdAt ? new Date(profileData.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : '--'}
-                </span>
-              </div>
-            </div>
-
-            <p className="text-slate-600 dark:text-slate-400 text-sm px-6 mb-8 italic leading-relaxed">
-              {profileData.bio ? `"${profileData.bio}"` : '"Pronto para esmagar mais um treino!"'}
-            </p>
-
-            <div className="grid grid-cols-1 gap-3 w-full border-t border-border-light dark:border-border-dark pt-6 px-6 pb-6 mt-2">
-              {stats.map((stat) => (
-                <div key={stat.label} className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-between gap-4 border border-slate-100 dark:border-white/5 hover:border-primary-DEFAULT/20 transition-all cursor-default group">
-                  <div className="flex items-center gap-4">
-                    <div className={`size-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                      <span className={`material-symbols-outlined ${stat.color} text-2xl`}>{stat.icon}</span>
+            <div className="flex flex-col items-center p-6 md:p-8 pt-12 relative z-10 w-full text-center">
+              <div className="relative mb-6 group">
+                <div className="relative size-40 sm:size-48 flex items-center justify-center">
+                  {user?.image ? (
+                    <OptimizedImage
+                      src={user.image}
+                      alt="Profile"
+                      className="h-full w-full rounded-full border-4 border-white dark:border-surface-dark shadow-xl object-cover transition-all duration-300 group-hover:brightness-50"
+                    />
+                  ) : (
+                    <div className="h-full w-full rounded-full border-4 border-white dark:border-surface-dark shadow-xl bg-gradient-to-br from-[#16a34a] to-[#15803d] flex items-center justify-center text-white text-5xl font-black">
+                      {profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U'}
                     </div>
-                    <div className="flex flex-col items-start leading-tight">
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-widest mb-0.5">{stat.label}</span>
-                      <span className="text-lg font-bold text-slate-900 dark:text-white">{stat.value}</span>
+                  )}
+                  <button className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="material-symbols-outlined text-4xl">camera_alt</span>
+                      <span className="text-[10px] font-black uppercase tracking-tighter">Alterar Foto</span>
                     </div>
-                  </div>
-                  <span className="material-symbols-outlined text-slate-300 dark:text-white/10 text-xl group-hover:text-primary-DEFAULT transition-colors">chevron_right</span>
+                  </button>
                 </div>
-              ))}
+              </div>
+
+              <div className="z-10 relative">
+                <h2 className="text-slate-900 dark:text-white text-2xl font-black mb-1">
+                  {loading ? 'Carregando...' : (profileData.name || 'Usuário')}
+                </h2>
+                <div className="flex flex-col items-center gap-2 mb-6">
+                  <span className="px-3 py-1 rounded-full bg-primary-DEFAULT/10 text-primary-DEFAULT dark:text-primary-neon text-[10px] font-black uppercase tracking-widest">
+                    Plano Free
+                  </span>
+                  <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                    Membro desde {profileData.createdAt ? new Date(profileData.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : '--'}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-slate-600 dark:text-slate-400 text-sm px-6 mb-8 italic leading-relaxed">
+                {profileData.bio ? `"${profileData.bio}"` : '"Pronto para esmagar mais um treino!"'}
+              </p>
+
+              <div className="grid grid-cols-1 gap-3 w-full border-t border-border-light dark:border-border-dark pt-6 px-6 pb-6 mt-2">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-between gap-4 border border-slate-100 dark:border-white/5 hover:border-primary-DEFAULT/20 transition-all cursor-default group">
+                    <div className="flex items-center gap-4">
+                      <div className={`size-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                        <span className={`material-symbols-outlined ${stat.color} text-2xl`}>{stat.icon}</span>
+                      </div>
+                      <div className="flex flex-col items-start leading-tight">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-widest mb-0.5">{stat.label}</span>
+                        <span className="text-lg font-bold text-slate-900 dark:text-white">{stat.value}</span>
+                      </div>
+                    </div>
+                    <span className="material-symbols-outlined text-slate-300 dark:text-white/10 text-xl group-hover:text-primary-DEFAULT transition-colors">chevron_right</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </Card>
 
@@ -383,7 +385,7 @@ const Profile: React.FC = () => {
                     value={profileData.gender}
                     onChange={(e) => setProfileData(prev => ({ ...prev, gender: e.target.value }))}
                     disabled={!isEditing}
-                    className="h-12 px-4 bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none disabled:opacity-60 transition-all font-medium appearance-none cursor-pointer"
+                    className="h-12 px-4 text-base bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none disabled:opacity-60 transition-all font-medium appearance-none cursor-pointer"
                   >
                     <option>Masculino</option>
                     <option>Feminino</option>
@@ -469,7 +471,7 @@ const Profile: React.FC = () => {
                   value={profileData.goal}
                   onChange={(e) => setProfileData(prev => ({ ...prev, goal: e.target.value }))}
                   disabled={!isEditing}
-                  className="h-12 px-4 bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
+                  className="h-12 px-4 text-base bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
                 >
                   <option>Perda de Peso / Definição</option>
                   <option>Hipertrofia (Ganho de Massa)</option>
@@ -489,7 +491,7 @@ const Profile: React.FC = () => {
                   value={profileData.activityLevel}
                   onChange={(e) => setProfileData(prev => ({ ...prev, activityLevel: e.target.value }))}
                   disabled={!isEditing}
-                  className="h-12 px-4 bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
+                  className="h-12 px-4 text-base bg-white dark:bg-background-dark border border-slate-200 dark:border-border-dark rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#16a34a]/50 focus:border-[#16a34a] outline-none transition-all font-medium appearance-none cursor-pointer"
                 >
                   <option>Sedentário</option>
                   <option>Leve (1-2 dias/sem)</option>

@@ -38,15 +38,21 @@ export const dateToIso = (dateStr: string): string | null => {
 export const isoToDate = (isoStr: string): string => {
     if (!isoStr) return '';
     try {
-        const date = new Date(isoStr);
+        // Normaliza a string para ajudar o Safari
+        // Substitui espaço por T caso venha do Postgres como "YYYY-MM-DD HH:mm:ss"
+        const normalizedStr = isoStr.includes(' ') ? isoStr.replace(' ', 'T') : isoStr;
+
+        const date = new Date(normalizedStr);
+
         if (isNaN(date.getTime())) {
-            // Se falhar o parse direto (ex: string ISO parcial), tenta split
-            const parts = isoStr.split('T')[0].split('-');
-            if (parts.length === 3) {
-                return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+            // Fallback manual robusto para Safari/iOS
+            const match = isoStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (match) {
+                return `${match[3]}/${match[2]}/${match[1]}`;
             }
             return '';
         }
+
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const year = date.getFullYear();

@@ -56,7 +56,7 @@ const ResetPassword: React.FC = () => {
     };
 
     return (
-        <main className="flex min-h-screen w-full bg-background-light dark:bg-background-dark text-slate-900 dark:text-white">
+        <main className="flex min-h-screen min-h-[100dvh] w-full bg-background-light dark:bg-background-dark text-slate-900 dark:text-white">
             <section className="flex-1 flex flex-col justify-center items-center px-8 py-12 bg-white dark:bg-[#0f140f]">
                 <div className="max-w-[420px] w-full flex flex-col gap-8">
                     <div className="flex flex-col gap-3">

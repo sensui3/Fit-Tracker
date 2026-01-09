@@ -13,13 +13,19 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuthStore();
 
+  type NavItem = {
+    icon: string;
+    label: string;
+    path: string;
+  };
+
 
   const handleLogout = async () => {
     await logout();
     if (onItemClick) onItemClick();
   };
 
-  const navItems = [
+  const navItems: NavItem[] = [
     { icon: 'dashboard', label: 'Painel', path: '/' },
     { icon: 'fitness_center', label: 'Treinos', path: '/workouts' },
     { icon: 'flag', label: 'Metas', path: '/goals' },
@@ -28,8 +34,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
     { icon: 'menu_book', label: 'Exercícios', path: '/exercises' },
   ];
 
-  const systemItems = [
-    { icon: 'notifications', label: 'Notificações', path: '/notifications', count: 3 },
+  const systemItems: NavItem[] = [
+    { icon: 'notifications', label: 'Notificações', path: '/notifications' },
     { icon: 'person', label: 'Perfil', path: '/profile' },
     { icon: 'settings', label: 'Configurações', path: '/settings' },
   ];
@@ -38,7 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
     <aside
       role="navigation"
       aria-label="Menu Principal"
-      className={`flex flex-col w-64 h-screen bg-surface-light dark:bg-surface-darker border-r border-border-light dark:border-border-dark shrink-0 transition-colors duration-200 z-20 ${className}`}
+      className={`flex flex-col w-64 h-screen h-[100dvh] bg-surface-light dark:bg-surface-darker border-r border-border-light dark:border-border-dark shrink-0 transition-colors duration-200 z-20 ${className}`}
     >
       {/* Logo */}
       <div className="h-20 flex items-center px-6 gap-3 shrink-0">
@@ -112,17 +118,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
           >
             <span className="material-symbols-outlined" aria-hidden="true">{item.icon}</span>
             <span className="flex-1">{item.label}</span>
-            {item.count && (
-              <span className="bg-[#16a34a] text-[#102210] text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto" aria-label={`${item.count} notificações não lidas`}>
-                {item.count}
-              </span>
-            )}
           </NavLink>
         ))}
       </nav>
 
       {/* User Footer */}
-      <div className="mt-auto p-4 border-t border-border-light dark:border-border-dark">
+      <div className="mt-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-border-light dark:border-border-dark">
         <div className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group overflow-hidden">
           <div
             onClick={() => {

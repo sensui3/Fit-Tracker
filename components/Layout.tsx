@@ -16,7 +16,7 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display selection:bg-primary-DEFAULT dark:selection:bg-primary-neon selection:text-white dark:selection:text-black">
+    <div className="flex h-screen h-[100dvh] w-full overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display selection:bg-primary-DEFAULT dark:selection:bg-primary-neon selection:text-white dark:selection:text-black">
       {/* Desktop Sidebar */}
       <Sidebar className="hidden md:flex" />
 
@@ -35,39 +35,41 @@ const Layout: React.FC = () => {
 
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Mobile Header */}
-        <header className="md:hidden h-16 border-b border-border-light dark:border-border-dark flex items-center justify-between px-4 bg-surface-light dark:bg-background-dark z-30 shrink-0">
-          <div className="flex items-center gap-3">
-            <div onClick={() => navigate('/')} className="size-8 rounded-lg bg-gradient-to-br from-primary-DEFAULT to-green-600 dark:from-primary-neon flex items-center justify-center text-white dark:text-black cursor-pointer transform active:scale-95 transition-transform">
-              <span className="material-symbols-outlined text-lg">fitness_center</span>
+        <header className="md:hidden pt-safe border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-background-dark z-30 shrink-0">
+          <div className="h-16 flex items-center justify-between px-4">
+            <div className="flex items-center gap-3">
+              <div onClick={() => navigate('/')} className="size-8 rounded-lg bg-gradient-to-br from-primary-DEFAULT to-green-600 dark:from-primary-neon flex items-center justify-center text-white dark:text-black cursor-pointer transform active:scale-95 transition-transform">
+                <span className="material-symbols-outlined text-lg">fitness_center</span>
+              </div>
+              <span className="font-bold text-lg tracking-tight select-none">FitTrack</span>
             </div>
-            <span className="font-bold text-lg tracking-tight select-none">FitTrack</span>
-          </div>
 
-          <div className="flex items-center gap-1">
-            <button
-              onClick={handleToggleTheme}
-              className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-primary-DEFAULT transition-colors rounded-xl"
-              aria-label="Alternar tema"
-            >
-              <span className="material-symbols-outlined leading-none block">
-                {theme === Theme.Dark ? 'light_mode' : 'dark_mode'}
-              </span>
-            </button>
-            <button
-              onClick={() => navigate('/notifications')}
-              className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-primary-DEFAULT transition-colors rounded-xl relative"
-              aria-label="Ver notificações"
-            >
-              <span className="material-symbols-outlined leading-none block">notifications</span>
-              <span className="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-surface-light dark:border-background-dark"></span>
-            </button>
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2.5 text-slate-600 dark:text-slate-300 hover:text-primary-DEFAULT transition-colors rounded-xl ml-1"
-              aria-label="Abrir menu"
-            >
-              <span className="material-symbols-outlined leading-none block">menu</span>
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleToggleTheme}
+                className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-primary-DEFAULT transition-colors rounded-xl"
+                aria-label="Alternar tema"
+              >
+                <span className="material-symbols-outlined leading-none block">
+                  {theme === Theme.Dark ? 'light_mode' : 'dark_mode'}
+                </span>
+              </button>
+              <button
+                onClick={() => navigate('/notifications')}
+                className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-primary-DEFAULT transition-colors rounded-xl relative"
+                aria-label="Ver notificações"
+              >
+                <span className="material-symbols-outlined leading-none block">notifications</span>
+                <span className="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-surface-light dark:border-background-dark"></span>
+              </button>
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2.5 text-slate-600 dark:text-slate-300 hover:text-primary-DEFAULT transition-colors rounded-xl ml-1"
+                aria-label="Abrir menu"
+              >
+                <span className="material-symbols-outlined leading-none block">menu</span>
+              </button>
+            </div>
           </div>
         </header>
 

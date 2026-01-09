@@ -39,7 +39,7 @@ export const RestTimer: React.FC<RestTimerProps> = ({ onClose }) => {
     if (!isActive) return null;
 
     return (
-        <div className="fixed bottom-6 left-0 w-full flex justify-center z-40 pointer-events-none px-4">
+        <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-0 w-full flex justify-center z-40 pointer-events-none px-4">
             <div className="pointer-events-auto bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-4 rounded-2xl shadow-2xl flex items-center gap-5 animate-in slide-in-from-bottom-4 duration-300 ring-1 ring-white/10 dark:ring-black/10">
                 <div className="flex items-center gap-3 pr-5 border-r border-white/10 dark:border-black/10">
                     <div className="size-10 rounded-full bg-[#16a34a] flex items-center justify-center animate-pulse">

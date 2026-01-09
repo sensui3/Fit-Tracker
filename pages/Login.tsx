@@ -45,7 +45,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <main className="flex min-h-screen w-full bg-background-light dark:bg-background-dark text-slate-900 dark:text-white">
+    <main className="flex min-h-screen min-h-[100dvh] w-full bg-background-light dark:bg-background-dark text-slate-900 dark:text-white">
       {/* Lado Esquerdo - Imagem e Branding */}
       <div className="hidden lg:flex relative w-1/2 overflow-hidden">
         <img
