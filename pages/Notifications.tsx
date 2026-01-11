@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { dbService } from '../services/databaseService';
 import { Notification } from '../types';
+import { GranularErrorBoundary } from '../components/GranularErrorBoundary';
 
 const Notifications: React.FC = () => {
   const navigate = useNavigate();
@@ -168,113 +169,124 @@ const Notifications: React.FC = () => {
         <div className="p-4 md:p-8 lg:p-10 max-w-5xl mx-auto flex flex-col gap-6">
 
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-2">
-            <div className="flex flex-col gap-2">
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Notificações</h1>
-              <p className="text-slate-500 dark:text-text-secondary text-base md:text-lg">
-                Fique por dentro das suas atividades e novidades da comunidade.
-              </p>
+          <GranularErrorBoundary name="NotificationsHeader">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-2">
+              <div className="flex flex-col gap-2">
+                <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Notificações</h1>
+                <p className="text-slate-500 dark:text-text-secondary text-base md:text-lg">
+                  Fique por dentro das suas atividades e novidades da comunidade.
+                </p>
+              </div>
+              <button
+                onClick={markAllAsRead}
+                className="flex items-center justify-center gap-2 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark hover:bg-slate-50 dark:hover:bg-white/5 text-slate-900 dark:text-white px-5 py-2.5 rounded-xl transition-all shadow-sm font-bold text-sm"
+              >
+                <span className="material-symbols-outlined text-lg">done_all</span>
+                Marcar todas como lidas
+              </button>
             </div>
-            <button
-              onClick={markAllAsRead}
-              className="flex items-center justify-center gap-2 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark hover:bg-slate-50 dark:hover:bg-white/5 text-slate-900 dark:text-white px-5 py-2.5 rounded-xl transition-all shadow-sm font-bold text-sm"
-            >
-              <span className="material-symbols-outlined text-lg">done_all</span>
-              Marcar todas como lidas
-            </button>
-          </div>
+          </GranularErrorBoundary>
 
           {/* Tabs */}
-          <div className="border-b border-slate-200 dark:border-border-dark">
-            <div className="flex gap-8 overflow-x-auto no-scrollbar">
-              {['todas', 'menções', 'sistema', 'amigos'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex flex-col items-center justify-center pb-3 pt-2 min-w-[60px] relative capitalize text-sm font-bold tracking-wide transition-colors ${activeTab === tab
-                    ? 'text-slate-900 dark:text-white'
-                    : 'text-slate-500 dark:text-text-secondary hover:text-slate-700 dark:hover:text-gray-300'
-                    }`}
-                >
-                  {tab}
-                  {activeTab === tab && (
-                    <span className="absolute bottom-0 w-full h-[3px] bg-[#16a34a] rounded-t-full"></span>
-                  )}
-                </button>
-              ))}
+          <GranularErrorBoundary name="NotificationsTabs">
+            <div className="border-b border-slate-200 dark:border-border-dark">
+              <div className="flex gap-8 overflow-x-auto no-scrollbar">
+                {['todas', 'menções', 'sistema', 'amigos'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex flex-col items-center justify-center pb-3 pt-2 min-w-[60px] relative capitalize text-sm font-bold tracking-wide transition-colors ${activeTab === tab
+                      ? 'text-slate-900 dark:text-white'
+                      : 'text-slate-500 dark:text-text-secondary hover:text-slate-700 dark:hover:text-gray-300'
+                      }`}
+                  >
+                    {tab}
+                    {activeTab === tab && (
+                      <span className="absolute bottom-0 w-full h-[3px] bg-[#16a34a] rounded-t-full"></span>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          </GranularErrorBoundary>
 
           {/* Notifications List */}
-          <div className="flex flex-col gap-4 pb-20">
+          <GranularErrorBoundary name="NotificationsList">
+            <div className="flex flex-col gap-4 pb-20">
 
-            {loading ? (
-              <div className="flex justify-center py-10">
-                <div className="size-10 border-4 border-primary-DEFAULT border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : notifications.length === 0 ? (
-              // Empty State
-              <div className="mt-8 mb-10 flex flex-col items-center justify-center text-center opacity-50">
-                <div className="bg-slate-200 dark:bg-white/10 rounded-full p-4 mb-3">
-                  <span className="material-symbols-outlined text-4xl text-slate-400 dark:text-slate-500">notifications_off</span>
+              {loading ? (
+                <div className="flex justify-center py-10">
+                  <div className="size-10 border-4 border-primary-DEFAULT border-t-transparent rounded-full animate-spin"></div>
                 </div>
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Nenhuma notificação por enquanto</p>
-              </div>
-            ) : (
-              <>
-                {todayNotifications.length > 0 && (
-                  <>
-                    <p className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mt-2 pl-1">Hoje</p>
-                    {todayNotifications.map(n => <NotificationItem key={n.id} notification={n} />)}
-                  </>
-                )}
+              ) : notifications.length === 0 ? (
+                // Empty State
+                <div className="mt-8 mb-10 flex flex-col items-center justify-center text-center opacity-50">
+                  <div className="bg-slate-200 dark:bg-white/10 rounded-full p-4 mb-3">
+                    <span className="material-symbols-outlined text-4xl text-slate-400 dark:text-slate-500">notifications_off</span>
+                  </div>
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Nenhuma notificação por enquanto</p>
+                </div>
+              ) : (
+                <>
+                  {todayNotifications.length > 0 && (
+                    <>
+                      <p className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mt-2 pl-1">Hoje</p>
+                      {todayNotifications.map(n => <NotificationItem key={n.id} notification={n} />)}
+                    </>
+                  )}
 
-                {yesterdayNotifications.length > 0 && (
-                  <>
-                    <p className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mt-6 pl-1">Ontem</p>
-                    {yesterdayNotifications.map(n => <NotificationItem key={n.id} notification={n} />)}
-                  </>
-                )}
+                  {yesterdayNotifications.length > 0 && (
+                    <>
+                      <p className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mt-6 pl-1">Ontem</p>
+                      {yesterdayNotifications.map(n => <NotificationItem key={n.id} notification={n} />)}
+                    </>
+                  )}
 
-                {olderNotifications.length > 0 && (
-                  <>
-                    <p className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mt-6 pl-1">Antigas</p>
-                    {olderNotifications.map(n => <NotificationItem key={n.id} notification={n} />)}
-                  </>
-                )}
-              </>
-            )}
+                  {olderNotifications.length > 0 && (
+                    <>
+                      <p className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mt-6 pl-1">Antigas</p>
+                      {olderNotifications.map(n => <NotificationItem key={n.id} notification={n} />)}
+                    </>
+                  )}
+                </>
+              )}
 
-          </div>
+            </div>
+          </GranularErrorBoundary>
         </div>
       </div>
 
       {/* Right Sidebar Widget (Desktop Only) */}
       <aside className="hidden xl:flex flex-col w-80 bg-white dark:bg-surface-dark border-l border-slate-200 dark:border-border-dark h-full shrink-0 p-6 overflow-y-auto">
+        <GranularErrorBoundary name="NotificationsSidebar">
+          <div className="flex flex-col gap-8">
+            <div>
+              {/* Widget 1: Next Workout */}
+              <h3 className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mb-4">Próximo Treino</h3>
+              <div className="bg-slate-50 dark:bg-surface-darker rounded-2xl p-6 mb-8 border border-slate-100 dark:border-transparent flex flex-col items-center text-center gap-3">
+                <div className="size-10 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400">
+                  <span className="material-symbols-outlined text-xl">event_upcoming</span>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">Nenhum treino agendado</p>
+                  <p className="text-xs text-slate-500 dark:text-text-secondary mt-1">Seus treinos planejados aparecerão aqui.</p>
+                </div>
+              </div>
 
-        {/* Widget 1: Next Workout */}
-        <h3 className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mb-4">Próximo Treino</h3>
-        <div className="bg-slate-50 dark:bg-surface-darker rounded-2xl p-6 mb-8 border border-slate-100 dark:border-transparent flex flex-col items-center text-center gap-3">
-          <div className="size-10 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400">
-            <span className="material-symbols-outlined text-xl">event_upcoming</span>
+              {/* Widget 2: Active Friends */}
+              <h3 className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mb-4">Amigos Ativos</h3>
+              <div className="bg-slate-50 dark:bg-surface-darker rounded-2xl p-6 border border-slate-100 dark:border-transparent flex flex-col items-center text-center gap-3">
+                <div className="size-10 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400">
+                  <span className="material-symbols-outlined text-xl">group</span>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">Nenhum amigo online</p>
+                  <p className="text-xs text-slate-500 dark:text-text-secondary mt-1">Conecte-se com amigos para ver suas atividades.</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-bold text-slate-900 dark:text-white">Nenhum treino agendado</p>
-            <p className="text-xs text-slate-500 dark:text-text-secondary mt-1">Seus treinos planejados aparecerão aqui.</p>
-          </div>
-        </div>
-
-        {/* Widget 2: Active Friends */}
-        <h3 className="text-xs font-bold text-slate-500 dark:text-text-secondary uppercase tracking-wider mb-4">Amigos Ativos</h3>
-        <div className="bg-slate-50 dark:bg-surface-darker rounded-2xl p-6 border border-slate-100 dark:border-transparent flex flex-col items-center text-center gap-3">
-          <div className="size-10 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400">
-            <span className="material-symbols-outlined text-xl">group</span>
-          </div>
-          <div>
-            <p className="text-sm font-bold text-slate-900 dark:text-white">Nenhum amigo online</p>
-            <p className="text-xs text-slate-500 dark:text-text-secondary mt-1">Conecte-se com amigos para ver suas atividades.</p>
-          </div>
-        </div>
+        </GranularErrorBoundary>
       </aside>
     </div>
   );

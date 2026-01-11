@@ -8,6 +8,7 @@ import { useUIStore } from '../stores/useUIStore';
 import { useAuthStore } from '../stores/useAuthStore';
 import { Theme } from '../types';
 import { dbService } from '../services/databaseService';
+import { GranularErrorBoundary } from '../components/GranularErrorBoundary';
 
 // Lazy load heavy chart component
 const WorkoutVolumeChart = lazy(() => import('../components/dashboard/WorkoutVolumeChart'));
@@ -107,122 +108,128 @@ const Dashboard: React.FC = () => {
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold dark:text-white">
-            Bem-vindo de volta, {user?.name?.split(' ')[0] || 'Usuário'}! 👋
-          </h1>
-          <div className="text-slate-500 dark:text-slate-400 mt-1">
-            {loading ? (
-              <Skeleton className="h-4 w-64 mt-2" />
-            ) : userStats.totalWorkouts > 0 ? (
-              `Você realizou ${userStats.totalWorkouts} treinos. Continue assim!`
-            ) : (
-              'Comece seus treinos e veja suas estatísticas aqui.'
-            )}
+      <GranularErrorBoundary name="DashboardHeader">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold dark:text-white">
+              Bem-vindo de volta, {user?.name?.split(' ')[0] || 'Usuário'}! 👋
+            </h1>
+            <div className="text-slate-500 dark:text-slate-400 mt-1">
+              {loading ? (
+                <Skeleton className="h-4 w-64 mt-2" />
+              ) : userStats.totalWorkouts > 0 ? (
+                `Você realizou ${userStats.totalWorkouts} treinos. Continue assim!`
+              ) : (
+                'Comece seus treinos e veja suas estatísticas aqui.'
+              )}
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-[#16a34a] dark:hover:text-[#13ec13] transition-all duration-300 border border-transparent hover:border-primary-DEFAULT/20"
+              title={theme === Theme.Dark ? 'Mudar para modo claro' : 'Mudar para modo escuro'}
+            >
+              <span className="material-symbols-outlined text-2xl">
+                {theme === Theme.Dark ? 'light_mode' : 'dark_mode'}
+              </span>
+            </button>
+            <button
+              onClick={() => navigate('/notifications')}
+              className="relative p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-[#16a34a] dark:hover:text-[#13ec13] transition-all duration-300 border border-transparent hover:border-primary-DEFAULT/20"
+            >
+              <span className="material-symbols-outlined text-2xl">notifications</span>
+              <span className="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+            </button>
           </div>
         </div>
-        <div className="hidden md:flex items-center gap-4">
-          <button
-            onClick={toggleTheme}
-            className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-[#16a34a] dark:hover:text-[#13ec13] transition-all duration-300 border border-transparent hover:border-primary-DEFAULT/20"
-            title={theme === Theme.Dark ? 'Mudar para modo claro' : 'Mudar para modo escuro'}
-          >
-            <span className="material-symbols-outlined text-2xl">
-              {theme === Theme.Dark ? 'light_mode' : 'dark_mode'}
-            </span>
-          </button>
-          <button
-            onClick={() => navigate('/notifications')}
-            className="relative p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-[#16a34a] dark:hover:text-[#13ec13] transition-all duration-300 border border-transparent hover:border-primary-DEFAULT/20"
-          >
-            <span className="material-symbols-outlined text-2xl">notifications</span>
-            <span className="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
-          </button>
-        </div>
-      </div>
+      </GranularErrorBoundary>
 
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-[#162e16] border border-white/5 p-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 size-64 bg-[#13ec13]/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="relative z-10">
-          <h3 className="text-2xl font-bold text-white mb-2">Continue focado!</h3>
-          <p className="text-slate-400 max-w-lg">Seus resultados começarão a aparecer conforme você registra seus treinos semanalmente.</p>
+      <GranularErrorBoundary name="DashboardBanner">
+        <div className="relative overflow-hidden rounded-2xl bg-[#162e16] border border-white/5 p-8">
+          <div className="absolute top-0 right-0 -mt-10 -mr-10 size-64 bg-[#13ec13]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="relative z-10">
+            <h3 className="text-2xl font-bold text-white mb-2">Continue focado!</h3>
+            <p className="text-slate-400 max-w-lg">Seus resultados começarão a aparecer conforme você registra seus treinos semanalmente.</p>
+          </div>
         </div>
-      </div>
+      </GranularErrorBoundary>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="flex flex-col border border-border-light dark:border-border-dark">
-          <div className="flex items-start justify-between mb-4">
-            <div className="p-3 rounded-lg bg-blue-500/10 text-blue-500">
-              <span className="material-symbols-outlined">timer</span>
+      <GranularErrorBoundary name="DashboardStats">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="flex flex-col border border-border-light dark:border-border-dark">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-lg bg-blue-500/10 text-blue-500">
+                <span className="material-symbols-outlined">timer</span>
+              </div>
             </div>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Tempo Médio</p>
-          {loading ? (
-            <Skeleton className="h-8 w-32 mt-1" />
-          ) : (
-            <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-              {userStats.avgSessionTime > 0
-                ? `${Math.floor(userStats.avgSessionTime / 60)}h ${userStats.avgSessionTime % 60}m`
-                : '--'
-              }
-            </h4>
-          )}
-        </Card>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Tempo Médio</p>
+            {loading ? (
+              <Skeleton className="h-8 w-32 mt-1" />
+            ) : (
+              <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                {userStats.avgSessionTime > 0
+                  ? `${Math.floor(userStats.avgSessionTime / 60)}h ${userStats.avgSessionTime % 60}m`
+                  : '--'
+                }
+              </h4>
+            )}
+          </Card>
 
-        <Card className="flex flex-col border border-border-light dark:border-border-dark">
-          <div className="flex items-start justify-between mb-4">
-            <div className="p-3 rounded-lg bg-orange-500/10 text-orange-500">
-              <span className="material-symbols-outlined">directions_run</span>
+          <Card className="flex flex-col border border-border-light dark:border-border-dark">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-lg bg-orange-500/10 text-orange-500">
+                <span className="material-symbols-outlined">directions_run</span>
+              </div>
             </div>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Total de Treinos</p>
-          {loading ? (
-            <Skeleton className="h-8 w-24 mt-1" />
-          ) : (
-            <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-              {userStats.totalWorkouts}
-            </h4>
-          )}
-        </Card>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Total de Treinos</p>
+            {loading ? (
+              <Skeleton className="h-8 w-24 mt-1" />
+            ) : (
+              <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                {userStats.totalWorkouts}
+              </h4>
+            )}
+          </Card>
 
-        <Card className="flex flex-col border border-border-light dark:border-border-dark">
-          <div className="flex items-start justify-between mb-4">
-            <div className="p-3 rounded-lg bg-[#16a34a]/10 text-[#16a34a] dark:text-[#13ec13]">
-              <span className="material-symbols-outlined">fitness_center</span>
+          <Card className="flex flex-col border border-border-light dark:border-border-dark">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-lg bg-[#16a34a]/10 text-[#16a34a] dark:text-[#13ec13]">
+                <span className="material-symbols-outlined">fitness_center</span>
+              </div>
             </div>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Volume Total</p>
-          {loading ? (
-            <Skeleton className="h-8 w-40 mt-1" />
-          ) : (
-            <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-              {userStats.totalVolume > 0 ? `${userStats.totalVolume.toLocaleString()} kg` : '--'}
-            </h4>
-          )}
-        </Card>
-      </div>
-
-      {/* Chart & Records Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 !p-0 shadow-sm overflow-hidden flex flex-col border border-border-light dark:border-border-dark">
-          <div className="p-6 border-b border-border-light dark:border-border-dark">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Volume de Treino</h3>
-            <div className="flex items-baseline gap-2 mt-1">
-              <p className="text-[#16a34a] dark:text-[#13ec13] text-2xl font-bold">
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Volume Total</p>
+            {loading ? (
+              <Skeleton className="h-8 w-40 mt-1" />
+            ) : (
+              <h4 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
                 {userStats.totalVolume > 0 ? `${userStats.totalVolume.toLocaleString()} kg` : '--'}
-              </p>
-              <p className="text-slate-500 text-sm">Volume total registrado</p>
+              </h4>
+            )}
+          </Card>
+        </div>
+      </GranularErrorBoundary>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <GranularErrorBoundary name="DashboardVolumeChart">
+          <Card className="lg:col-span-2 !p-0 shadow-sm overflow-hidden flex flex-col border border-border-light dark:border-border-dark">
+            <div className="p-6 border-b border-border-light dark:border-border-dark">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Volume de Treino</h3>
+              <div className="flex items-baseline gap-2 mt-1">
+                <p className="text-[#16a34a] dark:text-[#13ec13] text-2xl font-bold">
+                  {userStats.totalVolume > 0 ? `${userStats.totalVolume.toLocaleString()} kg` : '--'}
+                </p>
+                <p className="text-slate-500 text-sm">Volume total registrado</p>
+              </div>
             </div>
-          </div>
-          <div className="h-[250px] w-full mt-4 min-w-0 px-4">
-            <Suspense fallback={<Skeleton className="w-full h-full" />}>
-              <WorkoutVolumeChart />
-            </Suspense>
-          </div>
-        </Card>
+            <div className="h-[250px] w-full mt-4 min-w-0 px-4">
+              <Suspense fallback={<Skeleton className="w-full h-full" />}>
+                <WorkoutVolumeChart />
+              </Suspense>
+            </div>
+          </Card>
+        </GranularErrorBoundary>
 
         <div className="flex flex-col gap-4">
           <Card
@@ -243,91 +250,94 @@ const Dashboard: React.FC = () => {
             </Button>
           </Card>
 
-          <Card className="flex-1 shadow-sm border border-border-light dark:border-border-dark">
-            <h3 className="text-slate-900 dark:text-white text-base font-bold mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#16a34a] dark:text-[#13ec13] text-xl">emoji_events</span>
-              Recordes Pessoais
-            </h3>
-            <div className="flex flex-col gap-3">
-              {loading ? (
-                <>
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-6 w-full" />
-                </>
-              ) : personalRecords.length > 0 ? (
-                personalRecords.map((record, i, arr) => (
-                  <div key={record.label} className={`flex items-center justify-between ${i !== arr.length - 1 ? 'border-b border-border-light dark:border-border-dark pb-2' : ''}`}>
-                    <span className="text-slate-500 dark:text-slate-400 text-sm">{record.label}</span>
-                    <span className="text-slate-900 dark:text-white font-bold text-sm">{record.value}</span>
+          <GranularErrorBoundary name="DashboardPersonalRecords">
+            <Card className="flex-1 shadow-sm border border-border-light dark:border-border-dark">
+              <h3 className="text-slate-900 dark:text-white text-base font-bold mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#16a34a] dark:text-[#13ec13] text-xl">emoji_events</span>
+                Recordes Pessoais
+              </h3>
+              <div className="flex flex-col gap-3">
+                {loading ? (
+                  <>
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-full" />
+                  </>
+                ) : personalRecords.length > 0 ? (
+                  personalRecords.map((record, i, arr) => (
+                    <div key={record.label} className={`flex items-center justify-between ${i !== arr.length - 1 ? 'border-b border-border-light dark:border-border-dark pb-2' : ''}`}>
+                      <span className="text-slate-500 dark:text-slate-400 text-sm">{record.label}</span>
+                      <span className="text-slate-900 dark:text-white font-bold text-sm">{record.value}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                    <span className="material-symbols-outlined text-4xl mb-2 block">emoji_events</span>
+                    <p className="text-sm">Comece seus treinos para ver seus recordes aqui!</p>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-                  <span className="material-symbols-outlined text-4xl mb-2 block">emoji_events</span>
-                  <p className="text-sm">Comece seus treinos para ver seus recordes aqui!</p>
-                </div>
-              )}
-            </div>
-          </Card>
+                )}
+              </div>
+            </Card>
+          </GranularErrorBoundary>
         </div>
       </div>
 
-      {/* Workout History Section */}
-      <Card className="!p-0 shadow-sm overflow-hidden border border-border-light dark:border-border-dark">
-        <div className="px-6 py-4 border-b border-border-light dark:border-border-dark flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#16a34a] dark:text-[#13ec13]">history</span>
-            <h4 className="font-bold text-slate-900 dark:text-white">Histórico de Treinos</h4>
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/workouts')} className="text-[#16a34a] dark:text-[#13ec13]">
-            Ver todos
-          </Button>
-        </div>
-        <div className="divide-y divide-border-light dark:divide-border-dark text-slate-900 dark:text-white">
-          {loading ? (
-            <div className="p-6 space-y-4">
-              <Skeleton className="h-16 w-full rounded-xl" />
-              <Skeleton className="h-16 w-full rounded-xl" />
-              <Skeleton className="h-16 w-full rounded-xl" />
+      <GranularErrorBoundary name="DashboardWorkoutHistory">
+        <Card className="!p-0 shadow-sm overflow-hidden border border-border-light dark:border-border-dark">
+          <div className="px-6 py-4 border-b border-border-light dark:border-border-dark flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#16a34a] dark:text-[#13ec13]">history</span>
+              <h4 className="font-bold text-slate-900 dark:text-white">Histórico de Treinos</h4>
             </div>
-          ) : recentSessions.length > 0 ? (
-            recentSessions.map((session) => (
-              <div
-                key={session.id}
-                onClick={() => navigate('/log-workout')}
-                className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`size-10 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform ${session.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400' :
-                    session.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' :
-                      'bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400'
-                    }`}>
-                    <span className="material-symbols-outlined">{session.icon}</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white">{session.title}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{session.time}</p>
-                      <span className="text-[10px] bg-slate-100 dark:bg-white/10 px-1.5 rounded text-slate-500 dark:text-slate-400">{session.tag}</span>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/workouts')} className="text-[#16a34a] dark:text-[#13ec13]">
+              Ver todos
+            </Button>
+          </div>
+          <div className="divide-y divide-border-light dark:divide-border-dark text-slate-900 dark:text-white">
+            {loading ? (
+              <div className="p-6 space-y-4">
+                <Skeleton className="h-16 w-full rounded-xl" />
+                <Skeleton className="h-16 w-full rounded-xl" />
+                <Skeleton className="h-16 w-full rounded-xl" />
+              </div>
+            ) : recentSessions.length > 0 ? (
+              recentSessions.map((session) => (
+                <div
+                  key={session.id}
+                  onClick={() => navigate('/log-workout')}
+                  className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`size-10 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform ${session.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400' :
+                      session.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' :
+                        'bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400'
+                      }`}>
+                      <span className="material-symbols-outlined">{session.icon}</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900 dark:text-white">{session.title}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{session.time}</p>
+                        <span className="text-[10px] bg-slate-100 dark:bg-white/10 px-1.5 rounded text-slate-500 dark:text-slate-400">{session.tag}</span>
+                      </div>
                     </div>
                   </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">{session.duration}</span>
+                    <span className="text-xs text-slate-400">{session.value}</span>
+                  </div>
                 </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-sm font-bold text-slate-900 dark:text-white">{session.duration}</span>
-                  <span className="text-xs text-slate-400">{session.value}</span>
-                </div>
+              ))
+            ) : (
+              <div className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
+                <span className="material-symbols-outlined text-4xl mb-2 block">history</span>
+                <p className="text-sm">Nenhum treino registrado ainda.</p>
+                <p className="text-xs mt-1">Comece seu primeiro treino para ver o histórico aqui!</p>
               </div>
-            ))
-          ) : (
-            <div className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
-              <span className="material-symbols-outlined text-4xl mb-2 block">history</span>
-              <p className="text-sm">Nenhum treino registrado ainda.</p>
-              <p className="text-xs mt-1">Comece seu primeiro treino para ver o histórico aqui!</p>
-            </div>
-          )}
-        </div>
-      </Card>
+            )}
+          </div>
+        </Card>
+      </GranularErrorBoundary>
     </div>
   );
 };

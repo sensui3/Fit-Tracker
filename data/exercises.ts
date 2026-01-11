@@ -18,7 +18,7 @@ const RAW_EXERCISES = [
     {
         id: "2",
         name: "Supino Inclinado (Halteres)",
-        muscle: "Peitoral Superior",
+        muscle: "Peitoral",
         equipment: "Halteres",
         difficulty: "Intermediário",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw",
@@ -38,7 +38,7 @@ const RAW_EXERCISES = [
     {
         id: "4",
         name: "Agachamento Livre",
-        muscle: "Pernas (Quadríceps)",
+        muscle: "Pernas",
         equipment: "Barra",
         difficulty: "Avançado",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBbPX5oo2Sb7KSZkMlJVFnDxuzL0TQcmEjzDDPiJhkXDBHjWG1I1VLkTQkVIm1YIxwnYWqi4cinSNXdLeahmltSmzGBBzuKkwYZX3iEqNu6oAgGUMyZCGtjsR-ay0BY4ebLcz9te5pbeCO_9GA_dmhj-OxyHDI7SHaFctMy_owdCWHa47MtlGbD_TKi0Dj6UfUEnQzrQgYTyghhiPQ3kXzhcCpfyAAS26r8a2DUXrQPiu5RpARApxVrsecRq3S3ppyxk_xbJgatiaE",
@@ -61,7 +61,7 @@ const RAW_EXERCISES = [
     {
         id: "6",
         name: "Cadeira Extensora",
-        muscle: "Quadríceps",
+        muscle: "Pernas",
         equipment: "Máquina",
         difficulty: "Iniciante",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAYmC0rPib7YXizNo1HV2gleXNd_QBIIsW63ljv5wGV4DiJTsWtk0CKhIGL6qbylH6tPbCd_OGZcJH8O4KYzmF7fcIAOwFcRlsvgMgXyPG6K6fYQks-2GFXJ4Np0tTU77q7eKx9ie2fO7HO6x9f5gF7-8o6noeaG88dbPB5SJvmHxYicv-FDIWUNRD6FN1ayAn7MDm-iC2FQjM0Mfw40Ky9xpwPVZQep1PiBKHDDuyoEYf60N-kwoWGO9sREBUAqrtL4Jdj43K83Z0",
@@ -71,7 +71,7 @@ const RAW_EXERCISES = [
     {
         id: "7",
         name: "Levantamento Terra",
-        muscle: "Costas / Posterior",
+        muscle: "Costas",
         equipment: "Barra",
         difficulty: "Avançado",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBKGhZmLWyqU8EfDxiNyV2jklL4Jn1r82jF3MXOpVsQzCPzK9LWkI_4x10kuFN5R0-UC8W0duuQ6zbM7h0oBDPjxxunHgzPBNqxdxxAjxQT4OZJshs_krHRXdAH2pk8JgSEWwgZRbQ0nHwh7Nla2b9JyipQZ65JijcsqjPfdZZ05aRIRfZ1XpoEI4WyaZk7KG66f37LMmiERzQSKVCl-FZ10G4-OCCPQS8O1DuZqqOZOGOfoy568zxK4CwNg5vKMRigxaWoDjvuWHw",
@@ -84,7 +84,7 @@ const RAW_EXERCISES = [
     {
         id: "8",
         name: "Puxada Alta",
-        muscle: "Dorsais",
+        muscle: "Costas",
         equipment: "Máquina",
         difficulty: "Iniciante",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBNkF30GhdYWoP3JSVhOIZNjkO4AF8b2UBb-uIwyMboCx09UR7K63FGb6anqGqko9F8gAfHOSGNxznFWUggqFTaQB9_97NZjOJn-rfZ16YvAREJxGnX8Kwp_ubP3rEfsO7lNJaWRfgHdfecN_W36lBcIUBzKAPQ3Ne8wbByoVlCwwSUvldpppIDK5zoW4MDUCWILEE8aHPJCXrcFktNwQzASkAnyQ4FA5b2bfxScPNX1rYPXJY02fqnODJaLHnneubSKE3guLRsxrE",
@@ -114,7 +114,7 @@ const RAW_EXERCISES = [
     {
         id: "11",
         name: "Rosca Martelo",
-        muscle: "Bíceps / Antebraço",
+        muscle: "Bíceps",
         equipment: "Halteres",
         difficulty: "Iniciante",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw",
@@ -154,7 +154,7 @@ const RAW_EXERCISES = [
     {
         id: "15",
         name: "Elevação Lateral",
-        muscle: "Ombros (Lateral)",
+        muscle: "Ombros",
         equipment: "Halteres",
         difficulty: "Iniciante",
         image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBIV2N5qK6TRU5vfzegy7pLo7clecn_QLnF_wdzsheZzPxTjfRig95IXQmXU-LprvExwMB5t90SLIfkuWDbp7lhN-KgRgyoI648JF2_IPOHHxAAqj-EZWcze4W6Ik86JVpKjfp3YM3RLvH8Rcgcgm6ysfCVWh9Y1ij-cCmndtvnPrZZyn0Yur1i-ZtWgxdx2lUAbTnMPJ44ChBWpmkBwyRVa48pJccu0AqZu6riVxT0s_JTiZlndVeS6h74pvL3CI3HIIowoU_XQYw",

@@ -32,6 +32,7 @@ export default defineConfig(({ mode }) => {
           target: process.env.VITE_BETTER_AUTH_URL || 'http://localhost:8788',
           changeOrigin: true,
           secure: false,
+          rewrite: (path) => path.replace(/^\/api\/auth/, '')
         }
       }
     },

@@ -11,6 +11,15 @@ export const auth = betterAuth({
         },
         type: "postgres"
     },
+    secret: (typeof process !== 'undefined' ? (process.env.BETTER_AUTH_SECRET || process.env.VITE_BETTER_AUTH_SECRET) : undefined) ||
+        (import.meta.env ? import.meta.env.VITE_BETTER_AUTH_SECRET : undefined) ||
+        "fallback-secret-for-ci", // Apenas fallback, deve ser pego do ENV
+    // O baseURL é crucial para que os cookies sejam emitidos para o domínio correto.
+    // Em produção (Cloudflare), isso deve ser o URL do site + /api/auth
+    // Tentamos pegar de várias fontes para evitar erros no CI/CD ou em diferentes ambientes
+    baseURL: (typeof process !== 'undefined' ? (process.env.BETTER_AUTH_URL || process.env.VITE_BETTER_AUTH_URL) : undefined) ||
+        (import.meta.env ? import.meta.env.VITE_BETTER_AUTH_URL : undefined) ||
+        "/api/auth",
     // Mapeamento para o Schema SQL que criamos (snake_case e plural)
     user: {
         modelName: "users",

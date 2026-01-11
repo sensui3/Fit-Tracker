@@ -21,7 +21,25 @@ async function populateExercises() {
         console.log(`📊 Exercícios existentes: ${existingCount[0].count}`);
 
         if (existingCount[0].count > 0) {
-            console.log('⚠️  A tabela já contém exercícios. Pulando população.');
+            console.log('⚠️  A tabela já contém exercícios. Atualizando muscle_group...');
+
+            // Atualizar os muscle_group para corresponder aos filtros
+            const updates = [
+                { old: 'Peitoral Superior', new: 'Peitoral' },
+                { old: 'Pernas (Quadríceps)', new: 'Pernas' },
+                { old: 'Costas / Posterior', new: 'Costas' },
+                { old: 'Dorsais', new: 'Costas' },
+                { old: 'Quadríceps', new: 'Pernas' },
+                { old: 'Bíceps / Antebraço', new: 'Bíceps' },
+                { old: 'Ombros (Lateral)', new: 'Ombros' }
+            ];
+
+            for (const update of updates) {
+                await sql`UPDATE exercises SET muscle_group = ${update.new} WHERE muscle_group = ${update.old}`;
+                console.log(`✅ Atualizado ${update.old} -> ${update.new}`);
+            }
+
+            console.log('🎉 Atualização concluída!');
             return;
         }
 

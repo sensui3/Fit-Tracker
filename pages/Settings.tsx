@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useUIStore } from '../stores/useUIStore';
 import { Theme } from '../types';
 import { useNavigate } from 'react-router-dom';
+import { GranularErrorBoundary } from '../components/GranularErrorBoundary';
 
 const Settings: React.FC = () => {
     const navigate = useNavigate();
@@ -48,142 +49,154 @@ const Settings: React.FC = () => {
         <div className="h-full flex flex-col bg-slate-50 dark:bg-background-dark overflow-hidden">
             <div id="settings-scroll-container" className="flex-1 overflow-y-auto scroll-smooth">
                 <div className="max-w-5xl mx-auto w-full">
-                    <div className="px-4 md:px-8 pt-8 pb-6 bg-slate-50 dark:bg-background-dark">
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Configurações</h1>
-                        <p className="text-slate-500 dark:text-text-secondary mt-1">Gerencie suas preferências e opções da conta.</p>
-                    </div>
+                    <GranularErrorBoundary name="SettingsHeader">
+                        <div className="px-4 md:px-8 pt-8 pb-6 bg-slate-50 dark:bg-background-dark">
+                            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Configurações</h1>
+                            <p className="text-slate-500 dark:text-text-secondary mt-1">Gerencie suas preferências e opções da conta.</p>
+                        </div>
+                    </GranularErrorBoundary>
 
-                    <div className="sticky top-0 z-30 bg-slate-50/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-slate-200 dark:border-border-dark px-4 md:px-8 py-3 mb-6">
-                        <nav className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
-                            {menuItems.map((item) => (
-                                <button
-                                    key={item.id}
-                                    onClick={() => scrollToSection(item.id)}
-                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${activeSection === item.id
-                                        ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-md shadow-green-600/20'
-                                        : 'bg-white dark:bg-surface-dark text-slate-600 dark:text-slate-400 border-slate-200 dark:border-border-dark hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
-                                        }`}
-                                >
-                                    <span className={`material-symbols-outlined text-[18px] ${activeSection === item.id ? 'filled' : ''}`}>{item.icon}</span>
-                                    {item.label}
-                                </button>
-                            ))}
-                        </nav>
-                    </div>
+                    <GranularErrorBoundary name="SettingsNavigation">
+                        <div className="sticky top-0 z-30 bg-slate-50/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-slate-200 dark:border-border-dark px-4 md:px-8 py-3 mb-6">
+                            <nav className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+                                {menuItems.map((item) => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => scrollToSection(item.id)}
+                                        className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${activeSection === item.id
+                                            ? 'bg-[#16a34a] text-white border-[#16a34a] shadow-md shadow-green-600/20'
+                                            : 'bg-white dark:bg-surface-dark text-slate-600 dark:text-slate-400 border-slate-200 dark:border-border-dark hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'
+                                            }`}
+                                    >
+                                        <span className={`material-symbols-outlined text-[18px] ${activeSection === item.id ? 'filled' : ''}`}>{item.icon}</span>
+                                        {item.label}
+                                    </button>
+                                ))}
+                            </nav>
+                        </div>
+                    </GranularErrorBoundary>
 
                     <div className="px-4 md:px-8 pb-32 space-y-12">
                         <section id="general" className="space-y-6 scroll-mt-32">
-                            <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
-                                <span className="material-symbols-outlined text-[#16a34a] text-2xl">settings</span>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Geral</h3>
-                            </div>
-                            <div className="grid gap-6">
-                                <div className="p-6 rounded-2xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                    <div>
-                                        <h4 className="font-semibold text-slate-900 dark:text-white mb-1">Tema da Interface</h4>
-                                        <p className="text-sm text-slate-500 dark:text-text-secondary">Selecione a aparência do aplicativo</p>
-                                    </div>
-                                    <div className="flex bg-slate-100 dark:bg-black/20 p-1.5 rounded-xl self-start sm:self-auto">
-                                        {[
-                                            { value: Theme.Light, icon: 'light_mode', label: 'Claro' },
-                                            { value: Theme.Dark, icon: 'dark_mode', label: 'Escuro' },
-                                            { value: Theme.System, icon: 'contrast', label: 'Sistema' },
-                                        ].map((option) => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() => setTheme(option.value)}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${theme === option.value
-                                                    ? 'bg-white dark:bg-[#1c271c] shadow-sm text-[#16a34a] dark:text-[#13ec13] ring-1 ring-black/5 dark:ring-white/5'
-                                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                                                    }`}
-                                            >
-                                                <span className={`material-symbols-outlined text-[18px] ${theme === option.value ? 'filled' : ''}`}>{option.icon}</span>
-                                                {option.label}
-                                            </button>
-                                        ))}
+                            <GranularErrorBoundary name="SettingsGeneral">
+                                <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
+                                    <span className="material-symbols-outlined text-[#16a34a] text-2xl">settings</span>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Geral</h3>
+                                </div>
+                                <div className="grid gap-6">
+                                    <div className="p-6 rounded-2xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div>
+                                            <h4 className="font-semibold text-slate-900 dark:text-white mb-1">Tema da Interface</h4>
+                                            <p className="text-sm text-slate-500 dark:text-text-secondary">Selecione a aparência do aplicativo</p>
+                                        </div>
+                                        <div className="flex bg-slate-100 dark:bg-black/20 p-1.5 rounded-xl self-start sm:self-auto">
+                                            {[
+                                                { value: Theme.Light, icon: 'light_mode', label: 'Claro' },
+                                                { value: Theme.Dark, icon: 'dark_mode', label: 'Escuro' },
+                                                { value: Theme.System, icon: 'contrast', label: 'Sistema' },
+                                            ].map((option) => (
+                                                <button
+                                                    key={option.value}
+                                                    onClick={() => setTheme(option.value)}
+                                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${theme === option.value
+                                                        ? 'bg-white dark:bg-[#1c271c] shadow-sm text-[#16a34a] dark:text-[#13ec13] ring-1 ring-black/5 dark:ring-white/5'
+                                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                                        }`}
+                                                >
+                                                    <span className={`material-symbols-outlined text-[18px] ${theme === option.value ? 'filled' : ''}`}>{option.icon}</span>
+                                                    {option.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </GranularErrorBoundary>
                         </section>
 
                         <section id="notifications" className="space-y-6 scroll-mt-32">
-                            <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
-                                <span className="material-symbols-outlined text-[#16a34a] text-2xl">notifications</span>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Notificações</h3>
-                            </div>
-                            <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl overflow-hidden divide-y divide-slate-100 dark:divide-border-dark shadow-sm">
-                                {[
-                                    { id: 'workoutReminders', icon: 'fitness_center', label: 'Lembretes de Treino', sub: 'Receba avisos para manter a rotina' },
-                                    { id: 'newsletter', icon: 'mail', label: 'Newsletter Semanal', sub: 'Resumo do seu progresso por email' },
-                                    { id: 'appSounds', icon: 'volume_up', label: 'Sons do App', sub: 'Efeitos sonoros durante o uso' },
-                                ].map((item) => (
-                                    <div key={item.id} className="p-6 flex items-center justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="text-slate-400 dark:text-slate-500">
-                                                <span className="material-symbols-outlined">{item.icon}</span>
+                            <GranularErrorBoundary name="SettingsNotifications">
+                                <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
+                                    <span className="material-symbols-outlined text-[#16a34a] text-2xl">notifications</span>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Notificações</h3>
+                                </div>
+                                <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl overflow-hidden divide-y divide-slate-100 dark:divide-border-dark shadow-sm">
+                                    {[
+                                        { id: 'workoutReminders', icon: 'fitness_center', label: 'Lembretes de Treino', sub: 'Receba avisos para manter a rotina' },
+                                        { id: 'newsletter', icon: 'mail', label: 'Newsletter Semanal', sub: 'Resumo do seu progresso por email' },
+                                        { id: 'appSounds', icon: 'volume_up', label: 'Sons do App', sub: 'Efeitos sonoros durante o uso' },
+                                    ].map((item) => (
+                                        <div key={item.id} className="p-6 flex items-center justify-between gap-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-slate-400 dark:text-slate-500">
+                                                    <span className="material-symbols-outlined">{item.icon}</span>
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-semibold text-slate-900 dark:text-white text-sm md:text-base">{item.label}</h4>
+                                                    <p className="text-sm text-slate-500 dark:text-text-secondary">{item.sub}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm md:text-base">{item.label}</h4>
-                                                <p className="text-sm text-slate-500 dark:text-text-secondary">{item.sub}</p>
-                                            </div>
+                                            <button
+                                                onClick={() => setNotifications(prev => ({ ...prev, [item.id]: !prev[item.id as keyof typeof notifications] }))}
+                                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${notifications[item.id as keyof typeof notifications] ? 'bg-[#16a34a] dark:bg-[#13ec13]' : 'bg-slate-200 dark:bg-gray-700'}`}
+                                            >
+                                                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${notifications[item.id as keyof typeof notifications] ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={() => setNotifications(prev => ({ ...prev, [item.id]: !prev[item.id as keyof typeof notifications] }))}
-                                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${notifications[item.id as keyof typeof notifications] ? 'bg-[#16a34a] dark:bg-[#13ec13]' : 'bg-slate-200 dark:bg-gray-700'}`}
-                                        >
-                                            <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${notifications[item.id as keyof typeof notifications] ? 'translate-x-5' : 'translate-x-0'}`} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            </GranularErrorBoundary>
                         </section>
 
                         <section id="privacy" className="space-y-6 scroll-mt-32">
-                            <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
-                                <span className="material-symbols-outlined text-[#16a34a] text-2xl">lock</span>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Privacidade & Dados</h3>
-                            </div>
-                            <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl p-6 shadow-sm">
-                                <div className="flex items-start justify-between gap-4 mb-6">
-                                    <div>
-                                        <h4 className="font-bold text-lg mb-1 flex items-center gap-2 text-slate-900 dark:text-white">
-                                            <span className="material-symbols-outlined text-purple-600 dark:text-purple-400">public</span>
-                                            Perfil Público
-                                        </h4>
-                                        <p className="text-sm text-slate-500 dark:text-text-secondary max-w-md leading-relaxed">
-                                            Ao ativar, outros usuários poderão ver seus treinos e recordes pessoais. Seu peso e notas privadas permanecem ocultos.
-                                        </p>
-                                    </div>
-                                    <button
-                                        onClick={() => setPublicProfile(!publicProfile)}
-                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none mt-2 ${publicProfile ? 'bg-[#16a34a] dark:bg-[#13ec13]' : 'bg-slate-200 dark:bg-gray-700'}`}
-                                    >
-                                        <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${publicProfile ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </button>
+                            <GranularErrorBoundary name="SettingsPrivacy">
+                                <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
+                                    <span className="material-symbols-outlined text-[#16a34a] text-2xl">lock</span>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Privacidade & Dados</h3>
                                 </div>
-                            </div>
+                                <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl p-6 shadow-sm">
+                                    <div className="flex items-start justify-between gap-4 mb-6">
+                                        <div>
+                                            <h4 className="font-bold text-lg mb-1 flex items-center gap-2 text-slate-900 dark:text-white">
+                                                <span className="material-symbols-outlined text-purple-600 dark:text-purple-400">public</span>
+                                                Perfil Público
+                                            </h4>
+                                            <p className="text-sm text-slate-500 dark:text-text-secondary max-w-md leading-relaxed">
+                                                Ao ativar, outros usuários poderão ver seus treinos e recordes pessoais. Seu peso e notas privadas permanecem ocultos.
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setPublicProfile(!publicProfile)}
+                                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none mt-2 ${publicProfile ? 'bg-[#16a34a] dark:bg-[#13ec13]' : 'bg-slate-200 dark:bg-gray-700'}`}
+                                        >
+                                            <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${publicProfile ? 'translate-x-5' : 'translate-x-0'}`} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </GranularErrorBoundary>
                         </section>
 
                         <section id="account" className="space-y-6 scroll-mt-32">
-                            <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
-                                <span className="material-symbols-outlined text-[#16a34a] text-2xl">person</span>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Conta</h3>
-                            </div>
-                            <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl p-6 shadow-sm">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="font-bold text-slate-900 dark:text-white text-lg">Plano Atual</h4>
-                                        <p className="text-slate-500 dark:text-text-secondary">FitTrack Basic (Gratuito)</p>
-                                    </div>
-                                    <button
-                                        onClick={() => navigate('/subscription')}
-                                        className="flex items-center gap-2 px-5 py-2.5 bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-[#102210] font-bold rounded-lg transition-colors text-sm shadow-md"
-                                    >
-                                        <span className="material-symbols-outlined text-[20px]">stars</span>
-                                        Gerenciar Assinatura
-                                    </button>
+                            <GranularErrorBoundary name="SettingsAccount">
+                                <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-border-dark">
+                                    <span className="material-symbols-outlined text-[#16a34a] text-2xl">person</span>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Conta</h3>
                                 </div>
-                            </div>
+                                <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-2xl p-6 shadow-sm">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h4 className="font-bold text-slate-900 dark:text-white text-lg">Plano Atual</h4>
+                                            <p className="text-slate-500 dark:text-text-secondary">FitTrack Basic (Gratuito)</p>
+                                        </div>
+                                        <button
+                                            onClick={() => navigate('/subscription')}
+                                            className="flex items-center gap-2 px-5 py-2.5 bg-[#16a34a] hover:bg-[#15803d] dark:bg-[#13ec13] dark:hover:bg-[#0fd60f] text-white dark:text-[#102210] font-bold rounded-lg transition-colors text-sm shadow-md"
+                                        >
+                                            <span className="material-symbols-outlined text-[20px]">stars</span>
+                                            Gerenciar Assinatura
+                                        </button>
+                                    </div>
+                                </div>
+                            </GranularErrorBoundary>
                         </section>
                     </div>
                 </div>
@@ -198,7 +211,7 @@ const Settings: React.FC = () => {
                     </button>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

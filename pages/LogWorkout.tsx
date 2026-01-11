@@ -10,6 +10,7 @@ import { WorkoutSetItem } from '../components/workout/WorkoutSetItem';
 import { ExerciseSuggestions } from '../components/workout/ExerciseSuggestions';
 import { useAuthStore } from '../stores/useAuthStore';
 import { dbService } from '../services/databaseService';
+import { GranularErrorBoundary } from '../components/GranularErrorBoundary';
 
 const LogWorkout: React.FC = () => {
   const navigate = useNavigate();
@@ -90,157 +91,161 @@ const LogWorkout: React.FC = () => {
     <>
       <div className="flex-1 flex justify-center py-8 px-4 md:px-6 lg:px-8">
         <div className="flex flex-col w-full max-w-6xl gap-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-[#16a34a] text-sm font-medium uppercase tracking-wider">
-                <span className="material-symbols-outlined text-lg">edit_calendar</span>
-                <span>Sessão Atual</span>
+          <GranularErrorBoundary name="LogWorkoutHeader">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-[#16a34a] text-sm font-medium uppercase tracking-wider">
+                  <span className="material-symbols-outlined text-lg">edit_calendar</span>
+                  <span>Sessão Atual</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+                  Novo Registro
+                </h1>
+                <p className="text-slate-500 dark:text-text-secondary text-lg max-w-xl">
+                  Detalhe seu desempenho. A consistência é a chave para o progresso.
+                </p>
               </div>
-              <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                Novo Registro
-              </h1>
-              <p className="text-slate-500 dark:text-text-secondary text-lg max-w-xl">
-                Detalhe seu desempenho. A consistência é a chave para o progresso.
-              </p>
             </div>
-          </div>
+          </GranularErrorBoundary>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 flex flex-col gap-6">
-              <Card>
-                <form className="flex flex-col gap-8" onSubmit={(e) => e.preventDefault()}>
-                  {/* Exercise Input com Autocomplete */}
-                  {/* Exercise Input com Autocomplete */}
-                  <div className="flex flex-col gap-2 relative" ref={dropdownRef}>
-                    {!selectedExercise ? (
-                      <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-                        <Input
-                          label="Exercício"
-                          placeholder="Ex: Supino Reto, Agachamento..."
-                          value={exerciseInput}
-                          onChange={(e) => handleInputChange(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (!showSuggestions || filteredExercises.length === 0) return;
-                            if (e.key === 'ArrowDown') {
-                              e.preventDefault();
-                              setHighlightedIndex(prev => (prev < filteredExercises.length - 1 ? prev + 1 : 0));
-                            } else if (e.key === 'ArrowUp') {
-                              e.preventDefault();
-                              setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredExercises.length - 1));
-                            } else if (e.key === 'Enter') {
-                              e.preventDefault();
-                              if (highlightedIndex >= 0) {
-                                handleSelectExercise(filteredExercises[highlightedIndex]);
+              <GranularErrorBoundary name="LogWorkoutForm">
+                <Card>
+                  <form className="flex flex-col gap-8" onSubmit={(e) => e.preventDefault()}>
+                    {/* Exercise Input com Autocomplete */}
+                    <div className="flex flex-col gap-2 relative" ref={dropdownRef}>
+                      {!selectedExercise ? (
+                        <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+                          <Input
+                            label="Exercício"
+                            placeholder="Ex: Supino Reto, Agachamento..."
+                            value={exerciseInput}
+                            onChange={(e) => handleInputChange(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (!showSuggestions || filteredExercises.length === 0) return;
+                              if (e.key === 'ArrowDown') {
+                                e.preventDefault();
+                                setHighlightedIndex(prev => (prev < filteredExercises.length - 1 ? prev + 1 : 0));
+                              } else if (e.key === 'ArrowUp') {
+                                e.preventDefault();
+                                setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredExercises.length - 1));
+                              } else if (e.key === 'Enter') {
+                                e.preventDefault();
+                                if (highlightedIndex >= 0) {
+                                  handleSelectExercise(filteredExercises[highlightedIndex]);
+                                }
+                              } else if (e.key === 'Escape') {
+                                setShowSuggestions(false);
                               }
-                            } else if (e.key === 'Escape') {
-                              setShowSuggestions(false);
-                            }
-                          }}
-                          onFocus={() => {
-                            if (exerciseInput) setShowSuggestions(true);
-                          }}
-                          leftIcon={<span className="material-symbols-outlined">search</span>}
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex flex-col gap-2 animate-in zoom-in-95 duration-300">
-                        <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide">Exercício Selecionado</label>
-                        <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-border-dark group transition-all hover:border-[#16a34a]/50">
-                          <OptimizedImage
-                            src={selectedExercise.image_url || selectedExercise.image}
-                            alt={selectedExercise.name}
-                            className="w-full h-full object-cover"
-                            containerClassName="size-16 rounded-xl shrink-0 bg-slate-200 dark:bg-white/10 shadow-sm"
+                            }}
+                            onFocus={() => {
+                              if (exerciseInput) setShowSuggestions(true);
+                            }}
+                            leftIcon={<span className="material-symbols-outlined">search</span>}
                           />
-                          <div className="flex flex-col flex-1">
-                            <h3 className="text-lg font-black text-slate-900 dark:text-white leading-tight">{selectedExercise.name}</h3>
-                            <p className="text-sm text-slate-500 dark:text-text-secondary font-medium">{selectedExercise.muscle_group || selectedExercise.muscle}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSelectExercise(null as any)}
-                            className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-2"
-                            title="Trocar exercício"
-                          >
-                            <span className="material-symbols-outlined">sync</span>
-                          </Button>
                         </div>
+                      ) : (
+                        <div className="flex flex-col gap-2 animate-in zoom-in-95 duration-300">
+                          <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide">Exercício Selecionado</label>
+                          <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-border-dark group transition-all hover:border-[#16a34a]/50">
+                            <OptimizedImage
+                              src={selectedExercise.image_url || selectedExercise.image}
+                              alt={selectedExercise.name}
+                              className="w-full h-full object-cover"
+                              containerClassName="size-16 rounded-xl shrink-0 bg-slate-200 dark:bg-white/10 shadow-sm"
+                            />
+                            <div className="flex flex-col flex-1">
+                              <h3 className="text-lg font-black text-slate-900 dark:text-white leading-tight">{selectedExercise.name}</h3>
+                              <p className="text-sm text-slate-500 dark:text-text-secondary font-medium">{selectedExercise.muscle_group || selectedExercise.muscle}</p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleSelectExercise(null as any)}
+                              className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-2"
+                              title="Trocar exercício"
+                            >
+                              <span className="material-symbols-outlined">sync</span>
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {showSuggestions && !selectedExercise && (
+                        <div className="absolute top-[calc(100%+8px)] left-0 w-full z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
+                          <ExerciseSuggestions
+                            exercises={filteredExercises}
+                            highlightedIndex={highlightedIndex}
+                            onSelect={handleSelectExercise}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Sets List (Dynamic) */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide">Séries</label>
+                        <span className="text-xs font-bold text-slate-500 dark:text-text-secondary bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">
+                          Total: {sets.length}
+                        </span>
                       </div>
-                    )}
 
-                    {/* Dropdown de Sugestões Memoizado */}
-                    {showSuggestions && !selectedExercise && (
-                      <div className="absolute top-[calc(100%+8px)] left-0 w-full z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
-                        <ExerciseSuggestions
-                          exercises={filteredExercises}
-                          highlightedIndex={highlightedIndex}
-                          onSelect={handleSelectExercise}
-                        />
+                      <div className="grid grid-cols-12 gap-3 px-2 text-[10px] font-black text-slate-400 dark:text-text-secondary uppercase tracking-widest mb-3">
+                        <div className="col-span-2 text-center">Set</div>
+                        <div className="col-span-3 text-center">Carga (kg)</div>
+                        <div className="col-span-3 text-center">Reps</div>
+                        <div className="col-span-4 text-center">Status</div>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Sets List (Dynamic) */}
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                      <label className="text-slate-900 dark:text-white text-sm font-bold uppercase tracking-wide">Séries</label>
-                      <span className="text-xs font-bold text-slate-500 dark:text-text-secondary bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">
-                        Total: {sets.length}
-                      </span>
+                      <div className="flex flex-col gap-3">
+                        {sets.map((set, index) => (
+                          <WorkoutSetItem
+                            key={set.id}
+                            set={set}
+                            index={index}
+                            onUpdate={updateSet}
+                            onRemove={handleRemoveSet}
+                          />
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={handleAddSet}
+                        className="w-full mt-2 py-3 rounded-xl border-2 border-dashed border-slate-200 dark:border-border-dark text-slate-500 dark:text-text-secondary hover:text-[#16a34a] hover:border-[#16a34a] hover:bg-slate-50 dark:hover:bg-white/5 transition-all font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 group"
+                      >
+                        <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add</span>
+                        Adicionar Série
+                      </button>
                     </div>
 
-                    <div className="grid grid-cols-12 gap-3 px-2 text-[10px] font-black text-slate-400 dark:text-text-secondary uppercase tracking-widest mb-3">
-                      <div className="col-span-2 text-center">Set</div>
-                      <div className="col-span-3 text-center">Carga (kg)</div>
-                      <div className="col-span-3 text-center">Reps</div>
-                      <div className="col-span-4 text-center">Status</div>
+                    <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-border-dark mt-2">
+                      <Button
+                        onClick={onSave}
+                        isLoading={isSaving}
+                        disabled={isSaving}
+                        leftIcon={!isSaving && <span className="material-symbols-outlined">check</span>}
+                      >
+                        Salvar Registro
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setShowDeleteModal(true)}
+                        className="ml-auto text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        Excluir
+                      </Button>
                     </div>
-
-                    <div className="flex flex-col gap-3">
-                      {sets.map((set, index) => (
-                        <WorkoutSetItem
-                          key={set.id}
-                          set={set}
-                          index={index}
-                          onUpdate={updateSet}
-                          onRemove={handleRemoveSet}
-                        />
-                      ))}
-                    </div>
-
-                    <button
-                      onClick={handleAddSet}
-                      className="w-full mt-2 py-3 rounded-xl border-2 border-dashed border-slate-200 dark:border-border-dark text-slate-500 dark:text-text-secondary hover:text-[#16a34a] hover:border-[#16a34a] hover:bg-slate-50 dark:hover:bg-white/5 transition-all font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 group"
-                    >
-                      <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add</span>
-                      Adicionar Série
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-border-dark mt-2">
-                    <Button
-                      onClick={onSave}
-                      isLoading={isSaving}
-                      disabled={isSaving}
-                      leftIcon={!isSaving && <span className="material-symbols-outlined">check</span>}
-                    >
-                      Salvar Registro
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={() => setShowDeleteModal(true)}
-                      className="ml-auto text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-                    >
-                      Excluir
-                    </Button>
-                  </div>
-                </form>
-              </Card>
+                  </form>
+                </Card>
+              </GranularErrorBoundary>
             </div>
 
             <div className="lg:col-span-4 flex flex-col gap-6">
-              <LastLogs navigate={navigate} />
+              <GranularErrorBoundary name="LogWorkoutRecentLogs">
+                <LastLogs navigate={navigate} />
+              </GranularErrorBoundary>
             </div>
           </div>
         </div>
@@ -365,4 +370,5 @@ const DeleteModal = memo(({ onClose, onConfirm }: { onClose: () => void, onConfi
     </div>
   </div>
 ));
+
 export default LogWorkout;

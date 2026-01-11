@@ -31,20 +31,21 @@ export const useExerciseFilters = () => {
     // Carregar exercícios do banco de dados
     useEffect(() => {
         const loadExercises = async () => {
-            if (!user?.id) return;
-
             try {
                 setLoading(true);
                 setError(null);
 
-                // Buscar exercícios padrão + exercícios customizados do usuário
-                const result = await dbService.query<Exercise>`
-                    SELECT id::text, name, muscle_group, equipment, difficulty, image_url, description, instructions, is_custom, user_id::text, created_at::text
-                    FROM exercises
-                    WHERE user_id IS NULL OR user_id = ${user.id}
-                    ORDER BY is_custom DESC, name ASC
-                `;
-
+                const result = user?.id
+                    ? await dbService.query<Exercise>`
+                        SELECT id::text, name, muscle_group, equipment, difficulty, image_url, description, instructions, is_custom, user_id::text, created_at::text
+                        FROM exercises
+                        WHERE user_id IS NULL OR user_id = ${user.id}
+                        ORDER BY is_custom DESC, name ASC`
+                    : await dbService.query<Exercise>`
+                        SELECT id::text, name, muscle_group, equipment, difficulty, image_url, description, instructions, is_custom, user_id::text, created_at::text
+                        FROM exercises
+                        WHERE user_id IS NULL
+                        ORDER BY name ASC`;
                 setExercises(result);
             } catch (err) {
                 console.error('Erro ao carregar exercícios:', err);

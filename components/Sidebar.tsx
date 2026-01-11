@@ -52,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onItemClick }) => {
           <span className="material-symbols-outlined font-bold text-2xl" aria-hidden="true">fitness_center</span>
         </div>
         <div className="flex flex-col">
-          <h1 className="text-xl font-bold tracking-tight leading-none text-slate-900 dark:text-white">FitTrack</h1>
+          <span className="text-xl font-bold tracking-tight leading-none text-slate-900 dark:text-white">FitTrack</span>
           <p className="text-xs text-slate-500 dark:text-text-secondaryDark font-medium mt-1">Pro Dashboard</p>
         </div>
       </div>

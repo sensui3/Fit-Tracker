@@ -3,6 +3,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { useGoalFilters, Goal, GoalTab, ViewMode } from '../hooks/useGoalFilters';
 import { dbService } from '../services/databaseService';
 import { useToast } from '../components/ui/Toast';
+import { GranularErrorBoundary } from '../components/GranularErrorBoundary';
 
 const Goals: React.FC = () => {
   const { user } = useAuthStore();
@@ -113,118 +114,126 @@ const Goals: React.FC = () => {
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto flex flex-col gap-8 pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Metas de Fitness</h1>
-          <p className="text-slate-500 dark:text-text-secondary text-lg">Defina limites e supere seus recordes pessoais.</p>
+      <GranularErrorBoundary name="GoalsHeader">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Metas de Fitness</h1>
+            <p className="text-slate-500 dark:text-text-secondary text-lg">Defina limites e supere seus recordes pessoais.</p>
+          </div>
+          <button
+            onClick={() => setShowAddGoalModal(true)}
+            className="flex items-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white px-5 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-green-600/20"
+          >
+            <span className="material-symbols-outlined">add_circle</span>
+            Nova Meta
+          </button>
         </div>
-        <button
-          onClick={() => setShowAddGoalModal(true)}
-          className="flex items-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white px-5 py-3 rounded-xl font-bold transition-colors shadow-lg shadow-green-600/20"
-        >
-          <span className="material-symbols-outlined">add_circle</span>
-          Nova Meta
-        </button>
-      </div>
+      </GranularErrorBoundary>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, idx) => (
-          <div key={idx} className="bg-white dark:bg-surface-dark rounded-xl p-6 border border-slate-200 dark:border-border-dark shadow-sm flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.label}</span>
-              <span className="material-symbols-outlined text-[#16a34a]">{stat.icon}</span>
+      <GranularErrorBoundary name="GoalsKPIs">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((stat, idx) => (
+            <div key={idx} className="bg-white dark:bg-surface-dark rounded-xl p-6 border border-slate-200 dark:border-border-dark shadow-sm flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.label}</span>
+                <span className="material-symbols-outlined text-[#16a34a]">{stat.icon}</span>
+              </div>
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-bold text-slate-900 dark:text-white">{stat.value}</span>
+                {stat.badge && parseInt(stat.value) > 0 ? (
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full mb-1 ${stat.badgeColor}`}>{stat.badge}</span>
+                ) : (
+                  <span className={`text-sm font-medium mb-1 ${stat.subColor}`}>{stat.sub}</span>
+                )}
+              </div>
             </div>
-            <div className="flex items-end gap-2">
-              <span className="text-3xl font-bold text-slate-900 dark:text-white">{stat.value}</span>
-              {stat.badge && parseInt(stat.value) > 0 ? (
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-full mb-1 ${stat.badgeColor}`}>{stat.badge}</span>
-              ) : (
-                <span className={`text-sm font-medium mb-1 ${stat.subColor}`}>{stat.sub}</span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </GranularErrorBoundary>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Weekly Consistency Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-surface-dark rounded-xl p-6 border border-slate-200 dark:border-border-dark shadow-sm">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Consistência Semanal</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Comece a treinar para ver sua consistência.</p>
-            </div>
-            <div className="flex items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400">
-              <div className="flex items-center gap-1">
-                <div className="size-2 rounded-full bg-[#16a34a]"></div>
-                Realizado
+        <GranularErrorBoundary name="GoalsWeeklyConsistency">
+          <div className="lg:col-span-2 bg-white dark:bg-surface-dark rounded-xl p-6 border border-slate-200 dark:border-border-dark shadow-sm">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Consistência Semanal</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Comece a treinar para ver sua consistência.</p>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="size-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
-                Meta
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-end justify-between h-48 gap-2 sm:gap-4">
-            {weeklyConsistency.map((day, idx) => (
-              <div key={idx} className="flex flex-col items-center flex-1 gap-2 group cursor-pointer h-full justify-end">
-                <div className="relative w-full max-w-[40px] h-full rounded-t-sm bg-slate-100 dark:bg-white/5 overflow-hidden">
-                  <div
-                    className="absolute bottom-0 w-full rounded-t-sm transition-all duration-500 bg-[#16a34a]"
-                    style={{ height: `${day.val}%` }}
-                  ></div>
+              <div className="flex items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-1">
+                  <div className="size-2 rounded-full bg-[#16a34a]"></div>
+                  Realizado
                 </div>
-                <span className="text-xs font-medium text-slate-400">
-                  {day.day}
-                </span>
+                <div className="flex items-center gap-1">
+                  <div className="size-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                  Meta
+                </div>
               </div>
-            ))}
+            </div>
+
+            <div className="flex items-end justify-between h-48 gap-2 sm:gap-4">
+              {weeklyConsistency.map((day, idx) => (
+                <div key={idx} className="flex flex-col items-center flex-1 gap-2 group cursor-pointer h-full justify-end">
+                  <div className="relative w-full max-w-[40px] h-full rounded-t-sm bg-slate-100 dark:bg-white/5 overflow-hidden">
+                    <div
+                      className="absolute bottom-0 w-full rounded-t-sm transition-all duration-500 bg-[#16a34a]"
+                      style={{ height: `${day.val}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-xs font-medium text-slate-400">
+                    {day.day}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </GranularErrorBoundary>
 
         {/* Featured Goal Card */}
-        <div className="lg:col-span-1 relative overflow-hidden rounded-xl bg-[#102210] p-6 shadow-lg flex flex-col group">
-          <div className="absolute -top-10 -right-10 size-64 bg-[#16a34a]/20 rounded-full blur-3xl pointer-events-none"></div>
+        <GranularErrorBoundary name="GoalsFeaturedGoal">
+          <div className="lg:col-span-1 relative overflow-hidden rounded-xl bg-[#102210] p-6 shadow-lg flex flex-col group">
+            <div className="absolute -top-10 -right-10 size-64 bg-[#16a34a]/20 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="relative z-10 flex justify-between items-start mb-6">
-            <div>
-              <span className="inline-block bg-[#16a34a] text-[#102210] text-xs font-bold px-2 py-1 rounded mb-2">
-                Foco Principal
-              </span>
-              <h3 className="text-white text-xl font-bold truncate pr-2">{featuredGoal?.title || 'Sem Metas'}</h3>
+            <div className="relative z-10 flex justify-between items-start mb-6">
+              <div>
+                <span className="inline-block bg-[#16a34a] text-[#102210] text-xs font-bold px-2 py-1 rounded mb-2">
+                  Foco Principal
+                </span>
+                <h3 className="text-white text-xl font-bold truncate pr-2">{featuredGoal?.title || 'Sem Metas'}</h3>
+              </div>
+              <div className="bg-white/10 p-2 rounded-lg backdrop-blur-sm text-[#16a34a]">
+                <span className="material-symbols-outlined">{featuredGoal?.icon || 'flag'}</span>
+              </div>
             </div>
-            <div className="bg-white/10 p-2 rounded-lg backdrop-blur-sm text-[#16a34a]">
-              <span className="material-symbols-outlined">{featuredGoal?.icon || 'flag'}</span>
+
+            <div className="relative z-10 flex-1 flex flex-col justify-center mb-6">
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-bold text-white">{featuredGoal?.current || 0}</span>
+                <span className="text-slate-400 text-lg">/ {featuredGoal?.target || 0} {featuredGoal?.unit}</span>
+              </div>
+              <p className="text-slate-400 text-sm">Progresso atual</p>
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
+                <span>Progresso</span>
+                <span>{featuredGoal?.progress ? Math.round(featuredGoal.progress) : 0}%</span>
+              </div>
+              <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#16a34a] rounded-full shadow-[0_0_10px_rgba(22,163,74,0.5)] transition-all duration-1000"
+                  style={{ width: `${featuredGoal?.progress || 0}%` }}
+                ></div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm text-slate-300">
+                <span className="material-symbols-outlined text-[#16a34a] text-base">event</span>
+                <span>{featuredGoal?.statusText || 'Defina sua meta'}</span>
+              </div>
             </div>
           </div>
-
-          <div className="relative z-10 flex-1 flex flex-col justify-center mb-6">
-            <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-4xl font-bold text-white">{featuredGoal?.current || 0}</span>
-              <span className="text-slate-400 text-lg">/ {featuredGoal?.target || 0} {featuredGoal?.unit}</span>
-            </div>
-            <p className="text-slate-400 text-sm">Progresso atual</p>
-          </div>
-
-          <div className="relative z-10">
-            <div className="flex justify-between text-xs font-medium text-slate-400 mb-2">
-              <span>Progresso</span>
-              <span>{featuredGoal?.progress ? Math.round(featuredGoal.progress) : 0}%</span>
-            </div>
-            <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#16a34a] rounded-full shadow-[0_0_10px_rgba(22,163,74,0.5)] transition-all duration-1000"
-                style={{ width: `${featuredGoal?.progress || 0}%` }}
-              ></div>
-            </div>
-            <div className="mt-4 flex items-center gap-2 text-sm text-slate-300">
-              <span className="material-symbols-outlined text-[#16a34a] text-base">event</span>
-              <span>{featuredGoal?.statusText || 'Defina sua meta'}</span>
-            </div>
-          </div>
-        </div>
+        </GranularErrorBoundary>
       </div>
 
       {/* Filter Tabs */}
@@ -274,107 +283,109 @@ const Goals: React.FC = () => {
       </div>
 
       {/* Goals Content */}
-      <div className={`
-        ${viewMode === 'grid'
-          ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-          : 'flex flex-col gap-4'
-        }
-      `}>
-        {filteredGoals.length > 0 ? (
-          filteredGoals.map((goal) => (
-            <div
-              key={goal.id}
-              className={`
-                group bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm hover:shadow-md transition-all
-                ${viewMode === 'grid'
-                  ? 'flex flex-col rounded-xl p-5 relative'
-                  : 'flex flex-col md:flex-row items-center gap-6 p-4 rounded-2xl relative overflow-hidden'
-                }
-              `}
-            >
-              {viewMode === 'list' && (
-                <div className="absolute left-0 top-0 w-1.5 h-full bg-[#16a34a]"></div>
-              )}
+      <GranularErrorBoundary name="GoalsList">
+        <div className={`
+          ${viewMode === 'grid'
+            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+            : 'flex flex-col gap-4'
+          }
+        `}>
+          {filteredGoals.length > 0 ? (
+            filteredGoals.map((goal) => (
+              <div
+                key={goal.id}
+                className={`
+                  group bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm hover:shadow-md transition-all
+                  ${viewMode === 'grid'
+                    ? 'flex flex-col rounded-xl p-5 relative'
+                    : 'flex flex-col md:flex-row items-center gap-6 p-4 rounded-2xl relative overflow-hidden'
+                  }
+                `}
+              >
+                {viewMode === 'list' && (
+                  <div className="absolute left-0 top-0 w-1.5 h-full bg-[#16a34a]"></div>
+                )}
 
-              <div className={`flex items-center gap-4 ${viewMode === 'list' ? 'flex-1 md:min-w-[200px]' : 'mb-4'}`}>
-                <div className="size-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-300 shrink-0">
-                  <span className="material-symbols-outlined text-2xl">{goal.icon}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-slate-900 dark:text-white text-lg truncate">{goal.title}</h4>
+                <div className={`flex items-center gap-4 ${viewMode === 'list' ? 'flex-1 md:min-w-[200px]' : 'mb-4'}`}>
+                  <div className="size-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-300 shrink-0">
+                    <span className="material-symbols-outlined text-2xl">{goal.icon}</span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-text-secondary font-medium tracking-wide uppercase">{goal.category}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-lg truncate">{goal.title}</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-text-secondary font-medium tracking-wide uppercase">{goal.category}</p>
+                  </div>
+                </div>
+
+                <div className={`flex flex-col gap-2 ${viewMode === 'list' ? 'flex-[2]' : 'mb-3'}`}>
+                  <div className="flex items-end justify-between text-sm mb-1">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-slate-900 dark:text-white">{goal.current}</span>
+                      <span className="text-slate-500 font-bold">{goal.unit}</span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
+                      Meta: {goal.target}{goal.unit}
+                    </div>
+                  </div>
+                  <div className={`h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden ${goal.reverse ? 'flex justify-end' : ''}`}>
+                    <div
+                      className="h-full bg-[#16a34a] rounded-full relative overflow-hidden transition-all duration-1000"
+                      style={{ width: `${goal.progress}%` }}
+                    >
+                      {goal.shimmer && (
+                        <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`
+                  ${viewMode === 'grid'
+                    ? 'pt-4 border-t border-slate-100 dark:border-border-dark flex items-center justify-between'
+                    : 'flex flex-row md:flex-col lg:flex-row items-center gap-4 md:items-end lg:items-center justify-between'
+                  }
+                `}>
+                  <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium text-xs">
+                    <span className="material-symbols-outlined text-base text-[#16a34a]">{goal.statusIcon}</span>
+                    <span>{goal.statusText}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs font-bold px-2 py-1 rounded-lg bg-opacity-10 ${goal.trendColor} ${goal.trendColor.replace('text-', 'bg-')}`}>
+                      {goal.trend}
+                    </span>
+                  </div>
                 </div>
               </div>
-
-              <div className={`flex flex-col gap-2 ${viewMode === 'list' ? 'flex-[2]' : 'mb-3'}`}>
-                <div className="flex items-end justify-between text-sm mb-1">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-slate-900 dark:text-white">{goal.current}</span>
-                    <span className="text-slate-500 font-bold">{goal.unit}</span>
-                  </div>
-                  <div className="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
-                    Meta: {goal.target}{goal.unit}
-                  </div>
-                </div>
-                <div className={`h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden ${goal.reverse ? 'flex justify-end' : ''}`}>
-                  <div
-                    className="h-full bg-[#16a34a] rounded-full relative overflow-hidden transition-all duration-1000"
-                    style={{ width: `${goal.progress}%` }}
-                  >
-                    {goal.shimmer && (
-                      <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
-                    )}
-                  </div>
-                </div>
+            ))
+          ) : !loading && (
+            <div className="col-span-full py-12 flex flex-col items-center justify-center text-center bg-slate-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10">
+              <div className="size-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center text-slate-400 mb-4">
+                <span className="material-symbols-outlined text-4xl">flag</span>
               </div>
-
-              <div className={`
-                ${viewMode === 'grid'
-                  ? 'pt-4 border-t border-slate-100 dark:border-border-dark flex items-center justify-between'
-                  : 'flex flex-row md:flex-col lg:flex-row items-center gap-4 md:items-end lg:items-center justify-between'
-                }
-              `}>
-                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium text-xs">
-                  <span className="material-symbols-outlined text-base text-[#16a34a]">{goal.statusIcon}</span>
-                  <span>{goal.statusText}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs font-bold px-2 py-1 rounded-lg bg-opacity-10 ${goal.trendColor} ${goal.trendColor.replace('text-', 'bg-')}`}>
-                    {goal.trend}
-                  </span>
-                </div>
-              </div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Nenhuma meta encontrada</h3>
+              <p className="text-slate-500 dark:text-slate-400 max-w-xs mt-1">Você ainda não definiu nenhuma meta. Comece definindo seu primeiro objetivo!</p>
             </div>
-          ))
-        ) : !loading && (
-          <div className="col-span-full py-12 flex flex-col items-center justify-center text-center bg-slate-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10">
-            <div className="size-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center text-slate-400 mb-4">
-              <span className="material-symbols-outlined text-4xl">flag</span>
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Nenhuma meta encontrada</h3>
-            <p className="text-slate-500 dark:text-slate-400 max-w-xs mt-1">Você ainda não definiu nenhuma meta. Comece definindo seu primeiro objetivo!</p>
-          </div>
-        )}
+          )}
 
-        {/* Add New Goal Card */}
-        <button
-          onClick={() => setShowAddGoalModal(true)}
-          className={`
-            group flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-border-dark transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:border-[#16a34a]
-            ${viewMode === 'grid'
-              ? 'flex-col gap-4 rounded-2xl min-h-[220px]'
-              : 'flex-row gap-6 p-6 rounded-2xl min-h-[80px]'
-            }
-          `}
-        >
-          <div className="size-12 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-[#16a34a] group-hover:text-white transition-all transform group-hover:scale-110">
-            <span className="material-symbols-outlined text-2xl">add</span>
-          </div>
-          <p className="font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-lg">Adicionar Nova Meta</p>
-        </button>
-      </div>
+          {/* Add New Goal Card */}
+          <button
+            onClick={() => setShowAddGoalModal(true)}
+            className={`
+              group flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-border-dark transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:border-[#16a34a]
+              ${viewMode === 'grid'
+                ? 'flex-col gap-4 rounded-2xl min-h-[220px]'
+                : 'flex-row gap-6 p-6 rounded-2xl min-h-[80px]'
+              }
+            `}
+          >
+            <div className="size-12 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-[#16a34a] group-hover:text-white transition-all transform group-hover:scale-110">
+              <span className="material-symbols-outlined text-2xl">add</span>
+            </div>
+            <p className="font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-lg">Adicionar Nova Meta</p>
+          </button>
+        </div>
+      </GranularErrorBoundary>
 
       {/* Add Goal Modal */}
       {showAddGoalModal && (
