@@ -50,6 +50,7 @@ export const dbService = {
         // Como o Better Auth chama isso, precisamos de algo robusto.
         const sql = getSql();
         if (!sql) throw new Error('No database connection string provided');
+        const params = paramsOrEnv;
         const timeoutMs = 15000; // 15 seconds timeout
 
         try {
