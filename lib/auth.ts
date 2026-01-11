@@ -1,12 +1,21 @@
 import { betterAuth } from "better-auth";
 import { dbService, getSql } from "../services/databaseService";
 
-export const getAuth = (env?: any) => {
+export const getAuth = (env?: any, request?: Request) => {
     // No Cloudflare, as variáveis estão em env. No Node/Vite, em process.env ou import.meta.env
-    const betterAuthUrl = env?.BETTER_AUTH_URL || env?.VITE_BETTER_AUTH_URL ||
+    let betterAuthUrl = env?.BETTER_AUTH_URL || env?.VITE_BETTER_AUTH_URL ||
         process.env.BETTER_AUTH_URL || process.env.VITE_BETTER_AUTH_URL ||
-        (import.meta.env ? import.meta.env.VITE_BETTER_AUTH_URL : undefined) ||
-        "/api/auth";
+        (import.meta.env ? import.meta.env.VITE_BETTER_AUTH_URL : undefined);
+
+    // Se estivermos na Cloudflare e tivermos o request, podemos descobrir o baseURL dinamicamente
+    // Isso evita erros de 405 por conflito de domínios (Staging vs Prod)
+    if (!betterAuthUrl && request) {
+        const url = new URL(request.url);
+        betterAuthUrl = `${url.origin}/api/auth`;
+    }
+
+    // Fallback final
+    if (!betterAuthUrl) betterAuthUrl = "/api/auth";
 
     const secret = env?.BETTER_AUTH_SECRET || env?.VITE_BETTER_AUTH_SECRET ||
         process.env.BETTER_AUTH_SECRET || process.env.VITE_BETTER_AUTH_SECRET ||
