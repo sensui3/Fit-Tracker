@@ -8,24 +8,32 @@ import { logDomainError } from '../lib/logrocket';
 
 let sqlInstance: any = null;
 
-const getSql = () => {
-    if (sqlInstance) return sqlInstance;
+export const getSql = (env?: any) => {
+    if (sqlInstance && !env) return sqlInstance;
 
     // Tenta pegar de várias fontes conforme o ambiente (Node, Vite, Cloudflare)
     const connectionString =
-        (typeof process !== 'undefined' ? process.env.DATABASE_URL : undefined) ||
+        env?.DATABASE_URL ||
+        env?.VITE_DATABASE_URL ||
+        (typeof process !== 'undefined' ? (process.env.DATABASE_URL || process.env.VITE_DATABASE_URL) : undefined) ||
         (typeof globalThis !== 'undefined' && (globalThis as any).process?.env?.DATABASE_URL) ||
         (import.meta.env ? import.meta.env.VITE_DATABASE_URL : undefined) ||
         '';
 
     if (!connectionString) {
         if (typeof window === 'undefined') {
-            console.error('❌ DATABASE_URL não encontrada. Certifique-se de configurar o arquivo .env.local');
+            console.error('❌ DATABASE_URL não encontrada. Certifique-se de configurar o arquivo .env.local ou as variáveis na Cloudflare.');
         }
-        throw new Error('No database connection string provided');
+        // Se estivermos em um ambiente que requer DB mas não temos a URL, retornamos nulo 
+        // em vez de estourar erro imediatamente, ou deixamos estourar se for essencial.
+        return null;
     }
 
+    // Se a instância já existe e a connection string é a mesma, reutiliza
+    if (sqlInstance && sqlInstance.connectionString === connectionString) return sqlInstance;
+
     sqlInstance = neon(connectionString, { disableWarningInBrowsers: true });
+    (sqlInstance as any).connectionString = connectionString; // Mark to detect changes
     return sqlInstance;
 };
 
@@ -36,8 +44,12 @@ export const dbService = {
     /**
      * DataService para Neon
      */
-    async query<T = any>(strings: string | TemplateStringsArray, ...params: any[]): Promise<T[]> {
+    async query<T = any>(strings: string | TemplateStringsArray, ...paramsOrEnv: any[]): Promise<T[]> {
+        // Tenta extrair o env se ele for o último parâmetro e for um objeto especial,
+        // mas para simplificar, vamos apenas permitir passar o env como argumento se necessário.
+        // Como o Better Auth chama isso, precisamos de algo robusto.
         const sql = getSql();
+        if (!sql) throw new Error('No database connection string provided');
         const timeoutMs = 15000; // 15 seconds timeout
 
         try {

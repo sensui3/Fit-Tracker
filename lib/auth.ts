@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth";
-import { dbService } from "../services/databaseService";
+import { dbService, getSql } from "../services/databaseService";
 
 export const getAuth = (env?: any) => {
     // No Cloudflare, as variáveis estão em env. No Node/Vite, em process.env ou import.meta.env
@@ -17,6 +17,10 @@ export const getAuth = (env?: any) => {
         database: {
             db: {
                 execute: async (sql: string, params?: any[]) => {
+                    // Garantimos que o dbService use o env correto
+                    // Como não podemos passar o env diretamente para o query sem mudar a assinatura,
+                    // vamos pré-inicializar o SQL instance
+                    getSql(env);
                     const rows = await dbService.query(sql, ...(params || []));
                     return { rows };
                 },
