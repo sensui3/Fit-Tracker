@@ -1,5 +1,6 @@
-import { auth } from "../../../lib/auth";
+import { getAuth } from "../../../lib/auth";
 
-export const onRequest = async ({ request }: { request: Request }) => {
-    return auth.handler(request);
+export const onRequest = async (context: any) => {
+    const authInstance = getAuth(context.env);
+    return authInstance.handler(context.request);
 };
