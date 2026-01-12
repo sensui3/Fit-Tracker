@@ -7,14 +7,15 @@ export const getAuth = (env?: any, request?: Request) => {
         process.env.BETTER_AUTH_URL || process.env.VITE_BETTER_AUTH_URL ||
         (import.meta.env ? import.meta.env.VITE_BETTER_AUTH_URL : undefined);
 
-    // Se estivermos na Cloudflare e tivermos o request, podemos descobrir o baseURL dinamicamente
-    // Isso evita erros de 405 por conflito de domínios (Staging vs Prod)
-    if (!betterAuthUrl && request) {
+    // Prioridade Máxima: Se temos o request, usamos o origin dele.
+    // Isso é o ÚNICO jeito de garantir que o baseURL bata com o domínio (Staging vs Prod)
+    // e evite o erro 405.
+    if (request) {
         const url = new URL(request.url);
         betterAuthUrl = `${url.origin}/api/auth`;
     }
 
-    // Fallback final
+    // Fallback se nada foi encontrado
     if (!betterAuthUrl) betterAuthUrl = "/api/auth";
 
     const secret = env?.BETTER_AUTH_SECRET || env?.VITE_BETTER_AUTH_SECRET ||
